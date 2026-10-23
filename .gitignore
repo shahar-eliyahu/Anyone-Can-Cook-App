@@ -1,0 +1,33 @@
+# --- Secrets: never commit ---
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+*.pem
+*.key
+*.p12
+*.jks
+*.keystore
+key.properties
+service-account*.json
+
+# --- Claude Code personal settings ---
+.claude/settings.local.json
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Editors / OS ---
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
