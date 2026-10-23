@@ -3,7 +3,7 @@
 part of 'database.dart';
 
 // ignore_for_file: type=lint
-class $RecipesTable extends Recipes with TableInfo<$RecipesTable, Recipe> {
+class $RecipesTable extends Recipes with TableInfo<$RecipesTable, RecipeRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -201,7 +201,7 @@ class $RecipesTable extends Recipes with TableInfo<$RecipesTable, Recipe> {
   static const String $name = 'recipes';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Recipe> instance, {
+    Insertable<RecipeRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -321,9 +321,9 @@ class $RecipesTable extends Recipes with TableInfo<$RecipesTable, Recipe> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Recipe map(Map<String, dynamic> data, {String? tablePrefix}) {
+  RecipeRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Recipe(
+    return RecipeRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -393,7 +393,7 @@ class $RecipesTable extends Recipes with TableInfo<$RecipesTable, Recipe> {
   }
 }
 
-class Recipe extends DataClass implements Insertable<Recipe> {
+class RecipeRow extends DataClass implements Insertable<RecipeRow> {
   final String id;
   final String? ownerId;
   final DateTime createdAt;
@@ -409,7 +409,7 @@ class Recipe extends DataClass implements Insertable<Recipe> {
   final String? analysisJson;
   final int? analysisSchemaVersion;
   final bool planStale;
-  const Recipe({
+  const RecipeRow({
     required this.id,
     this.ownerId,
     required this.createdAt,
@@ -499,12 +499,12 @@ class Recipe extends DataClass implements Insertable<Recipe> {
     );
   }
 
-  factory Recipe.fromJson(
+  factory RecipeRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Recipe(
+    return RecipeRow(
       id: serializer.fromJson<String>(json['id']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -546,7 +546,7 @@ class Recipe extends DataClass implements Insertable<Recipe> {
     };
   }
 
-  Recipe copyWith({
+  RecipeRow copyWith({
     String? id,
     Value<String?> ownerId = const Value.absent(),
     DateTime? createdAt,
@@ -562,7 +562,7 @@ class Recipe extends DataClass implements Insertable<Recipe> {
     Value<String?> analysisJson = const Value.absent(),
     Value<int?> analysisSchemaVersion = const Value.absent(),
     bool? planStale,
-  }) => Recipe(
+  }) => RecipeRow(
     id: id ?? this.id,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
     createdAt: createdAt ?? this.createdAt,
@@ -583,8 +583,8 @@ class Recipe extends DataClass implements Insertable<Recipe> {
         : this.analysisSchemaVersion,
     planStale: planStale ?? this.planStale,
   );
-  Recipe copyWithCompanion(RecipesCompanion data) {
-    return Recipe(
+  RecipeRow copyWithCompanion(RecipesCompanion data) {
+    return RecipeRow(
       id: data.id.present ? data.id.value : this.id,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -619,7 +619,7 @@ class Recipe extends DataClass implements Insertable<Recipe> {
 
   @override
   String toString() {
-    return (StringBuffer('Recipe(')
+    return (StringBuffer('RecipeRow(')
           ..write('id: $id, ')
           ..write('ownerId: $ownerId, ')
           ..write('createdAt: $createdAt, ')
@@ -660,7 +660,7 @@ class Recipe extends DataClass implements Insertable<Recipe> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Recipe &&
+      (other is RecipeRow &&
           other.id == this.id &&
           other.ownerId == this.ownerId &&
           other.createdAt == this.createdAt &&
@@ -678,7 +678,7 @@ class Recipe extends DataClass implements Insertable<Recipe> {
           other.planStale == this.planStale);
 }
 
-class RecipesCompanion extends UpdateCompanion<Recipe> {
+class RecipesCompanion extends UpdateCompanion<RecipeRow> {
   final Value<String> id;
   final Value<String?> ownerId;
   final Value<DateTime> createdAt;
@@ -735,7 +735,7 @@ class RecipesCompanion extends UpdateCompanion<Recipe> {
        updatedAt = Value(updatedAt),
        title = Value(title),
        sourceType = Value(sourceType);
-  static Insertable<Recipe> custom({
+  static Insertable<RecipeRow> custom({
     Expression<String>? id,
     Expression<String>? ownerId,
     Expression<DateTime>? createdAt,
@@ -893,7 +893,7 @@ class RecipesCompanion extends UpdateCompanion<Recipe> {
   }
 }
 
-class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
+class $PlansTable extends Plans with TableInfo<$PlansTable, PlanRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1039,7 +1039,7 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
   static const String $name = 'plans';
   @override
   VerificationContext validateIntegrity(
-    Insertable<Plan> instance, {
+    Insertable<PlanRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1133,9 +1133,9 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  Plan map(Map<String, dynamic> data, {String? tablePrefix}) {
+  PlanRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Plan(
+    return PlanRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -1189,7 +1189,7 @@ class $PlansTable extends Plans with TableInfo<$PlansTable, Plan> {
   }
 }
 
-class Plan extends DataClass implements Insertable<Plan> {
+class PlanRow extends DataClass implements Insertable<PlanRow> {
   final String id;
   final String? ownerId;
   final DateTime createdAt;
@@ -1201,7 +1201,7 @@ class Plan extends DataClass implements Insertable<Plan> {
   final String status;
   final DateTime? approvedAt;
   final String? basedOnPlanId;
-  const Plan({
+  const PlanRow({
     required this.id,
     this.ownerId,
     required this.createdAt,
@@ -1263,12 +1263,12 @@ class Plan extends DataClass implements Insertable<Plan> {
     );
   }
 
-  factory Plan.fromJson(
+  factory PlanRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Plan(
+    return PlanRow(
       id: serializer.fromJson<String>(json['id']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1300,7 +1300,7 @@ class Plan extends DataClass implements Insertable<Plan> {
     };
   }
 
-  Plan copyWith({
+  PlanRow copyWith({
     String? id,
     Value<String?> ownerId = const Value.absent(),
     DateTime? createdAt,
@@ -1312,7 +1312,7 @@ class Plan extends DataClass implements Insertable<Plan> {
     String? status,
     Value<DateTime?> approvedAt = const Value.absent(),
     Value<String?> basedOnPlanId = const Value.absent(),
-  }) => Plan(
+  }) => PlanRow(
     id: id ?? this.id,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
     createdAt: createdAt ?? this.createdAt,
@@ -1327,8 +1327,8 @@ class Plan extends DataClass implements Insertable<Plan> {
         ? basedOnPlanId.value
         : this.basedOnPlanId,
   );
-  Plan copyWithCompanion(PlansCompanion data) {
-    return Plan(
+  PlanRow copyWithCompanion(PlansCompanion data) {
+    return PlanRow(
       id: data.id.present ? data.id.value : this.id,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -1351,7 +1351,7 @@ class Plan extends DataClass implements Insertable<Plan> {
 
   @override
   String toString() {
-    return (StringBuffer('Plan(')
+    return (StringBuffer('PlanRow(')
           ..write('id: $id, ')
           ..write('ownerId: $ownerId, ')
           ..write('createdAt: $createdAt, ')
@@ -1384,7 +1384,7 @@ class Plan extends DataClass implements Insertable<Plan> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is Plan &&
+      (other is PlanRow &&
           other.id == this.id &&
           other.ownerId == this.ownerId &&
           other.createdAt == this.createdAt &&
@@ -1398,7 +1398,7 @@ class Plan extends DataClass implements Insertable<Plan> {
           other.basedOnPlanId == this.basedOnPlanId);
 }
 
-class PlansCompanion extends UpdateCompanion<Plan> {
+class PlansCompanion extends UpdateCompanion<PlanRow> {
   final Value<String> id;
   final Value<String?> ownerId;
   final Value<DateTime> createdAt;
@@ -1445,7 +1445,7 @@ class PlansCompanion extends UpdateCompanion<Plan> {
        planJson = Value(planJson),
        planSchemaVersion = Value(planSchemaVersion),
        status = Value(status);
-  static Insertable<Plan> custom({
+  static Insertable<PlanRow> custom({
     Expression<String>? id,
     Expression<String>? ownerId,
     Expression<DateTime>? createdAt,
@@ -1568,7 +1568,7 @@ class PlansCompanion extends UpdateCompanion<Plan> {
 }
 
 class $CookingSessionsTable extends CookingSessions
-    with TableInfo<$CookingSessionsTable, CookingSession> {
+    with TableInfo<$CookingSessionsTable, SessionRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -1713,7 +1713,7 @@ class $CookingSessionsTable extends CookingSessions
   static const String $name = 'cooking_sessions';
   @override
   VerificationContext validateIntegrity(
-    Insertable<CookingSession> instance, {
+    Insertable<SessionRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -1801,9 +1801,9 @@ class $CookingSessionsTable extends CookingSessions
   @override
   Set<GeneratedColumn> get $primaryKey => {id};
   @override
-  CookingSession map(Map<String, dynamic> data, {String? tablePrefix}) {
+  SessionRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return CookingSession(
+    return SessionRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -1857,7 +1857,7 @@ class $CookingSessionsTable extends CookingSessions
   }
 }
 
-class CookingSession extends DataClass implements Insertable<CookingSession> {
+class SessionRow extends DataClass implements Insertable<SessionRow> {
   final String id;
   final String? ownerId;
   final DateTime createdAt;
@@ -1869,7 +1869,7 @@ class CookingSession extends DataClass implements Insertable<CookingSession> {
   final DateTime startedAt;
   final DateTime? endedAt;
   final String? notes;
-  const CookingSession({
+  const SessionRow({
     required this.id,
     this.ownerId,
     required this.createdAt,
@@ -1931,12 +1931,12 @@ class CookingSession extends DataClass implements Insertable<CookingSession> {
     );
   }
 
-  factory CookingSession.fromJson(
+  factory SessionRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return CookingSession(
+    return SessionRow(
       id: serializer.fromJson<String>(json['id']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -1968,7 +1968,7 @@ class CookingSession extends DataClass implements Insertable<CookingSession> {
     };
   }
 
-  CookingSession copyWith({
+  SessionRow copyWith({
     String? id,
     Value<String?> ownerId = const Value.absent(),
     DateTime? createdAt,
@@ -1980,7 +1980,7 @@ class CookingSession extends DataClass implements Insertable<CookingSession> {
     DateTime? startedAt,
     Value<DateTime?> endedAt = const Value.absent(),
     Value<String?> notes = const Value.absent(),
-  }) => CookingSession(
+  }) => SessionRow(
     id: id ?? this.id,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
     createdAt: createdAt ?? this.createdAt,
@@ -1993,8 +1993,8 @@ class CookingSession extends DataClass implements Insertable<CookingSession> {
     endedAt: endedAt.present ? endedAt.value : this.endedAt,
     notes: notes.present ? notes.value : this.notes,
   );
-  CookingSession copyWithCompanion(CookingSessionsCompanion data) {
-    return CookingSession(
+  SessionRow copyWithCompanion(CookingSessionsCompanion data) {
+    return SessionRow(
       id: data.id.present ? data.id.value : this.id,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -2011,7 +2011,7 @@ class CookingSession extends DataClass implements Insertable<CookingSession> {
 
   @override
   String toString() {
-    return (StringBuffer('CookingSession(')
+    return (StringBuffer('SessionRow(')
           ..write('id: $id, ')
           ..write('ownerId: $ownerId, ')
           ..write('createdAt: $createdAt, ')
@@ -2044,7 +2044,7 @@ class CookingSession extends DataClass implements Insertable<CookingSession> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is CookingSession &&
+      (other is SessionRow &&
           other.id == this.id &&
           other.ownerId == this.ownerId &&
           other.createdAt == this.createdAt &&
@@ -2058,7 +2058,7 @@ class CookingSession extends DataClass implements Insertable<CookingSession> {
           other.notes == this.notes);
 }
 
-class CookingSessionsCompanion extends UpdateCompanion<CookingSession> {
+class CookingSessionsCompanion extends UpdateCompanion<SessionRow> {
   final Value<String> id;
   final Value<String?> ownerId;
   final Value<DateTime> createdAt;
@@ -2105,7 +2105,7 @@ class CookingSessionsCompanion extends UpdateCompanion<CookingSession> {
        planId = Value(planId),
        status = Value(status),
        startedAt = Value(startedAt);
-  static Insertable<CookingSession> custom({
+  static Insertable<SessionRow> custom({
     Expression<String>? id,
     Expression<String>? ownerId,
     Expression<DateTime>? createdAt,
@@ -2228,7 +2228,7 @@ class CookingSessionsCompanion extends UpdateCompanion<CookingSession> {
 }
 
 class $SessionEventsTable extends SessionEvents
-    with TableInfo<$SessionEventsTable, SessionEvent> {
+    with TableInfo<$SessionEventsTable, SessionEventRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2369,7 +2369,7 @@ class $SessionEventsTable extends SessionEvents
   static const String $name = 'session_events';
   @override
   VerificationContext validateIntegrity(
-    Insertable<SessionEvent> instance, {
+    Insertable<SessionEventRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2468,9 +2468,9 @@ class $SessionEventsTable extends SessionEvents
     {sessionId, seq},
   ];
   @override
-  SessionEvent map(Map<String, dynamic> data, {String? tablePrefix}) {
+  SessionEventRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return SessionEvent(
+    return SessionEventRow(
       id: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}id'],
@@ -2524,7 +2524,7 @@ class $SessionEventsTable extends SessionEvents
   }
 }
 
-class SessionEvent extends DataClass implements Insertable<SessionEvent> {
+class SessionEventRow extends DataClass implements Insertable<SessionEventRow> {
   final String id;
   final String? ownerId;
   final DateTime createdAt;
@@ -2536,7 +2536,7 @@ class SessionEvent extends DataClass implements Insertable<SessionEvent> {
   final String payloadJson;
   final int payloadSchemaVersion;
   final DateTime at;
-  const SessionEvent({
+  const SessionEventRow({
     required this.id,
     this.ownerId,
     required this.createdAt,
@@ -2590,12 +2590,12 @@ class SessionEvent extends DataClass implements Insertable<SessionEvent> {
     );
   }
 
-  factory SessionEvent.fromJson(
+  factory SessionEventRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return SessionEvent(
+    return SessionEventRow(
       id: serializer.fromJson<String>(json['id']),
       ownerId: serializer.fromJson<String?>(json['ownerId']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -2629,7 +2629,7 @@ class SessionEvent extends DataClass implements Insertable<SessionEvent> {
     };
   }
 
-  SessionEvent copyWith({
+  SessionEventRow copyWith({
     String? id,
     Value<String?> ownerId = const Value.absent(),
     DateTime? createdAt,
@@ -2641,7 +2641,7 @@ class SessionEvent extends DataClass implements Insertable<SessionEvent> {
     String? payloadJson,
     int? payloadSchemaVersion,
     DateTime? at,
-  }) => SessionEvent(
+  }) => SessionEventRow(
     id: id ?? this.id,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
     createdAt: createdAt ?? this.createdAt,
@@ -2654,8 +2654,8 @@ class SessionEvent extends DataClass implements Insertable<SessionEvent> {
     payloadSchemaVersion: payloadSchemaVersion ?? this.payloadSchemaVersion,
     at: at ?? this.at,
   );
-  SessionEvent copyWithCompanion(SessionEventsCompanion data) {
-    return SessionEvent(
+  SessionEventRow copyWithCompanion(SessionEventsCompanion data) {
+    return SessionEventRow(
       id: data.id.present ? data.id.value : this.id,
       ownerId: data.ownerId.present ? data.ownerId.value : this.ownerId,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -2676,7 +2676,7 @@ class SessionEvent extends DataClass implements Insertable<SessionEvent> {
 
   @override
   String toString() {
-    return (StringBuffer('SessionEvent(')
+    return (StringBuffer('SessionEventRow(')
           ..write('id: $id, ')
           ..write('ownerId: $ownerId, ')
           ..write('createdAt: $createdAt, ')
@@ -2709,7 +2709,7 @@ class SessionEvent extends DataClass implements Insertable<SessionEvent> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is SessionEvent &&
+      (other is SessionEventRow &&
           other.id == this.id &&
           other.ownerId == this.ownerId &&
           other.createdAt == this.createdAt &&
@@ -2723,7 +2723,7 @@ class SessionEvent extends DataClass implements Insertable<SessionEvent> {
           other.at == this.at);
 }
 
-class SessionEventsCompanion extends UpdateCompanion<SessionEvent> {
+class SessionEventsCompanion extends UpdateCompanion<SessionEventRow> {
   final Value<String> id;
   final Value<String?> ownerId;
   final Value<DateTime> createdAt;
@@ -2772,7 +2772,7 @@ class SessionEventsCompanion extends UpdateCompanion<SessionEvent> {
        payloadJson = Value(payloadJson),
        payloadSchemaVersion = Value(payloadSchemaVersion),
        at = Value(at);
-  static Insertable<SessionEvent> custom({
+  static Insertable<SessionEventRow> custom({
     Expression<String>? id,
     Expression<String>? ownerId,
     Expression<DateTime>? createdAt,
@@ -2896,7 +2896,7 @@ class SessionEventsCompanion extends UpdateCompanion<SessionEvent> {
 }
 
 class $AppSettingsTable extends AppSettings
-    with TableInfo<$AppSettingsTable, AppSetting> {
+    with TableInfo<$AppSettingsTable, AppSettingRow> {
   @override
   final GeneratedDatabase attachedDatabase;
   final String? _alias;
@@ -2939,7 +2939,7 @@ class $AppSettingsTable extends AppSettings
   static const String $name = 'app_settings';
   @override
   VerificationContext validateIntegrity(
-    Insertable<AppSetting> instance, {
+    Insertable<AppSettingRow> instance, {
     bool isInserting = false,
   }) {
     final context = VerificationContext();
@@ -2974,9 +2974,9 @@ class $AppSettingsTable extends AppSettings
   @override
   Set<GeneratedColumn> get $primaryKey => {key};
   @override
-  AppSetting map(Map<String, dynamic> data, {String? tablePrefix}) {
+  AppSettingRow map(Map<String, dynamic> data, {String? tablePrefix}) {
     final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return AppSetting(
+    return AppSettingRow(
       key: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}key'],
@@ -2998,11 +2998,11 @@ class $AppSettingsTable extends AppSettings
   }
 }
 
-class AppSetting extends DataClass implements Insertable<AppSetting> {
+class AppSettingRow extends DataClass implements Insertable<AppSettingRow> {
   final String key;
   final String value;
   final DateTime updatedAt;
-  const AppSetting({
+  const AppSettingRow({
     required this.key,
     required this.value,
     required this.updatedAt,
@@ -3024,12 +3024,12 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     );
   }
 
-  factory AppSetting.fromJson(
+  factory AppSettingRow.fromJson(
     Map<String, dynamic> json, {
     ValueSerializer? serializer,
   }) {
     serializer ??= driftRuntimeOptions.defaultSerializer;
-    return AppSetting(
+    return AppSettingRow(
       key: serializer.fromJson<String>(json['key']),
       value: serializer.fromJson<String>(json['value']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -3045,14 +3045,14 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
     };
   }
 
-  AppSetting copyWith({String? key, String? value, DateTime? updatedAt}) =>
-      AppSetting(
+  AppSettingRow copyWith({String? key, String? value, DateTime? updatedAt}) =>
+      AppSettingRow(
         key: key ?? this.key,
         value: value ?? this.value,
         updatedAt: updatedAt ?? this.updatedAt,
       );
-  AppSetting copyWithCompanion(AppSettingsCompanion data) {
-    return AppSetting(
+  AppSettingRow copyWithCompanion(AppSettingsCompanion data) {
+    return AppSettingRow(
       key: data.key.present ? data.key.value : this.key,
       value: data.value.present ? data.value.value : this.value,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -3061,7 +3061,7 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
 
   @override
   String toString() {
-    return (StringBuffer('AppSetting(')
+    return (StringBuffer('AppSettingRow(')
           ..write('key: $key, ')
           ..write('value: $value, ')
           ..write('updatedAt: $updatedAt')
@@ -3074,13 +3074,13 @@ class AppSetting extends DataClass implements Insertable<AppSetting> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is AppSetting &&
+      (other is AppSettingRow &&
           other.key == this.key &&
           other.value == this.value &&
           other.updatedAt == this.updatedAt);
 }
 
-class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
+class AppSettingsCompanion extends UpdateCompanion<AppSettingRow> {
   final Value<String> key;
   final Value<String> value;
   final Value<DateTime> updatedAt;
@@ -3099,7 +3099,7 @@ class AppSettingsCompanion extends UpdateCompanion<AppSetting> {
   }) : key = Value(key),
        value = Value(value),
        updatedAt = Value(updatedAt);
-  static Insertable<AppSetting> custom({
+  static Insertable<AppSettingRow> custom({
     Expression<String>? key,
     Expression<String>? value,
     Expression<DateTime>? updatedAt,
@@ -3218,10 +3218,10 @@ typedef $$RecipesTableUpdateCompanionBuilder = RecipesCompanion Function({
 });
 
 final class $$RecipesTableReferences
-    extends BaseReferences<_$AppDatabase, $RecipesTable, Recipe> {
+    extends BaseReferences<_$AppDatabase, $RecipesTable, RecipeRow> {
   $$RecipesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
-  static MultiTypedResultKey<$PlansTable, List<Plan>> _plansRefsTable(
+  static MultiTypedResultKey<$PlansTable, List<PlanRow>> _plansRefsTable(
     _$AppDatabase db,
   ) => MultiTypedResultKey.fromTable(
     db.plans,
@@ -3240,7 +3240,7 @@ final class $$RecipesTableReferences
     );
   }
 
-  static MultiTypedResultKey<$CookingSessionsTable, List<CookingSession>>
+  static MultiTypedResultKey<$CookingSessionsTable, List<SessionRow>>
   _cookingSessionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.cookingSessions,
     aliasName: 'recipes__id__cooking_sessions__recipe_id',
@@ -3605,14 +3605,14 @@ class $$RecipesTableTableManager
         RootTableManager<
           _$AppDatabase,
           $RecipesTable,
-          Recipe,
+          RecipeRow,
           $$RecipesTableFilterComposer,
           $$RecipesTableOrderingComposer,
           $$RecipesTableAnnotationComposer,
           $$RecipesTableCreateCompanionBuilder,
           $$RecipesTableUpdateCompanionBuilder,
-          (Recipe, $$RecipesTableReferences),
-          Recipe,
+          (RecipeRow, $$RecipesTableReferences),
+          RecipeRow,
           PrefetchHooks Function({bool plansRefs, bool cookingSessionsRefs})
         > {
   $$RecipesTableTableManager(_$AppDatabase db, $RecipesTable table)
@@ -3701,7 +3701,7 @@ class $$RecipesTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$RecipesTable, Recipe>(table),
+                  e.readTable<$RecipesTable, RecipeRow>(table),
                   $$RecipesTableReferences(db, table, e),
                 ),
               )
@@ -3719,9 +3719,9 @@ class $$RecipesTableTableManager
                     return [
                       if (plansRefs)
                         await $_getPrefetchedDataByColumns<
-                          Recipe,
+                          RecipeRow,
                           $RecipesTable,
-                          Plan,
+                          PlanRow,
                           $PlansTable
                         >(
                           currentTable: table,
@@ -3735,9 +3735,9 @@ class $$RecipesTableTableManager
                         ),
                       if (cookingSessionsRefs)
                         await $_getPrefetchedDataByColumns<
-                          Recipe,
+                          RecipeRow,
                           $RecipesTable,
-                          CookingSession,
+                          SessionRow,
                           $CookingSessionsTable
                         >(
                           currentTable: table,
@@ -3765,14 +3765,14 @@ typedef $$RecipesTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $RecipesTable,
-      Recipe,
+      RecipeRow,
       $$RecipesTableFilterComposer,
       $$RecipesTableOrderingComposer,
       $$RecipesTableAnnotationComposer,
       $$RecipesTableCreateCompanionBuilder,
       $$RecipesTableUpdateCompanionBuilder,
-      (Recipe, $$RecipesTableReferences),
-      Recipe,
+      (RecipeRow, $$RecipesTableReferences),
+      RecipeRow,
       PrefetchHooks Function({bool plansRefs, bool cookingSessionsRefs})
     >;
 typedef $$PlansTableCreateCompanionBuilder = PlansCompanion Function({
@@ -3805,7 +3805,7 @@ typedef $$PlansTableUpdateCompanionBuilder = PlansCompanion Function({
 });
 
 final class $$PlansTableReferences
-    extends BaseReferences<_$AppDatabase, $PlansTable, Plan> {
+    extends BaseReferences<_$AppDatabase, $PlansTable, PlanRow> {
   $$PlansTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $RecipesTable _recipeIdTable(_$AppDatabase db) =>
@@ -3825,7 +3825,7 @@ final class $$PlansTableReferences
     );
   }
 
-  static MultiTypedResultKey<$CookingSessionsTable, List<CookingSession>>
+  static MultiTypedResultKey<$CookingSessionsTable, List<SessionRow>>
   _cookingSessionsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.cookingSessions,
     aliasName: 'plans__id__cooking_sessions__plan_id',
@@ -4135,14 +4135,14 @@ class $$PlansTableTableManager
         RootTableManager<
           _$AppDatabase,
           $PlansTable,
-          Plan,
+          PlanRow,
           $$PlansTableFilterComposer,
           $$PlansTableOrderingComposer,
           $$PlansTableAnnotationComposer,
           $$PlansTableCreateCompanionBuilder,
           $$PlansTableUpdateCompanionBuilder,
-          (Plan, $$PlansTableReferences),
-          Plan,
+          (PlanRow, $$PlansTableReferences),
+          PlanRow,
           PrefetchHooks Function({bool recipeId, bool cookingSessionsRefs})
         > {
   $$PlansTableTableManager(_$AppDatabase db, $PlansTable table)
@@ -4215,7 +4215,7 @@ class $$PlansTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$PlansTable, Plan>(table),
+                  e.readTable<$PlansTable, PlanRow>(table),
                   $$PlansTableReferences(db, table, e),
                 ),
               )
@@ -4261,9 +4261,9 @@ class $$PlansTableTableManager
                     return [
                       if (cookingSessionsRefs)
                         await $_getPrefetchedDataByColumns<
-                          Plan,
+                          PlanRow,
                           $PlansTable,
-                          CookingSession,
+                          SessionRow,
                           $CookingSessionsTable
                         >(
                           currentTable: table,
@@ -4291,14 +4291,14 @@ typedef $$PlansTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $PlansTable,
-      Plan,
+      PlanRow,
       $$PlansTableFilterComposer,
       $$PlansTableOrderingComposer,
       $$PlansTableAnnotationComposer,
       $$PlansTableCreateCompanionBuilder,
       $$PlansTableUpdateCompanionBuilder,
-      (Plan, $$PlansTableReferences),
-      Plan,
+      (PlanRow, $$PlansTableReferences),
+      PlanRow,
       PrefetchHooks Function({bool recipeId, bool cookingSessionsRefs})
     >;
 typedef $$CookingSessionsTableCreateCompanionBuilder =
@@ -4333,8 +4333,7 @@ typedef $$CookingSessionsTableUpdateCompanionBuilder =
     });
 
 final class $$CookingSessionsTableReferences
-    extends
-        BaseReferences<_$AppDatabase, $CookingSessionsTable, CookingSession> {
+    extends BaseReferences<_$AppDatabase, $CookingSessionsTable, SessionRow> {
   $$CookingSessionsTableReferences(
     super.$_db,
     super.$_table,
@@ -4375,7 +4374,7 @@ final class $$CookingSessionsTableReferences
     );
   }
 
-  static MultiTypedResultKey<$SessionEventsTable, List<SessionEvent>>
+  static MultiTypedResultKey<$SessionEventsTable, List<SessionEventRow>>
   _sessionEventsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
     db.sessionEvents,
     aliasName: 'cooking_sessions__id__session_events__session_id',
@@ -4734,14 +4733,14 @@ class $$CookingSessionsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $CookingSessionsTable,
-          CookingSession,
+          SessionRow,
           $$CookingSessionsTableFilterComposer,
           $$CookingSessionsTableOrderingComposer,
           $$CookingSessionsTableAnnotationComposer,
           $$CookingSessionsTableCreateCompanionBuilder,
           $$CookingSessionsTableUpdateCompanionBuilder,
-          (CookingSession, $$CookingSessionsTableReferences),
-          CookingSession,
+          (SessionRow, $$CookingSessionsTableReferences),
+          SessionRow,
           PrefetchHooks Function({
             bool recipeId,
             bool planId,
@@ -4820,7 +4819,7 @@ class $$CookingSessionsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$CookingSessionsTable, CookingSession>(table),
+                  e.readTable<$CookingSessionsTable, SessionRow>(table),
                   $$CookingSessionsTableReferences(db, table, e),
                 ),
               )
@@ -4877,9 +4876,9 @@ class $$CookingSessionsTableTableManager
                     return [
                       if (sessionEventsRefs)
                         await $_getPrefetchedDataByColumns<
-                          CookingSession,
+                          SessionRow,
                           $CookingSessionsTable,
-                          SessionEvent,
+                          SessionEventRow,
                           $SessionEventsTable
                         >(
                           currentTable: table,
@@ -4907,14 +4906,14 @@ typedef $$CookingSessionsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $CookingSessionsTable,
-      CookingSession,
+      SessionRow,
       $$CookingSessionsTableFilterComposer,
       $$CookingSessionsTableOrderingComposer,
       $$CookingSessionsTableAnnotationComposer,
       $$CookingSessionsTableCreateCompanionBuilder,
       $$CookingSessionsTableUpdateCompanionBuilder,
-      (CookingSession, $$CookingSessionsTableReferences),
-      CookingSession,
+      (SessionRow, $$CookingSessionsTableReferences),
+      SessionRow,
       PrefetchHooks Function({
         bool recipeId,
         bool planId,
@@ -4953,7 +4952,8 @@ typedef $$SessionEventsTableUpdateCompanionBuilder =
     });
 
 final class $$SessionEventsTableReferences
-    extends BaseReferences<_$AppDatabase, $SessionEventsTable, SessionEvent> {
+    extends
+        BaseReferences<_$AppDatabase, $SessionEventsTable, SessionEventRow> {
   $$SessionEventsTableReferences(
     super.$_db,
     super.$_table,
@@ -5217,14 +5217,14 @@ class $$SessionEventsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $SessionEventsTable,
-          SessionEvent,
+          SessionEventRow,
           $$SessionEventsTableFilterComposer,
           $$SessionEventsTableOrderingComposer,
           $$SessionEventsTableAnnotationComposer,
           $$SessionEventsTableCreateCompanionBuilder,
           $$SessionEventsTableUpdateCompanionBuilder,
-          (SessionEvent, $$SessionEventsTableReferences),
-          SessionEvent,
+          (SessionEventRow, $$SessionEventsTableReferences),
+          SessionEventRow,
           PrefetchHooks Function({bool sessionId})
         > {
   $$SessionEventsTableTableManager(_$AppDatabase db, $SessionEventsTable table)
@@ -5297,7 +5297,7 @@ class $$SessionEventsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$SessionEventsTable, SessionEvent>(table),
+                  e.readTable<$SessionEventsTable, SessionEventRow>(table),
                   $$SessionEventsTableReferences(db, table, e),
                 ),
               )
@@ -5349,14 +5349,14 @@ typedef $$SessionEventsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $SessionEventsTable,
-      SessionEvent,
+      SessionEventRow,
       $$SessionEventsTableFilterComposer,
       $$SessionEventsTableOrderingComposer,
       $$SessionEventsTableAnnotationComposer,
       $$SessionEventsTableCreateCompanionBuilder,
       $$SessionEventsTableUpdateCompanionBuilder,
-      (SessionEvent, $$SessionEventsTableReferences),
-      SessionEvent,
+      (SessionEventRow, $$SessionEventsTableReferences),
+      SessionEventRow,
       PrefetchHooks Function({bool sessionId})
     >;
 typedef $$AppSettingsTableCreateCompanionBuilder =
@@ -5448,17 +5448,17 @@ class $$AppSettingsTableTableManager
         RootTableManager<
           _$AppDatabase,
           $AppSettingsTable,
-          AppSetting,
+          AppSettingRow,
           $$AppSettingsTableFilterComposer,
           $$AppSettingsTableOrderingComposer,
           $$AppSettingsTableAnnotationComposer,
           $$AppSettingsTableCreateCompanionBuilder,
           $$AppSettingsTableUpdateCompanionBuilder,
           (
-            AppSetting,
-            BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>,
+            AppSettingRow,
+            BaseReferences<_$AppDatabase, $AppSettingsTable, AppSettingRow>,
           ),
-          AppSetting,
+          AppSettingRow,
           PrefetchHooks Function()
         > {
   $$AppSettingsTableTableManager(_$AppDatabase db, $AppSettingsTable table)
@@ -5499,12 +5499,12 @@ class $$AppSettingsTableTableManager
           withReferenceMapper: (p0) => p0
               .map(
                 (e) => (
-                  e.readTable<$AppSettingsTable, AppSetting>(table),
-                  BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>(
-                    db,
-                    table,
-                    e,
-                  ),
+                  e.readTable<$AppSettingsTable, AppSettingRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $AppSettingsTable,
+                    AppSettingRow
+                  >(db, table, e),
                 ),
               )
               .toList(),
@@ -5517,17 +5517,17 @@ typedef $$AppSettingsTableProcessedTableManager =
     ProcessedTableManager<
       _$AppDatabase,
       $AppSettingsTable,
-      AppSetting,
+      AppSettingRow,
       $$AppSettingsTableFilterComposer,
       $$AppSettingsTableOrderingComposer,
       $$AppSettingsTableAnnotationComposer,
       $$AppSettingsTableCreateCompanionBuilder,
       $$AppSettingsTableUpdateCompanionBuilder,
       (
-        AppSetting,
-        BaseReferences<_$AppDatabase, $AppSettingsTable, AppSetting>,
+        AppSettingRow,
+        BaseReferences<_$AppDatabase, $AppSettingsTable, AppSettingRow>,
       ),
-      AppSetting,
+      AppSettingRow,
       PrefetchHooks Function()
     >;
 

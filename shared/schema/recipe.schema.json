@@ -1,0 +1,269 @@
+{
+  "$defs": {
+    "Equipment": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "provenance": {
+          "default": "original",
+          "enum": [
+            "original",
+            "inferred",
+            "answered",
+            "user"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Equipment",
+      "type": "object"
+    },
+    "Ingredient": {
+      "additionalProperties": false,
+      "properties": {
+        "group": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Group"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "optional": {
+          "default": false,
+          "title": "Optional",
+          "type": "boolean"
+        },
+        "preparation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Preparation"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "name"
+      ],
+      "title": "Ingredient",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Amount"
+        },
+        "amount_max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Amount Max"
+        },
+        "display": {
+          "title": "Display",
+          "type": "string"
+        },
+        "provenance": {
+          "enum": [
+            "original",
+            "inferred",
+            "answered",
+            "user"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "display",
+        "provenance"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "Servings": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "exclusiveMinimum": 0,
+          "title": "Amount",
+          "type": "number"
+        },
+        "provenance": {
+          "enum": [
+            "original",
+            "inferred",
+            "answered",
+            "user"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "unit": {
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "amount",
+        "unit",
+        "provenance"
+      ],
+      "title": "Servings",
+      "type": "object"
+    },
+    "SourceStep": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "text": {
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "text"
+      ],
+      "title": "SourceStep",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "equipment": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/Equipment"
+      },
+      "title": "Equipment",
+      "type": "array"
+    },
+    "ingredients": {
+      "items": {
+        "$ref": "#/$defs/Ingredient"
+      },
+      "title": "Ingredients",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "servings": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Servings"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "source_steps": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/SourceStep"
+      },
+      "title": "Source Steps",
+      "type": "array"
+    },
+    "title": {
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "ingredients"
+  ],
+  "title": "Recipe",
+  "type": "object"
+}

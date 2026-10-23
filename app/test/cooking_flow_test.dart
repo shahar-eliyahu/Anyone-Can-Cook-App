@@ -1,0 +1,207 @@
+import 'package:anyone_can_cook/data/recipe_repository.dart';
+import 'package:anyone_can_cook/data/session_repository.dart';
+import 'package:anyone_can_cook/features/cooking/engine/action_dispatcher.dart';
+import 'package:anyone_can_cook/features/cooking/engine/cooking_engine.dart';
+import 'package:flutter/material.dart' hide ActionDispatcher;
+import 'package:flutter_test/flutter_test.dart';
+
+import 'support/app_harness.dart';
+
+Finder button(String label) => find.widgetWithText(FilledButton, label);
+
+Future<void> tapButton(WidgetTester tester, String label) async {
+  // A SnackBar from the previous action can cover buttons near the bottom.
+  tester.state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger)).removeCurrentSnackBar();
+  await tester.pumpAndSettle();
+  await expectSeen(tester, button(label));
+  final finder = button(label).first;
+  await Scrollable.ensureVisible(tester.element(finder), alignment: 0.5);
+  await tester.pumpAndSettle();
+  await tester.tap(finder);
+  await tester.pumpAndSettle();
+}
+
+/// Expects [finder] somewhere in the screen's lazy list: scrolls to the top,
+/// then down until it is built (off-screen list items are not built).
+Future<void> expectSeen(WidgetTester tester, Finder finder) async {
+  if (finder.evaluate().isEmpty) {
+    final list = find.byType(Scrollable).first;
+    await tester.drag(list, const Offset(0, 10000));
+    await tester.pumpAndSettle();
+    for (var i = 0; i < 30 && finder.evaluate().isEmpty; i++) {
+      await tester.drag(list, const Offset(0, -300));
+      await tester.pumpAndSettle();
+    }
+  }
+  expect(finder, findsWidgets);
+}
+
+void main() {
+  testApp('complete cooking flow on the sample recipe, fully offline', (tester, h) async {
+    final recipeId = await h.seedSample();
+    await tester.pumpWidget(h.build(initialLocation: '/recipes/$recipeId'));
+    await tester.pumpAndSettle();
+    expect(find.text('עוף בתנור עם תפוחי אדמה ואורז'), findsWidgets);
+
+    await tapButton(tester, 'התחל בישול');
+    final session = (await h.sessions.activeSession())!;
+    await expectSeen(tester, find.text('0 מתוך 5 שלבים הושלמו'));
+    await expectSeen(tester, find.text('הכנת תפוחי האדמה'));
+
+    // Preheat (prep task) starts its plan timer.
+    await tester.tap(find.text('הדליקו את התנור על 200 מעלות'));
+    await tester.pumpAndSettle();
+    expect(h.notifier.scheduled.keys, ['${session.id}/tp1']);
+    await expectSeen(tester, find.text('חימום תנור'));
+
+    // Prepare potatoes, season the chicken.
+    await tapButton(tester, 'התחלתי');
+    await tapButton(tester, 'סיימתי');
+    await tapButton(tester, 'סיימתי');
+    await expectSeen(tester, find.text('2 מתוך 5 שלבים הושלמו'));
+    await expectSeen(tester, find.text('נדרש עכשיו'));
+
+    // Into the oven: the plan's 45-minute timer starts and is scheduled.
+    await tapButton(tester, 'הכנסתי לתנור');
+    expect(h.notifier.scheduled['${session.id}/t1'], h.clock.now.add(const Duration(seconds: 2700)));
+    await expectSeen(tester, find.text('עוף בתנור'));
+    await expectSeen(tester, find.text('45:00'));
+
+    // Meanwhile: rice, a second timer at the same time.
+    await expectSeen(tester, find.text('בינתיים אפשר'));
+    await tapButton(tester, 'הוספתי את האורז');
+    expect(h.notifier.scheduled.containsKey('${session.id}/t2'), isTrue);
+    await expectSeen(tester, find.text('18:00'));
+
+    // Rice finishes first.
+    await h.advance(tester, const Duration(minutes: 18));
+    await expectSeen(tester, find.text('הזמן נגמר!'));
+    await expectSeen(tester, find.text('27:00'));
+    await tapButton(tester, 'האורז מוכן');
+    expect(h.notifier.scheduled.containsKey('${session.id}/t2'), isFalse);
+
+    // Taking poultry out always asks first; "not yet" changes nothing.
+    await h.advance(tester, const Duration(minutes: 27));
+    await tapButton(tester, 'הוצאתי מהתנור');
+    expect(find.text('הוצאתי מהתנור?'), findsOneWidget);
+    expect(find.textContaining('ודאו שהעוף עשוי היטב'), findsWidgets);
+    await tester.tap(find.text('עוד לא'));
+    await tester.pumpAndSettle();
+    await expectSeen(tester, find.text('3 מתוך 5 שלבים הושלמו'));
+
+    await tapButton(tester, 'הוצאתי מהתנור');
+    await tester.tap(find.text('כן, הוצאתי מהתנור'));
+    await tester.pumpAndSettle();
+    await expectSeen(tester, find.text('4 מתוך 5 שלבים הושלמו'));
+    expect(h.notifier.scheduled.containsKey('${session.id}/t1'), isFalse);
+
+    // Rest and serve.
+    await tapButton(tester, 'התחלתי מנוחה');
+    expect(h.notifier.scheduled.containsKey('${session.id}/t3'), isTrue);
+    await tapButton(tester, 'הגשתי');
+    await expectSeen(tester, find.text('כל השלבים הושלמו! 🎉'));
+
+    await tapButton(tester, 'לסיום הבישול');
+    await tester.enterText(find.byType(TextField), 'בפעם הבאה פחות מלח');
+    await tapButton(tester, 'שמירה וסיום');
+
+    // Saved to history; no notifications left behind.
+    final done = (await h.sessions.getSession(session.id))!;
+    expect(done.status, SessionStatus.completed);
+    expect(done.notes, 'בפעם הבאה פחות מלח');
+    expect(await h.sessions.activeSession(), isNull);
+    expect(h.notifier.scheduled, isEmpty);
+    await expectSeen(tester, find.text('הושלם'));
+    await expectSeen(tester, find.text('בפעם הבאה פחות מלח'));
+    await expectSeen(tester, find.text('אפיית העוף ותפוחי האדמה: הכנסתי לתנור'));
+  });
+
+  testApp('an interrupted session resumes with progress and timers restored', (tester, h) async {
+    final recipeId = await h.seedSample();
+    final plan = (await h.recipes.latestApprovedPlan(recipeId))!;
+    final session = await h.sessions.startSession(recipeId: recipeId, planId: plan.id);
+
+    // Cooking happened in an earlier app run.
+    final dispatcher = ActionDispatcher(
+      state: CookingEngine.replay(plan.plan, await h.sessions.loadEvents(session.id)),
+      store: h.sessions.eventStoreFor(session.id),
+      onEffects: (_) async {},
+      clock: h.clock.call,
+    );
+    for (final (step, action) in [('s1', 'a1'), ('s1', 'a2'), ('s2', 'a1'), ('s3', 'a1')]) {
+      await dispatcher.confirmAction(step, action);
+    }
+    h.clock.advance(const Duration(minutes: 10));
+
+    // New app run: no notifications are scheduled yet (e.g. after force stop).
+    await tester.pumpWidget(h.build());
+    await tester.pumpAndSettle();
+    expect(find.text('עוף בתנור עם תפוחי אדמה ואורז'), findsOneWidget);
+
+    await tester.tap(find.text('המשך בישול'));
+    await tester.pumpAndSettle();
+    expect(find.text('2 מתוך 5 שלבים הושלמו'), findsOneWidget);
+    expect(find.text('35:00'), findsOneWidget);
+    expect(
+      h.notifier.scheduled['${session.id}/t1'],
+      session.startedAt.toUtc().add(const Duration(seconds: 2700)),
+    );
+  });
+
+  testApp('favorite, rename and delete with undo', (tester, h) async {
+    final recipeId = await h.seedSample();
+    await tester.pumpWidget(h.build(initialLocation: '/recipes'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('⭐ מועדפים'));
+    await tester.pumpAndSettle();
+    expect(find.text('עוד לא סימנתם מתכונים כמועדפים'), findsOneWidget);
+
+    await tester.tap(find.text('הכל'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('עוף בתנור עם תפוחי אדמה ואורז'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('הוספה למועדפים'));
+    await tester.pumpAndSettle();
+    expect((await h.recipes.getRecipe(recipeId))!.isFavorite, isTrue);
+
+    await tester.tap(find.byWidgetPredicate((w) => w is PopupMenuButton).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('שינוי שם'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'העוף של שבת');
+    await tester.tap(find.text('שמירה'));
+    await tester.pumpAndSettle();
+    expect(find.text('העוף של שבת'), findsWidgets);
+
+    await tester.tap(find.byWidgetPredicate((w) => w is PopupMenuButton).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('מחיקת המתכון'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('מחיקה'));
+    await tester.pumpAndSettle();
+    expect(await h.recipes.getRecipe(recipeId), isNull);
+    expect(find.text('המתכון נמחק'), findsOneWidget);
+
+    await tester.tap(find.text('בטל'));
+    await tester.pumpAndSettle();
+    expect(await h.recipes.getRecipe(recipeId), isNotNull);
+    expect(find.text('העוף של שבת'), findsOneWidget);
+  });
+
+  testApp('a recipe being cooked cannot be deleted', (tester, h) async {
+    final recipeId = await h.seedSample();
+    final plan = (await h.recipes.latestApprovedPlan(recipeId))!;
+    await h.sessions.startSession(recipeId: recipeId, planId: plan.id);
+    await tester.pumpWidget(h.build(initialLocation: '/recipes/$recipeId'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byWidgetPredicate((w) => w is PopupMenuButton).first);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('מחיקת המתכון'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('מחיקה'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('אי אפשר למחוק מתכון בזמן בישול'), findsOneWidget);
+    expect(await h.recipes.getRecipe(recipeId), isNotNull);
+  });
+}

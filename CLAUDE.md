@@ -1,0 +1,109 @@
+# CLAUDE.md — Anyone Can Cook ("לבשל כל אחד יכול")
+
+Permanent instructions and project map for Claude Code. **Current status lives in `docs/PROGRESS.md`**;
+the approved design lives in `docs/PLAN.md`; the reasons behind decisions live in `docs/DECISIONS.md`.
+Do not copy status or plan details into this file.
+
+## Resuming work (read this first in a new session)
+
+1. Read `docs/PROGRESS.md`: current phase, what is verified, open issues, the exact next step.
+2. Skim the relevant phase in `docs/PLAN.md` (§7 Phases) and any related entry in `docs/DECISIONS.md`.
+3. Check the repo state: `git status`, `git log --oneline -5`.
+4. Run the tests (commands below) before changing anything.
+5. Do not start a new phase, commit or push until the user explicitly approves (see rules).
+
+## Product in one paragraph
+
+A Hebrew-only, RTL cooking assistant for beginners. Gemini analyzes a recipe (text, photo or URL), asks
+only necessary clarification questions, and produces a cooking plan the user reviews and approves. The app
+then runs the plan **deterministically**: logical steps, prep tasks at the right time, parallel work,
+action confirmations ("התחלתי", "סיימתי", "הכנסתי לתנור") that start timers taken from the approved plan,
+multiple timers with notifications, and progress that survives restarts. A domain-restricted cooking agent
+(Phase 3) answers cooking questions only and changes things only through proposals the app validates.
+
+## Architecture map
+
+```
+app/        Flutter (Android/iOS). Riverpod, go_router, drift (SQLite), dio, flutter_local_notifications
+  lib/models/                  freezed contract models (Recipe, CookingPlan) — mirror backend schemas
+  lib/features/cooking/engine/ pure-Dart CookingEngine, events, ActionDispatcher, plan validator
+  lib/features/timers/         TimerNotifier (notifications), TimerCoordinator, session restore on resume
+  lib/data/                    repositories over drift (recipes, plans, sessions, events, settings)
+  lib/features/*/              screens (kitchen, recipes, cooking, history, settings)
+  lib/l10n/app_he.arb          ALL user-facing strings (Hebrew)
+backend/    FastAPI, stateless, deployed on Render Free (root dir backend/)
+  app/services/llm/            LLMProvider interface; MockProvider (local/tests), GeminiProvider
+  app/schemas/                 Pydantic Recipe/CookingPlan — SOURCE OF TRUTH for the JSON contract
+  scripts/export_schemas.py    writes shared/schema/*.json
+shared/     schema/ (exported JSON Schema), fixtures/ (sample recipe + plan used by both sides)
+docs/       PLAN.md, DECISIONS.md, PROGRESS.md
+```
+
+Key invariants:
+- Gemini plans; the app executes. Gemini is never in the loop for step progression or timers.
+- Every session change goes through `ActionDispatcher` → append-only `session_events` → `CookingEngine.reduce`.
+  State = replay of events. Duplicate actions are no-ops. Timer durations come only from the approved plan.
+- Values carry provenance (`original` / `inferred` / `answered` / `user`); AI estimates show "הערכה" and are
+  never presented as recipe facts.
+- Phase 1 works fully offline; the backend is optional for cooking.
+- Local data uses sync-ready columns (UUID ids, `created_at`/`updated_at`, `deleted_at`, nullable `owner_id`).
+  No accounts or cloud sync until approved.
+
+## Standing rules
+
+- **Approval gates:** never commit, push, start a new phase, or make a major architectural change without
+  the user's explicit approval. Ask only when a decision is genuinely the user's (sensitive permissions,
+  destructive actions, architecture). Within an approved phase, work continuously.
+- **Secrets:** never read, print, log or commit secrets. The Gemini API key exists only in Render's
+  environment settings. `.env` files are git-ignored and blocked by `.claude/settings.json` deny rules;
+  `backend/.env.example` holds placeholders only. Never create public endpoints that can spend Gemini quota.
+- **Branding/language:** the user-facing name is **"לבשל כל אחד יכול"** (Android label, iOS display name,
+  app title, every screen's app bar). All UI text, notifications and errors are Hebrew, RTL. "Anyone Can
+  Cook" is the internal name for code, packages, folders, GitHub. Never rename the repo or folders.
+- **Function before polish** until Phase 4: simple, clean Hebrew UI; no styling work.
+- **Dependencies:** add a package only when the approved plan needs it; prefer small local code.
+- **Render/Gemini:** keep the Render configuration unchanged; no paid services; no unnecessary Gemini calls.
+  Automated tests always use the mock/fake provider.
+- **Processes:** stop only processes you started. Bind local servers to `127.0.0.1` for local tests.
+- Keep `docs/PROGRESS.md` current at the end of each work step; record new decisions in `docs/DECISIONS.md`.
+
+## Commands
+
+Backend (from `backend/`):
+```bash
+py -m venv .venv && .venv/Scripts/python -m pip install -r requirements-dev.txt
+.venv/Scripts/python -m pytest -q
+.venv/Scripts/python -m scripts.export_schemas      # after changing app/schemas/*
+.venv/Scripts/python -m uvicorn app.main:app --host 127.0.0.1 --port 8000   # local, mock AI
+```
+
+App (from `app/`):
+```bash
+flutter pub get
+dart run build_runner build        # after changing drift tables or freezed models
+flutter gen-l10n                   # after changing lib/l10n/app_he.arb
+flutter analyze
+flutter test --timeout 90s
+flutter run -d emulator-5554 --dart-define=API_BASE_URL=https://anyone-can-cook-api.onrender.com
+```
+
+Environment notes (Windows):
+- Emulator: `Pixel_8a_API_35` = `emulator-5554` (Android 15). `adb` is at
+  `%LOCALAPPDATA%\Android\Sdk\platform-tools\adb.exe` (not on PATH). In Git Bash set `MSYS_NO_PATHCONV=1`
+  before passing `/sdcard/...` paths to adb.
+- Driving a debug session from Claude Code: run `flutter run --machine` in the background fed by `tail -f`
+  on a control file; hot reload = JSON `app.restart` with `fullRestart:false`, hot restart = `true`.
+  Plain `flutter run` ignores piped keystrokes. Changing `--dart-define`, Android/iOS files, `main()` or
+  native plugins needs a hot restart or a full rerun.
+- A stopped `flutter test` run can leave `flutter_tester.exe` holding `build/native_assets/.../sqlite3.dll`;
+  stop that process before rerunning tests.
+
+## Conventions
+
+- Contract changes: edit Pydantic schemas → export schemas → update Dart models → run contract tests. Keep
+  `app/assets/recipes/sample_recipe.json` identical to `shared/fixtures/sample_recipe.json`.
+- Widget tests use `testApp(...)` and `AppHarness` (`app/test/support/`): in-memory DB, fake clock, test-driven
+  ticker, recording notifier. Real async I/O never completes inside `testWidgets`; use sync reads.
+- Hebrew strings only in `app_he.arb`; identifiers in English.
+- Comments explain *why*, not *what*; match the surrounding style.
+- Commit messages: short imperative summary, then bullets; end with the attribution line Claude Code provides.

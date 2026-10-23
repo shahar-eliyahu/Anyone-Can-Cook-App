@@ -1,0 +1,435 @@
+{
+  "$defs": {
+    "Minutes": {
+      "additionalProperties": false,
+      "properties": {
+        "note_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note He"
+        },
+        "provenance": {
+          "enum": [
+            "original",
+            "inferred",
+            "answered",
+            "user"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "value": {
+          "minimum": 0,
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value",
+        "provenance"
+      ],
+      "title": "Minutes",
+      "type": "object"
+    },
+    "PlanStep": {
+      "additionalProperties": false,
+      "properties": {
+        "actions": {
+          "items": {
+            "$ref": "#/$defs/StepAction"
+          },
+          "minItems": 1,
+          "title": "Actions",
+          "type": "array"
+        },
+        "depends_on": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Depends On",
+          "type": "array"
+        },
+        "doneness_cue_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doneness Cue He"
+        },
+        "equipment_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Equipment Ids",
+          "type": "array"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "ingredient_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Ingredient Ids",
+          "type": "array"
+        },
+        "instruction_he": {
+          "title": "Instruction He",
+          "type": "string"
+        },
+        "kind": {
+          "default": "active",
+          "enum": [
+            "active",
+            "passive"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "parallel_ok": {
+          "default": false,
+          "title": "Parallel Ok",
+          "type": "boolean"
+        },
+        "source_refs": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Refs",
+          "type": "array"
+        },
+        "temperature": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Temperature"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "timers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/PlanTimer"
+          },
+          "title": "Timers",
+          "type": "array"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "warnings_he": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings He",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "title",
+        "instruction_he",
+        "actions"
+      ],
+      "title": "PlanStep",
+      "type": "object"
+    },
+    "PlanTimer": {
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label_he": {
+          "title": "Label He",
+          "type": "string"
+        },
+        "note_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note He"
+        },
+        "provenance": {
+          "enum": [
+            "original",
+            "inferred",
+            "answered",
+            "user"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "seconds": {
+          "exclusiveMinimum": 0,
+          "maximum": 86400,
+          "title": "Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "id",
+        "label_he",
+        "seconds",
+        "provenance"
+      ],
+      "title": "PlanTimer",
+      "type": "object"
+    },
+    "PrepSurface": {
+      "additionalProperties": false,
+      "properties": {
+        "at_start": {
+          "default": false,
+          "title": "At Start",
+          "type": "boolean"
+        },
+        "with_step": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "With Step"
+        }
+      },
+      "title": "PrepSurface",
+      "type": "object"
+    },
+    "PrepTask": {
+      "additionalProperties": false,
+      "properties": {
+        "confirm_policy": {
+          "default": "auto_ok",
+          "enum": [
+            "auto_ok",
+            "always_ask"
+          ],
+          "title": "Confirm Policy",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "preheat_oven",
+            "boil_water",
+            "mise_en_place",
+            "thaw",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "lead_minutes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Minutes"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "needed_by_step": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Needed By Step"
+        },
+        "surface": {
+          "$ref": "#/$defs/PrepSurface",
+          "default": {
+            "at_start": true,
+            "with_step": null
+          }
+        },
+        "text_he": {
+          "title": "Text He",
+          "type": "string"
+        },
+        "timer": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/PlanTimer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "text_he"
+      ],
+      "title": "PrepTask",
+      "type": "object"
+    },
+    "StepAction": {
+      "additionalProperties": false,
+      "properties": {
+        "completes_step": {
+          "default": false,
+          "title": "Completes Step",
+          "type": "boolean"
+        },
+        "confirm_policy": {
+          "default": "auto_ok",
+          "enum": [
+            "auto_ok",
+            "always_ask"
+          ],
+          "title": "Confirm Policy",
+          "type": "string"
+        },
+        "id": {
+          "title": "Id",
+          "type": "string"
+        },
+        "label_he": {
+          "title": "Label He",
+          "type": "string"
+        },
+        "starts_timer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Starts Timer"
+        },
+        "type": {
+          "enum": [
+            "start",
+            "done",
+            "in_oven",
+            "out_of_oven",
+            "custom"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "label_he"
+      ],
+      "title": "StepAction",
+      "type": "object"
+    },
+    "Temperature": {
+      "additionalProperties": false,
+      "properties": {
+        "provenance": {
+          "enum": [
+            "original",
+            "inferred",
+            "answered",
+            "user"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "unit": {
+          "default": "C",
+          "enum": [
+            "C",
+            "F"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "value",
+        "provenance"
+      ],
+      "title": "Temperature",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "prep_tasks": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/PrepTask"
+      },
+      "title": "Prep Tasks",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": 1,
+      "default": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "steps": {
+      "items": {
+        "$ref": "#/$defs/PlanStep"
+      },
+      "minItems": 1,
+      "title": "Steps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "steps"
+  ],
+  "title": "CookingPlan",
+  "type": "object"
+}

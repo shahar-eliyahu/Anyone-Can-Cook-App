@@ -42,6 +42,10 @@ dependencies:
   intl: ^0.20.3
   flutter_localizations:
     sdk: flutter
+  freezed_annotation: ^3.1.0
+  json_annotation: ^4.12.0
+  flutter_local_notifications: ^22.3.2
+  timezone: ^0.11.2
 
 dev_dependencies:
   flutter_test:
@@ -55,6 +59,8 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   drift_dev: ^2.35.2
   build_runner: ^2.17.1
+  freezed: ^4.0.3
+  json_serializable: ^6.15.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -67,6 +73,10 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Copy of shared/fixtures/sample_recipe.json (kept identical by test/contract_test.dart).
+  assets:
+    - assets/recipes/sample_recipe.json
 
   # To add assets to your application, add an assets section, like this:
   # assets:

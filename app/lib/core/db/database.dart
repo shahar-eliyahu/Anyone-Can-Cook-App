@@ -19,6 +19,7 @@ mixin SyncColumns on Table {
 }
 
 /// The original (imported, AI-analyzed) recipe.
+@DataClassName('RecipeRow')
 class Recipes extends Table with SyncColumns {
   TextColumn get title => text()();
   TextColumn get customTitle => text().nullable()();
@@ -33,6 +34,7 @@ class Recipes extends Table with SyncColumns {
 }
 
 /// Approved cooking plans, stored separately from the recipe and versioned.
+@DataClassName('PlanRow')
 class Plans extends Table with SyncColumns {
   TextColumn get recipeId => text().references(Recipes, #id)();
   TextColumn get planJson => text()();
@@ -42,6 +44,7 @@ class Plans extends Table with SyncColumns {
   TextColumn get basedOnPlanId => text().nullable()();
 }
 
+@DataClassName('SessionRow')
 class CookingSessions extends Table with SyncColumns {
   TextColumn get recipeId => text().references(Recipes, #id)();
   TextColumn get planId => text().references(Plans, #id)();
@@ -52,6 +55,7 @@ class CookingSessions extends Table with SyncColumns {
 }
 
 /// Append-only cooking event log; session state is rebuilt by replaying it.
+@DataClassName('SessionEventRow')
 class SessionEvents extends Table with SyncColumns {
   TextColumn get sessionId => text().references(CookingSessions, #id)();
   IntColumn get seq => integer()();
@@ -66,6 +70,7 @@ class SessionEvents extends Table with SyncColumns {
       ];
 }
 
+@DataClassName('AppSettingRow')
 class AppSettings extends Table {
   TextColumn get key => text()();
   TextColumn get value => text()();
@@ -80,7 +85,14 @@ class AppSettings extends Table {
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
-      : super(executor ?? driftDatabase(name: 'anyone_can_cook'));
+      : super(executor ??
+            driftDatabase(
+              name: 'anyone_can_cook',
+              // Android can start a second Flutter engine in the same process
+              // (leave with Back, reopen). Without sharing, its writes waited
+              // forever on the first engine's connection.
+              native: const DriftNativeOptions(shareAcrossIsolates: true),
+            ));
 
   @override
   int get schemaVersion => 1;

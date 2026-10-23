@@ -5,7 +5,27 @@ A Hebrew-first (RTL) cooking assistant: Flutter app for Android/iOS + a small Fa
 ```
 app/       Flutter app
 backend/   FastAPI backend (stateless)
+shared/    JSON contract: schema/ (exported from Pydantic) and fixtures/ (sample recipe + plan)
 ```
+
+## Project docs
+
+- `docs/PLAN.md` — approved development plan · `docs/PROGRESS.md` — current status and next step
+- `docs/DECISIONS.md` — decision log · `CLAUDE.md` — standing rules and how to resume work (for Claude Code)
+
+## Recipe/plan contract
+
+The Pydantic models in `backend/app/schemas/` are the source of truth for the `Recipe` and `CookingPlan` JSON.
+After changing them, re-export the JSON Schemas (a backend test fails if they are stale):
+
+```bash
+cd backend
+.venv/Scripts/python -m scripts.export_schemas
+```
+
+The Dart models (`app/lib/models/`) mirror them; `app/test/contract_test.dart` checks the shared fixture
+parses in Dart and that every emitted key exists in the schema. `app/assets/recipes/sample_recipe.json`
+must stay identical to `shared/fixtures/sample_recipe.json` (also tested).
 
 ## Backend
 
@@ -60,6 +80,18 @@ flutter run -d emulator-5554 --dart-define=API_BASE_URL=https://<your-service>.o
 ```
 
 Plain HTTP is allowed only in debug builds and only to `10.0.2.2`, `127.0.0.1` and `localhost`.
+
+### How cooking works (offline)
+
+- `lib/features/cooking/engine/` is a pure-Dart, deterministic engine. Every change goes through
+  `ActionDispatcher` (UI buttons now, the AI agent in Phase 3) and is stored as an append-only event in
+  SQLite (`session_events`). A session's state is rebuilt by replaying its events; duplicates are no-ops.
+- Timer durations always come from the approved plan. Timers store their end time, so they survive restarts.
+- Timer notifications are scheduled with `flutter_local_notifications`. They are restored at startup and on
+  every resume (covers force stop and permission changes) and after reboot by the plugin's boot receiver.
+- Android 14+ denies exact alarms by default; the app asks when cooking starts and in Settings, and falls
+  back to inexact delivery (possibly minutes late) if refused.
+- Cooking never needs the backend; the server status on the home screen is informational only.
 
 ## Secrets
 
