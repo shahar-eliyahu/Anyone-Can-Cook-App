@@ -1,0 +1,27 @@
+{
+  "@@locale": "he",
+  "appTitle": "לבשל כל אחד יכול",
+  "kitchenTitle": "המטבח שלי",
+  "continueCooking": "המשך בישול",
+  "myRecipes": "המתכונים שלי",
+  "favorites": "מועדפים",
+  "cookingHistory": "היסטוריית בישול",
+  "settings": "הגדרות",
+  "newRecipe": "מתכון חדש",
+  "comingSoon": "בקרוב",
+  "noActiveSession": "אין בישול פעיל כרגע",
+  "backendConnecting": "מתחבר לשרת…",
+  "backendWakingUp": "השרת מתעורר… זה יכול לקחת עד דקה",
+  "backendOk": "השרת מחובר ✓",
+  "aiModeDemo": "מצב הדגמה (ללא בינה מלאכותית)",
+  "aiModeLive": "בינה מלאכותית מחוברת",
+  "aiModeUnknown": "מצב בינה מלאכותית לא ידוע",
+  "backendOffline": "אין חיבור לשרת",
+  "retry": "נסו שוב",
+  "databaseReady": "מסד הנתונים מוכן (גרסה {version})",
+  "@databaseReady": {
+    "placeholders": {
+      "version": { "type": "int" }
+    }
+  }
+}

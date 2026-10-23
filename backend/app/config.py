@@ -14,15 +14,16 @@ class Settings(BaseSettings):
     gemini_api_key: SecretStr | None = None
     ai_model: str | None = None
     parse_model: str | None = None
+    plan_model: str | None = None
     chat_model: str | None = None
-
-    # TEMPORARY (Phase 0): enables POST /internal/ai-check when set. Leave unset to disable it.
-    ai_check_token: SecretStr | None = None
-    ai_check_cooldown_seconds: int = 60
 
     @property
     def effective_parse_model(self) -> str | None:
         return self.parse_model or self.ai_model
+
+    @property
+    def effective_plan_model(self) -> str | None:
+        return self.plan_model or self.ai_model
 
     @property
     def effective_chat_model(self) -> str | None:

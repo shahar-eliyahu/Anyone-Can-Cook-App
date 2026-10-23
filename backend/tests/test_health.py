@@ -16,3 +16,7 @@ def test_health_reports_ok_and_provider():
     body = response.json()
     assert body["status"] == "ok"
     assert body["ai_provider"] == "mock"
+
+
+def test_temporary_ai_check_endpoint_is_removed():
+    assert TestClient(app).post("/internal/ai-check").status_code == 404
