@@ -3,7 +3,7 @@
 Frequently changing status. Permanent rules are in `CLAUDE.md`; the approved design is `docs/PLAN.md`.
 Update this file at the end of every work step.
 
-_Last updated: 2026-10-24 (3C–3B on origin at `cd82fa6`; 3D `fee2df1` `9386cbb`, Phase 4 `bac3d0d` `73d2f01` + 4E commit, all local only)_
+_Last updated: 2026-10-24 (origin/main at `9386cbb`: Phases 3C–3D; Phase 4 `bac3d0d` `73d2f01` `bf9853f` local only)_
 
 ## Phase status
 
@@ -12,7 +12,7 @@ _Last updated: 2026-10-24 (3C–3B on origin at `cd82fa6`; 3D `fee2df1` `9386cbb
 | 0 — Local foundations | ✅ Complete, committed and pushed (`1196478`). Render verified: `/health` 200, `/internal/ai-check` 404. |
 | 1 — Deterministic cooking core (no AI) | ✅ Implemented, verified (automated + emulator), approved by the user, committed and pushed to `main` (see `git log`). |
 | 2 — AI recipe analysis & planning | ✅ Complete, committed and pushed (`a6bd1f3` Phase 2, `a372736` app icon, `fa87e71` quota handling). Deployed on Render; live Gemini recipe test by the user passed (details below). |
-| 3 — Beginner cooking experience + assistant | ✅ 3C, 3A, 3B, 3D (local-first Remy + voice) implemented and verified locally. 3C–3B are on `origin/main`; 3D is committed locally, not pushed or deployed. |
+| 3 — Beginner cooking experience + assistant | ✅ 3C, 3A, 3B, 3D (local-first Remy + voice) implemented and verified locally; on `origin/main` (not deployed to Render). |
 | 4 — UX/UI redesign | ✅ 4B–4E implemented and verified locally (tests + emulator), committed locally, not pushed. Release work not started. |
 
 ## Phase 1 — what exists
@@ -448,8 +448,8 @@ Checked what existed, changed only what was missing.
 
 ## Next step
 
-1. User reviews Phase 3D and Phase 4 on a real phone (`fee2df1`, `9386cbb`, `bac3d0d`, `73d2f01` and the 4E
-   commit are local only).
+1. User reviews Phase 4 on a real phone (`bac3d0d`, `73d2f01`, `bf9853f` are local only; Phase 3D is on
+   `origin/main` at `9386cbb`).
 2. With approval: push; small live Gemini checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 /
    ≤ 10 calls; 3B/3D Remy ≈ 15 questions / ≤ 20 calls), then deploy (the backend copy and prompt style rule ship
    with that deploy).
