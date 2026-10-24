@@ -70,6 +70,9 @@ Emulator `emulator-5554` (Android 15), app built in debug, **network disabled** 
   restrictions (Samsung, Xiaomi). Needs a real device.
 - The "הערכה" badge explanation is on long-press only (not discoverable); revisit in Phase 4.
 - Screen-on during cooking (wakelock) not implemented; avoided an extra package. Revisit if users need it.
+- Cold start: the home screen's "המשך בישול" card briefly shows "אין בישול פעיל כרגע" before the active
+  session loads (the card treats "still loading" as "no session"). Fix later with the UI/UX improvements
+  (Phase 4): show a neutral loading state instead. Seen on the emulator 2026-10-24.
 
 ## Phase 2 progress
 
@@ -124,6 +127,22 @@ Emulator `emulator-5554` (Android 15), app built in debug, **network disabled** 
   exactly 1 analyze + 1 plan call; with the backend stopped the saved plan reopened and cooking ran; the oven
   step used the corrected 50:00 timer with the 74°C food-safety check; one exact alarm (window 0).
   Found and fixed: an edited timer kept the AI's "estimated" note.
+
+## App icon (2026-10-24, not committed)
+
+- Official logo (user-supplied, 2048×2048) as the app icon: source `app/assets/icon/app_icon.png` (lossless copy;
+  not bundled into the app), monochrome silhouette `app_icon_monochrome.png` for Android 13+ themed icons.
+  Generated with `flutter_launcher_icons` 0.14.4 run as a global tool (config `app/flutter_launcher_icons.yaml`)
+  so the app's dependencies didn't change. The tool's edit to `ios/Runner.xcodeproj/project.pbxproj` (a known
+  bug that breaks an unrelated build setting) was reverted; `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon`
+  was already set.
+- Android: legacy `mipmap-*/ic_launcher.png`, adaptive icon (`mipmap-anydpi-v26`) with the full logo as the
+  foreground at inset 0 (logo within 0.301 of the size from the center: inside the 0.306 safe zone), background
+  color, monochrome layer. Verified: APK declares the adaptive icon and label "לבשל כל אחד יכול"; installed on
+  the emulator with data kept; launcher lists the app and it opens normally; circle/squircle/rounded masks
+  simulated with nothing clipped. iOS: 25 icon sizes, no alpha, `Contents.json` valid (not built: needs macOS).
+- Observed (pre-existing, not icon related): on a cold start the "המשך בישול" card briefly shows
+  "אין בישול פעיל כרגע" while the database stream loads.
 
 ## Phase 2 — needs live testing (after deploy, with approval)
 

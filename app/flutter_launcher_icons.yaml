@@ -1,0 +1,21 @@
+# App icon for "לבשל כל אחד יכול". Regenerate after changing assets/icon/:
+#   dart pub global activate flutter_launcher_icons 0.14.4
+#   dart pub global run flutter_launcher_icons -f flutter_launcher_icons.yaml
+# (Run as a global tool so the app's own dependencies don't change.)
+#
+# The official logo fills the whole square with its blue gradient, and the hat and
+# sparkles stay within 0.301 of the size from the center, inside Android's adaptive
+# safe zone (0.306) and circle mask (0.333). So the full image is the adaptive
+# foreground at its exact scale (inset 0); the background color only shows if a
+# launcher reveals the area behind it.
+flutter_launcher_icons:
+  image_path: "assets/icon/app_icon.png"
+  android: "ic_launcher"
+  min_sdk_android: 21
+  adaptive_icon_foreground: "assets/icon/app_icon.png"
+  adaptive_icon_foreground_inset: 0
+  adaptive_icon_background: "#3F86C2"
+  # White-on-transparent silhouette for Android 13+ themed icons.
+  adaptive_icon_monochrome: "assets/icon/app_icon_monochrome.png"
+  ios: true
+  remove_alpha_ios: true
