@@ -592,6 +592,28 @@ Design:
   `PlanPatched` validation and replay, assistant sheet flows with a fake API; backend guardrails and proposals with a
   fake provider. Live evaluation only with approval.
 
+#### Phase 3D — voice, with local-first understanding and Gemini as a fallback interpreter
+
+Requirements (user, 2026-10-24): Remy feels natural, fast and inexpensive. Local understanding first (natural Hebrew
+variations, synonyms, verb forms, durations, references to steps and timers; simple questions answered from the
+plan); Gemini only as a fallback interpreter returning a strict command from the supported set, validated against
+the live engine; at most one Gemini call per unresolved request, no automatic retry; ambiguity resolved by asking
+locally; voice and text through the same pipeline; offline keeps every local command working.
+
+Status (2026-10-24): local-first refinements and the voice seams implemented locally (see `docs/PROGRESS.md`,
+decisions #58–#60). **Pending the user's approval of dependencies:** on-device speech recognition and
+text-to-speech packages (candidates: `speech_to_text` and `flutter_tts`, free, using the phone's own engines;
+Hebrew support to be checked on the user's phone), a microphone button in the Remy sheet and in the cooking screen,
+hands-free mode. The wake phrase ("Hey Remy") stays later (continuous listening: battery and privacy).
+
+- Implemented: word-family parser with prefix-aware and one-letter-tolerant matching, uncertainty markers,
+  question detection, local Q&A (amounts, temperature, next step, this step's ingredients, steps left), local
+  clarification ("עוד קצת" → the plan's re-check time, asked first), noise filtering for transcripts; server
+  `command` interpretation (complete_step, undo, get_timer_status, extend_timer, pause/resume_timer,
+  start_timer_action, whats_next, help) validated on the server and again in the app; one call, no repair, no
+  retry; minimal context (no source text, completed steps by title); `SpeechRecognizer` / `SpeechSynthesizer`
+  interfaces with silent defaults; spoken requests get `speechHe` read aloud once an engine is added.
+
 #### Phase 4 and Future
 
 - Phase 4: visual refinement, an original "Remy" (רמי) look, settings wording, release work.

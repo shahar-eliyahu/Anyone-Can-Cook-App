@@ -1,36 +1,74 @@
-/// Deterministic recognition of simple Hebrew cooking commands (Phase 3B): no network,
-/// no AI. Typed text now and recognized speech later use the same parser.
+/// Local-first understanding of the cook's Hebrew (Phase 3B, refined in 3D): no network,
+/// no AI. Typed text and recognized speech use the same parser.
 ///
-/// The parser only classifies; [AssistantService] resolves a command against the live
-/// cooking state and decides whether to act, propose or just answer.
+/// Not exact phrases: words are matched by families (synonyms and verb forms), with a
+/// one-letter tolerance for longer words (typos, transcription slips). The parser only
+/// classifies; `AssistantService` resolves a command against the live cooking state and
+/// decides whether to act, ask, or hand the message to Remy (Gemini) as a fallback.
 library;
 
-enum CommandKind { next, back, timeLeft, whatNow, help, pauseTimer, resumeTimer, extendTimer, reportedAction }
-
-class ParsedCommand {
-  const ParsedCommand(this.kind, {required this.normalized, this.seconds, this.intention = false});
-  final CommandKind kind;
-
-  /// The cleaned-up text (for matching action labels and timer names).
-  final String normalized;
-
-  /// For [CommandKind.extendTimer]: the duration the cook asked for.
-  final int? seconds;
-
-  /// For [CommandKind.reportedAction]: the cook said they're ABOUT to do it ("אני עומד
-  /// להכניס"), so nothing may be confirmed.
-  final bool intention;
+enum CommandKind {
+  next,
+  back,
+  timeLeft,
+  whatNow,
+  nextStepPreview,
+  help,
+  pauseTimer,
+  resumeTimer,
+  extendTimer,
+  reportedAction,
+  ingredientAmount,
+  temperature,
+  stepIngredients,
+  stepsLeft,
 }
 
-const _wakeWords = ['היי רמי', 'הי רמי', 'רמי'];
-const _fillers = ['בבקשה', 'אפשר', 'תגיד לי', 'תגידי לי', 'תגיד', 'תגידי', 'יאללה', 'אוקיי', 'טוב'];
+class ParsedCommand {
+  const ParsedCommand(
+    this.kind, {
+    required this.normalized,
+    this.seconds,
+    this.intention = false,
+    this.uncertain = false,
+    this.fuzzy = false,
+    this.subject,
+  });
 
-/// Lowercase, no niqqud or punctuation, no wake word or filler words.
+  final CommandKind kind;
+
+  /// The cleaned-up text (for matching action labels, timers and ingredients).
+  final String normalized;
+
+  /// For [CommandKind.extendTimer]: the duration asked for.
+  final int? seconds;
+
+  /// For [CommandKind.reportedAction]: ABOUT to do it ("אני עומד להכניס") — never a confirmation.
+  final bool intention;
+
+  /// The cook sounded unsure ("אולי צריך עוד 5 דקות?"): ask before acting.
+  final bool uncertain;
+
+  /// Recognized only through a near match (a typo or transcription slip): ask before acting.
+  final bool fuzzy;
+
+  /// For [CommandKind.ingredientAmount]: the words naming the ingredient.
+  final String? subject;
+
+  bool get needsConfirmation => uncertain || fuzzy;
+}
+
+const _wakeWords = ['היי רמי', 'הי רמי', 'שלום רמי', 'רמי'];
+const _fillers = ['בבקשה', 'אפשר', 'תגיד לי', 'תגידי לי', 'תגיד', 'תגידי', 'יאללה', 'אוקיי', 'אוקי', 'טוב', 'רגע', 'אז', 'נו'];
+
+/// Lowercase, no niqqud or punctuation, common transcription forms unified, no wake word
+/// or filler words.
 String normalizeCommand(String text) {
   var s = text
       .replaceAll(RegExp('[֑-ׇ]'), '')
       .replaceAll(RegExp(r'''[.,!?;:'"״׳()\-–—]'''), ' ')
       .toLowerCase()
+      .replaceAllMapped(RegExp(r'(\d)\s*(דק|דק׳)(\s|$)'), (m) => '${m[1]} דקות${m[3]}')
       .replaceAll(RegExp(r'\s+'), ' ')
       .trim();
   for (final w in _wakeWords) {
@@ -52,71 +90,159 @@ const _numberWords = {
 int? parseDuration(String s) {
   if (RegExp(r'(^| )רבע שעה').hasMatch(s)) return 900;
   if (RegExp(r'(^| )חצי שעה').hasMatch(s)) return 1800;
-  final m = RegExp(r'(\d+(?:\.\d+)?|חמש עשרה|[א-ת]+)?\s*(דקות|דקה|דק|שניות|שנייה|שניה|שעות|שעה)( וחצי)?').firstMatch(s);
+  if (RegExp(r'(^| )חצי דקה').hasMatch(s)) return 30;
+  final m = RegExp(r'(\d+(?:\.\d+)?|חמש עשרה|[א-ת]+)?\s*(דקות|דקה|שניות|שנייה|שניה|שעות|שעה)( וחצי)?').firstMatch(s);
   if (m == null) return null;
   final unit = m.group(2)!;
   final perUnit = unit.startsWith('ש') ? (unit.startsWith('שע') ? 3600 : 1) : 60;
   final word = m.group(1);
-  double? count;
-  if (word == null) {
-    count = 1; // "עוד דקה", "שעה"
-  } else if (double.tryParse(word) case final n?) {
-    count = n;
-  } else if (_numberWords[word] case final n?) {
-    count = n.toDouble();
-  } else {
-    count = 1; // "עוד דקה" with a leading verb captured as the word
+  if (word == 'כמה') return null; // "כמה דקות" is a question, not a duration
+  var count = 1.0; // "עוד דקה", "שעה"
+  if (word != null) {
+    // "בחמש דקות", "לשתי דקות": a prefix letter before the number word.
+    final bare = word.length > 2 && 'בלו'.contains(word[0]) ? word.substring(1) : word;
+    count = double.tryParse(word) ?? _numberWords[word]?.toDouble() ?? _numberWords[bare]?.toDouble() ?? 1;
   }
   if (m.group(3) != null) count += 0.5;
   final seconds = (count * perUnit).round();
   return seconds > 0 ? seconds : null;
 }
 
-bool _any(String s, List<String> phrases) => phrases.any(s.contains);
+// ---- word families ------------------------------------------------------------------------------
 
-bool _isOneOf(String s, List<String> phrases) => phrases.contains(s);
+const _nextWords = [
+  'הבא', 'הבאה', 'הלאה', 'קדימה', 'ממשיכים', 'נמשיך', 'סיימתי', 'סיימנו', 'סיימת', 'גמרתי', 'גמרנו',
+  'הסתיים', 'מוכן', 'מוכנה', 'מוכנים', 'בוצע', 'עשיתי', 'עשינו', 'next', 'done',
+];
+const _backWords = [
+  'חזרה', 'חזור', 'תחזור', 'תחזרי', 'נחזור', 'אחורה', 'בטל', 'תבטל', 'תבטלי', 'לבטל', 'ביטול',
+  'טעות', 'טעיתי', 'תחזיר', 'תחזירי', 'undo', 'back',
+];
+const _pauseWords = ['עצור', 'תעצור', 'תעצרי', 'לעצור', 'השהה', 'תשהה', 'השהיה', 'תקפיא', 'להשהות'];
+const _resumeWords = ['המשך', 'תמשיך', 'תמשיכי', 'להמשיך', 'תפעיל', 'תפעילי', 'הפעל'];
+const _extendWords = [
+  'תוסיף', 'תוסיפי', 'הוסף', 'להוסיף', 'תאריך', 'תאריכי', 'הארך', 'להאריך', 'תן', 'תני', 'עוד', 'תשאיר',
+];
+const _helpWords = ['עזרה', 'תעזור', 'תעזרי', 'עזור', 'הסבר', 'תסביר', 'תסבירי'];
+const _uncertainty = ['אולי', 'נראה לי', 'לא בטוח', 'לא בטוחה', 'כנראה', 'יכול להיות', 'חושב ש', 'חושבת ש'];
+const _intentionWords = [
+  'עומד', 'עומדת', 'הולך', 'הולכת', 'אכניס', 'נכניס', 'אשים', 'נשים', 'אניח', 'נניח', 'אדליק', 'נדליק',
+  'רוצה', 'אמור', 'אמורה', 'תיכף', 'מיד', 'בקרוב',
+];
+const _knownReportVerbs = [
+  'הכנסתי', 'שמתי', 'הנחתי', 'כיסיתי', 'הדלקתי', 'הוספתי', 'העברתי', 'התחלתי', 'הרתחתי', 'יצקתי',
+  'פיזרתי', 'סגרתי', 'הוצאתי', 'כיביתי', 'הפכתי', 'טיגנתי', 'אפיתי', 'בישלתי', 'חיממתי', 'ערבבתי',
+  'הכנסנו', 'שמנו', 'הנחנו', 'הוצאנו', 'כיסינו', 'הדלקנו', 'הרתחנו', 'התחלנו',
+];
 
-// Past-tense reports of a real-world action ("הכנסתי", "שמתי"…).
-final _reportVerbs = RegExp(r'(^| )(הכנסתי|שמתי|הנחתי|כיסיתי|הדלקתי|הוספתי|העברתי|התחלתי|הרתחתי|יצקתי|פיזרתי|סגרתי|הוצאתי|כיביתי|הפכתי|טיגנתי|אפיתי|בישלתי|הרתחנו|הכנסנו|שמנו|הנחנו|הוצאנו|כיסינו|הדלקנו)( |$)');
-// Intentions: about to do it — never a confirmation.
-final _intentionWords = RegExp(r'(^| )(עומד|עומדת|הולך|הולכת|אכניס|נכניס|אשים|נשים|צריך|צריכה|רוצה|אמור|אמורה|עוד מעט|תיכף)( |$)');
+/// Messages that need reasoning go to Remy even if they contain a command word.
+const _reasoning = ['מה זה', 'למה', 'אין לי', 'אין לנו', 'במקום', 'תחליף', 'מה עושים אם', 'מה קורה אם', 'אפשר להשתמש', 'שורף', 'דביק', 'נשרף'];
 
-/// Classifies a cook's message, or null when it isn't a simple command (ask Remy).
+int _distance(String a, String b) {
+  if ((a.length - b.length).abs() > 1) return 2;
+  var prev = List<int>.generate(b.length + 1, (i) => i);
+  for (var i = 1; i <= a.length; i++) {
+    final cur = [i, ...List.filled(b.length, 0)];
+    for (var j = 1; j <= b.length; j++) {
+      final cost = a[i - 1] == b[j - 1] ? 0 : 1;
+      cur[j] = [prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + cost].reduce((x, y) => x < y ? x : y);
+    }
+    prev = cur;
+  }
+  return prev[b.length];
+}
+
+/// 0: exact word (also after one prefix letter: "שסיימתי", "והבא"); 1: near (one letter off,
+/// words of 5+ letters — shorter words are too easily confused, e.g. מוכר/מוכן); null: none.
+int? _match(List<String> tokens, List<String> family) {
+  int? best;
+  for (final token in tokens) {
+    final forms = [token, if (token.length > 3 && 'שוהבלכמ'.contains(token[0])) token.substring(1)];
+    for (final t in forms) {
+      for (final w in family) {
+        if (t == w) return 0;
+        if (t.length >= 5 && w.length >= 5 && _distance(t, w) == 1) best = 1;
+      }
+    }
+  }
+  return best;
+}
+
+bool _has(String s, List<String> phrases) => phrases.any((p) => RegExp('(^| )$p( |\$)').hasMatch(s) || (p.contains(' ') && s.contains(p)));
+
+/// Classifies a cook's message, or null when it isn't something the app understands
+/// confidently on its own (then Remy may interpret it).
 ParsedCommand? parseCommand(String text) {
+  final asked = text.trim().endsWith('?');
   final s = normalizeCommand(text);
   if (s.isEmpty) return null;
-  ParsedCommand cmd(CommandKind k, {int? seconds, bool intention = false}) =>
-      ParsedCommand(k, normalized: s, seconds: seconds, intention: intention);
+  final tokens = s.split(' ');
+  final uncertain = _has(s, _uncertainty);
+  ParsedCommand cmd(CommandKind k, {int? seconds, bool intention = false, bool fuzzy = false, String? subject}) =>
+      ParsedCommand(k, normalized: s, seconds: seconds, intention: intention, uncertain: uncertain, fuzzy: fuzzy, subject: subject);
 
-  // Questions that need reasoning go to Remy even if they contain a keyword.
-  if (_any(s, ['מה זה', 'למה', 'מה אפשר', 'במקום', 'אין לי', 'תחליף', 'מה עושים אם'])) return null;
+  if (_reasoning.any(s.contains)) return null;
 
-  if (_any(s, ['תוסיף', 'תוסיפי', 'הוסף', 'להוסיף', 'תאריך', 'הארך', 'להאריך', 'תן עוד', 'עוד '])) {
-    if (parseDuration(s) case final seconds?) return cmd(CommandKind.extendTimer, seconds: seconds);
-  }
-  if (_any(s, ['כמה זמן', 'כמה נשאר', 'מתי לבדוק', 'מתי זה מוכן', 'מתי זה נגמר', 'כמה עוד'])) {
+  // Time questions (before extensions: "עוד כמה דקות נשארו?" asks, it doesn't extend).
+  if (_has(s, ['כמה זמן', 'כמה נשאר', 'כמה עוד', 'עוד כמה', 'כמה דקות', 'מה עם הטיימר', 'מה מצב הטיימר', 'איפה הטיימר', 'מתי לבדוק', 'מתי זה מוכן', 'מתי זה נגמר', 'מתי נגמר'])) {
     return cmd(CommandKind.timeLeft);
   }
-  if (_any(s, ['עצור טיימר', 'עצור את הטיימר', 'תעצור', 'השהה', 'תשהה', 'השהיה'])) return cmd(CommandKind.pauseTimer);
-  if (_any(s, ['המשך טיימר', 'תמשיך את הטיימר', 'המשך את הטיימר', 'להמשיך את הטיימר', 'תפעיל שוב'])) {
-    return cmd(CommandKind.resumeTimer);
+  // Extend: a duration plus an extend word ("תן לזה עוד 4 דקות", "צריך עוד דקה"); "עוד קצת" has
+  // no duration — the service suggests the plan's re-check time and asks.
+  if (_match(tokens, _extendWords) case final m?) {
+    if (parseDuration(s) case final seconds?) return cmd(CommandKind.extendTimer, seconds: seconds, fuzzy: m == 1);
+    if (_has(s, ['עוד קצת', 'עוד טיפה', 'עוד קצת זמן'])) return cmd(CommandKind.extendTimer, fuzzy: true);
   }
-  if (_any(s, ['מה עכשיו', 'מה השלב', 'מה עושים עכשיו', 'מה הלאה', 'איפה אני', 'באיזה שלב'])) return cmd(CommandKind.whatNow);
-  if (_isOneOf(s, ['עזרה', 'תעזור', 'תעזרי', 'הסבר', 'תסביר', 'לא הבנתי', 'help']) ||
-      _any(s, ['איך יודעים', 'איך אני יודע', 'איך אדע', 'עזרה בשלב', 'עזור לי'])) {
+  if (_has(s, ['כמה שלבים'])) return cmd(CommandKind.stepsLeft);
+  if (_has(s, ['כמה מעלות', 'איזה חום', 'באיזה חום', 'באיזו טמפרטורה', 'איזו טמפרטורה', 'מה הטמפרטורה', 'טמפרטורה'])) {
+    return cmd(CommandKind.temperature);
+  }
+  if (_has(s, ['מה השלב הבא', 'מה אחרי זה', 'מה בהמשך', 'מה יהיה אחר כך', 'מה אחר כך', 'מה הבא'])) {
+    return cmd(CommandKind.nextStepPreview);
+  }
+  if (_has(s, ['מה עכשיו', 'מה השלב', 'מה עושים עכשיו', 'מה עושים', 'איפה אנחנו', 'באיזה שלב', 'מה אני צריך לעשות', 'מה אני צריכה לעשות'])) {
+    return cmd(CommandKind.whatNow);
+  }
+  if (_has(s, ['מה צריך לשלב', 'אילו מצרכים', 'מה המצרכים', 'מה צריך עכשיו', 'מה צריך לזה'])) {
+    return cmd(CommandKind.stepIngredients);
+  }
+  // "כמה מלח?" / "כמה שמן צריך" — an amount from the saved recipe.
+  final amount = RegExp(r'(^| )כמה ([א-ת][א-ת ]*)').firstMatch(s);
+  if (amount != null) {
+    final subject = amount.group(2)!.replaceAll(RegExp(r' ?(צריך|צריכה|שמים|לשים|להוסיף|יש|בדיוק)( |$)'), ' ').trim();
+    if (subject.isNotEmpty) return cmd(CommandKind.ingredientAmount, subject: subject);
+  }
+  if (_match(tokens, _helpWords) == 0 || _has(s, ['לא הבנתי', 'איך יודעים', 'איך אני יודע', 'איך אדע', 'איך עושים', 'עזרה בשלב'])) {
     return cmd(CommandKind.help);
   }
-  if (_isOneOf(s, ['חזרה', 'אחורה', 'חזור', 'תחזור', 'שלב קודם', 'לשלב הקודם', 'קודם', 'בטל', 'תבטל', 'ביטול', 'טעות', 'undo', 'back']) ||
-      s.startsWith('בטל ') || s.startsWith('תבטל ') || s.startsWith('חזור ') || s.startsWith('חזרה ')) {
-    return cmd(CommandKind.back);
+  final timerWord = _has(s, ['טיימר', 'הטיימר', 'שעון', 'השעון']);
+  if (_match(tokens, _pauseWords) case final m?) {
+    if (timerWord || tokens.length <= 2) return cmd(CommandKind.pauseTimer, fuzzy: m == 1);
   }
-  if (_reportVerbs.hasMatch(s) || _intentionWords.hasMatch(s) && _any(s, ['להכניס', 'לשים', 'להניח', 'להדליק', 'להוציא'])) {
-    return cmd(CommandKind.reportedAction, intention: _intentionWords.hasMatch(s));
+  if (timerWord) {
+    if (_match(tokens, _resumeWords) case final m?) return cmd(CommandKind.resumeTimer, fuzzy: m == 1);
   }
-  if (_isOneOf(s, ['הבא', 'לשלב הבא', 'שלב הבא', 'הלאה', 'קדימה', 'סיימתי', 'גמרתי', 'סיימנו', 'מוכן', 'זה מוכן', 'מוכן לשלב הבא', 'בוצע', 'עשיתי', 'next', 'done']) ||
-      s.contains('לשלב הבא') || s.startsWith('סיימתי') || s.startsWith('גמרתי') || s.startsWith('סיימנו')) {
-    return cmd(CommandKind.next);
+  if (_match(tokens, _backWords) case final m? when !_has(s, ['טיימר'])) {
+    return cmd(CommandKind.back, fuzzy: m == 1);
   }
+  if (_has(s, ['שלב קודם', 'לשלב הקודם', 'לא התכוונתי', 'זה היה בטעות'])) return cmd(CommandKind.back);
+  // A real-world action reported (past tense) or about to happen (intention).
+  final intention = _has(s, _intentionWords) || _has(s, ['צריך ל', 'עוד מעט']);
+  final reports = _match(tokens, _knownReportVerbs) != null ||
+      tokens.any((t) => t.length >= 4 && (t.endsWith('תי') || t.endsWith('נו')) && !const {'מתי', 'אותי', 'שלנו', 'אותנו', 'לנו', 'שלי'}.contains(t));
+  // "סיימתי" also ends like a report: an exact next-word means "next".
+  final exactNext = _match(tokens, _nextWords) == 0;
+  if (reports && !exactNext) return cmd(CommandKind.reportedAction, intention: intention);
+  if (intention && _has(s, ['להכניס', 'לשים', 'להניח', 'להדליק', 'להוציא', 'לכסות'])) {
+    return cmd(CommandKind.reportedAction, intention: true);
+  }
+  if (_match(tokens, _nextWords) case final m?) {
+    // "מוכן?" asks whether it's ready — answer with the step's cue, don't move on.
+    if (asked && tokens.length <= 3) return cmd(CommandKind.help);
+    return cmd(CommandKind.next, fuzzy: m == 1);
+  }
+  if (_has(s, ['לשלב הבא', 'שלב הבא', 'תעביר'])) return cmd(CommandKind.next);
+  if (reports) return cmd(CommandKind.reportedAction, intention: intention);
   return null;
 }
 

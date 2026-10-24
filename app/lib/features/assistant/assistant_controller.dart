@@ -6,6 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../cooking/cooking_controller.dart';
 import 'assistant_models.dart';
 import 'assistant_service.dart';
+import 'voice.dart';
 
 class ChatMessage {
   const ChatMessage({required this.fromUser, required this.textHe, String? speechHe}) : speechHe = speechHe ?? textHe;
@@ -66,11 +67,12 @@ class AssistantController extends Notifier<AssistantState> {
         now: actions.now(),
         history: history,
       );
+      final spoken = input.modality == InputModality.voice;
       if (reply.action != null && !reply.requiresConfirmation) {
         final result = await _service.execute(reply.action!, actions);
-        _say(result);
+        _say(result, speak: spoken);
       } else {
-        _say(reply, pending: reply.action == null ? null : reply);
+        _say(reply, pending: reply.action == null ? null : reply, speak: spoken);
       }
     } finally {
       state = state.copyWith(busy: false);
@@ -96,11 +98,16 @@ class AssistantController extends Notifier<AssistantState> {
 
   String get _rejectedText => lookupAppLocalizations(const Locale('he')).remyRejected;
 
-  void _say(AssistantReply reply, {AssistantReply? pending}) {
+  /// What speech recognition delivers: the same pipeline as typed text.
+  Future<void> sendSpoken(String transcript) => send(AssistantInput(transcript, modality: InputModality.voice));
+
+  void _say(AssistantReply reply, {AssistantReply? pending, bool speak = false}) {
     state = state.copyWith(
       messages: [...state.messages, ChatMessage(fromUser: false, textHe: reply.answerHe, speechHe: reply.speechHe)],
       pending: pending,
     );
+    // Spoken requests get spoken answers (silent until a text-to-speech engine is added).
+    if (speak) ref.read(speechSynthesizerProvider).speak(reply.speechHe);
   }
 }
 

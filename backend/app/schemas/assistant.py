@@ -50,9 +50,29 @@ class AssistantProposal(ContractModel):
     ops: list[PatchOp] = []
 
 
+CommandName = Literal[
+    "complete_step", "undo", "get_timer_status", "extend_timer", "pause_timer", "resume_timer",
+    "start_timer_action", "whats_next", "help",
+]
+
+
+class AssistantCommand(ContractModel):
+    """The cook's message interpreted as one supported app command (Gemini as a fallback
+    interpreter). The app validates it against the live engine state before anything runs."""
+
+    action: CommandName
+    step_id: str | None = None
+    action_id: str | None = None
+    timer_id: str | None = None
+    seconds: int | None = Field(default=None, gt=0, le=3600)
+    confidence: Literal["high", "low"] = "high"
+    user_uncertain: bool = False
+
+
 class AssistantTurnResponse(ContractModel):
     intent: Literal["cooking_question", "session_question", "change_request", "out_of_scope", "unclear"]
     answer_he: str
     speech_he: str
     proposal: AssistantProposal | None = None
+    command: AssistantCommand | None = None
     safety_note_he: str | None = None

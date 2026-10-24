@@ -1965,6 +1965,84 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'שינויים בזמן הבישול'**
   String get changesDuringCooking;
+
+  /// No description provided for @remyNextPreview.
+  ///
+  /// In he, this message translates to:
+  /// **'אחרי זה: {title}.'**
+  String remyNextPreview(String title);
+
+  /// No description provided for @remyLastStep.
+  ///
+  /// In he, this message translates to:
+  /// **'זה השלב האחרון.'**
+  String get remyLastStep;
+
+  /// No description provided for @remyIngredientAmount.
+  ///
+  /// In he, this message translates to:
+  /// **'{name}: {amount}.'**
+  String remyIngredientAmount(String name, String amount);
+
+  /// No description provided for @remyTemperature.
+  ///
+  /// In he, this message translates to:
+  /// **'{title}: {value}°.'**
+  String remyTemperature(String title, int value);
+
+  /// No description provided for @remyNoTemperature.
+  ///
+  /// In he, this message translates to:
+  /// **'בשלב הזה אין טמפרטורה מוגדרת.'**
+  String get remyNoTemperature;
+
+  /// No description provided for @remyStepIngredients.
+  ///
+  /// In he, this message translates to:
+  /// **'בשלב הזה: {items}.'**
+  String remyStepIngredients(String items);
+
+  /// No description provided for @remyNoStepIngredients.
+  ///
+  /// In he, this message translates to:
+  /// **'אין מצרכים מיוחדים בשלב הזה.'**
+  String get remyNoStepIngredients;
+
+  /// No description provided for @remyStepsLeft.
+  ///
+  /// In he, this message translates to:
+  /// **'נשארו {left} שלבים מתוך {total}.'**
+  String remyStepsLeft(int left, int total);
+
+  /// No description provided for @remyDidntCatch.
+  ///
+  /// In he, this message translates to:
+  /// **'לא הבנתי, אפשר לנסח שוב?'**
+  String get remyDidntCatch;
+
+  /// No description provided for @remyConfirmUndo.
+  ///
+  /// In he, this message translates to:
+  /// **'לבטל את הפעולה האחרונה?'**
+  String get remyConfirmUndo;
+
+  /// No description provided for @remyConfirmPause.
+  ///
+  /// In he, this message translates to:
+  /// **'להשהות את הטיימר \"{label}\"?'**
+  String remyConfirmPause(String label);
+
+  /// No description provided for @remyConfirmResume.
+  ///
+  /// In he, this message translates to:
+  /// **'להמשיך את הטיימר \"{label}\"?'**
+  String remyConfirmResume(String label);
+
+  /// No description provided for @remyConfirmNext.
+  ///
+  /// In he, this message translates to:
+  /// **'לסיים את \"{title}\" ולעבור לשלב הבא?'**
+  String remyConfirmNext(String title);
 }
 
 class _AppLocalizationsDelegate

@@ -213,6 +213,18 @@ class LlmAssistantTurn(BaseModel):
     step_changes: list[LlmStepChange] = []
     timer_changes: list[LlmTimerChange] = []
     safety_note_he: str | None = None
+    # Fallback interpreter: the cook's message as one supported app command (or "none").
+    command: Literal[
+        "none", "complete_step", "undo", "get_timer_status", "extend_timer", "pause_timer",
+        "resume_timer", "start_timer_action", "whats_next", "help",
+    ] = "none"
+    command_step_id: str | None = None
+    command_action_id: str | None = None
+    command_timer_id: str | None = None
+    command_seconds: int | None = None
+    command_confidence: Literal["high", "low"] = "high"
+    # The cook sounded unsure ("אולי צריך עוד קצת?"): the app asks before acting.
+    user_uncertain: bool = False
 
 
 class LlmPlan(BaseModel):

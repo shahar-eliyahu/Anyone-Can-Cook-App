@@ -30,12 +30,13 @@ async def call_structured(
     settings: Settings,
     budget: DailyBudget,
     purpose: str,
+    max_attempts: int = 2,
 ) -> T:
     """Every attempt counts against the daily cap. Rate limits are never retried, and
     after one the provider isn't called again for a while; temporary failures are
-    retried once. `LLMInvalidOutput` is left to the caller (it decides whether to make
-    a repair call)."""
-    for attempt in (1, 2):
+    retried once unless `max_attempts=1` (Remy: one call per request). `LLMInvalidOutput`
+    is left to the caller (it decides whether to make a repair call)."""
+    for attempt in range(1, max_attempts + 1):
         budget.check_paused()
         budget.consume(settings.ai_daily_call_cap)
         logger.info("ai call purpose=%s attempt=%d calls_today=%d", purpose, attempt, budget.used)
@@ -56,7 +57,7 @@ async def call_structured(
             headers = {"Retry-After": str(e.retry_after_seconds)} if known else None
             raise ApiError(429, "ai_rate_limited", headers=headers) from e
         except LLMUnavailable as e:
-            if attempt == 2:
+            if attempt == max_attempts:
                 raise ApiError(503, "ai_unavailable") from e
         except LLMInvalidOutput:
             raise

@@ -57,6 +57,8 @@ Key invariants:
   the live engine state and executes through `ActionDispatcher` (source `agent`). The confirmation policy lives in
   `AssistantService`, not in the model. Simple commands are parsed locally (no AI). Mid-cooking changes are
   `PlanPatched` events (steps not started only). Text and future speech share `AssistantInput` (DECISIONS #53–#57).
+- Remy is local-first; Gemini is a fallback interpreter with at most one call per unresolved request (no repair,
+  no retry) and its commands are re-validated in the app (DECISIONS #58–#60). Voice packages need approval.
 - The recipe overview (`/recipes/:id`) is the entry point for drafts and saved recipes; the detailed review is
   optional "עריכה מתקדמת" (DECISIONS #52).
 - Beginner UX: one main action per step ("סיימתי — לשלב הבא"), timers start only from an explicit tap, no

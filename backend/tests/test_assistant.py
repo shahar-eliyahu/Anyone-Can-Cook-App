@@ -15,7 +15,7 @@ from app.main import app
 from app.schemas.assistant import AssistantTurnRequest
 from app.security import DailyBudget, SlidingWindowLimiter, get_ai_budget, get_limiter
 from app.services.assistant import NO_CLAIMS_HE, OFF_TOPIC_LINE_HE, REDIRECT_HE, assistant_turn, speakable
-from app.services.llm import get_llm_provider
+from app.services.llm import LLMRateLimited, LLMUnavailable, get_llm_provider
 from app.services.patching import apply_ops
 from tests.fakes import FakeProvider
 
@@ -72,13 +72,12 @@ def test_success_claims_are_rewritten_into_proposal_wording():
     assert r.answer_he == NO_CLAIMS_HE
 
 
-def test_extend_timer_must_target_an_active_timer_within_bounds():
+def test_an_invalid_proposal_is_dropped_not_repaired():
     provider = FakeProvider({"LlmAssistantTurn": [
         turn(proposal_kind="extend_timer", timer_id="t2", extra_seconds=60),  # rice isn't running
-        turn(proposal_kind="extend_timer", timer_id="t1", extra_seconds=180),
     ]})
     r = run(provider)
-    assert r.proposal.timer_id == "t1" and len(provider.calls) == 2  # one repair call
+    assert r.proposal is None and r.answer_he and len(provider.calls) == 1  # one call per request
 
 
 def test_substitution_proposal_reuses_validation_and_safety():
@@ -101,19 +100,77 @@ def test_substitution_proposal_reuses_validation_and_safety():
 
 
 def test_step_changes_may_not_touch_completed_steps():
+    provider = FakeProvider({"LlmAssistantTurn": [turn(proposal_kind="step_change", step_changes=[{"step_id": "s1", "note_he": "x"}])]})
+    assert run(provider).proposal is None
     provider = FakeProvider({"LlmAssistantTurn": [
-        turn(proposal_kind="step_change", step_changes=[{"step_id": "s1", "note_he": "x"}]),
         turn(proposal_kind="step_change", proposal_summary_he="להנמיך את האש", step_changes=[{"step_id": "s4", "note_he": "על אש נמוכה מאוד."}]),
     ]})
-    r = run(provider)
-    assert r.proposal.ops[0].step_id == "s4" and len(provider.calls) == 2
+    assert run(provider).proposal.ops[0].step_id == "s4"
 
 
-def test_answers_that_stay_invalid_fail_clearly():
-    provider = FakeProvider({"LlmAssistantTurn": [turn(proposal_kind="extend_timer", timer_id="nope", extra_seconds=60)]})
+def test_output_that_does_not_match_the_schema_fails_clearly_after_one_call():
+    provider = FakeProvider({"LlmAssistantTurn": [{"intent": "nonsense"}]})
     with pytest.raises(ApiError) as e:
         run(provider)
-    assert e.value.code == "invalid_ai_output" and len(provider.calls) == 2
+    assert e.value.code == "invalid_ai_output" and len(provider.calls) == 1
+
+
+# ---- Gemini as a fallback interpreter (decision #59) --------------------------------------------
+
+
+def test_a_conversational_request_becomes_a_validated_command():
+    r = run(FakeProvider({"LlmAssistantTurn": [turn(
+        intent="change_request", answer_he="מוסיף עוד קצת זמן לעוף.", command="extend_timer",
+        command_timer_id="t1", command_seconds=240, user_uncertain=True,
+    )]}), request("תן לעוף להתבשל עוד איזה ארבע דקות אם אפשר"))
+    assert (r.command.action, r.command.timer_id, r.command.seconds, r.command.user_uncertain) == ("extend_timer", "t1", 240, True)
+    assert r.proposal is None
+
+
+@pytest.mark.parametrize("bad", [
+    {"command": "extend_timer", "command_timer_id": "t9", "command_seconds": 60},  # no such running timer
+    {"command": "extend_timer", "command_timer_id": "t1", "command_seconds": 99999},
+    {"command": "complete_step", "command_step_id": "s1"},  # already completed
+    {"command": "complete_step", "command_step_id": "s99"},
+    {"command": "start_timer_action", "command_step_id": "s3", "command_action_id": "a2"},  # doesn't start a timer
+    {"command": "pause_timer", "command_timer_id": "t9"},
+])
+def test_invalid_commands_are_dropped(bad):
+    r = run(FakeProvider({"LlmAssistantTurn": [turn(**bad)]}))
+    assert r.command is None
+
+
+def test_unsupported_commands_fail_schema_validation():
+    provider = FakeProvider({"LlmAssistantTurn": [turn(command="delete_everything")]})
+    with pytest.raises(ApiError):
+        run(provider)
+
+
+def test_command_and_proposal_are_exclusive():
+    r = run(FakeProvider({"LlmAssistantTurn": [turn(command="undo", proposal_kind="extend_timer", timer_id="t1", extra_seconds=60)]}))
+    assert r.command.action == "undo" and r.proposal is None
+
+
+@pytest.mark.parametrize("error, code", [
+    (LLMUnavailable("down"), "ai_unavailable"),
+    (LLMRateLimited(scope="minute", retry_after_seconds=20), "ai_rate_limited"),
+    (LLMRateLimited(scope="day"), "ai_quota_exhausted"),
+])
+def test_errors_are_never_retried_for_remy(error, code):
+    provider = FakeProvider({"LlmAssistantTurn": [error, turn()]})
+    with pytest.raises(ApiError) as e:
+        run(provider)
+    assert e.value.code == code and len(provider.calls) == 1
+
+
+def test_only_minimal_context_is_sent():
+    provider = FakeProvider({"LlmAssistantTurn": [turn()]})
+    run(provider)
+    text = provider.calls[0]["parts"][0].text
+    assert BUNDLE["recipe"]["source_steps"][0]["text"] not in text  # no source text
+    assert '"completed": true' in text  # completed steps by title only
+    s1_instruction = BUNDLE["plan"]["steps"][0]["instruction_he"]
+    assert s1_instruction not in text
 
 
 def test_data_blocks_carry_the_state_and_history():

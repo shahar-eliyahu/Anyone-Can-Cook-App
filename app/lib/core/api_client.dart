@@ -152,11 +152,23 @@ final apiClientProvider = Provider<ApiClient>(
 
 /// Response of POST /v1/assistant/turn.
 class AssistantTurnResult {
-  const AssistantTurnResult({required this.answerHe, required this.speechHe, this.proposal});
+  const AssistantTurnResult({required this.answerHe, required this.speechHe, this.proposal, this.command});
 
   factory AssistantTurnResult.fromJson(Map<String, dynamic> j) {
     final p = j['proposal'] as Map<String, dynamic>?;
+    final c = j['command'] as Map<String, dynamic>?;
     return AssistantTurnResult(
+      command: c == null
+          ? null
+          : AssistantCommandData(
+              action: c['action'] as String,
+              stepId: c['step_id'] as String?,
+              actionId: c['action_id'] as String?,
+              timerId: c['timer_id'] as String?,
+              seconds: c['seconds'] as int?,
+              lowConfidence: c['confidence'] == 'low',
+              userUncertain: c['user_uncertain'] as bool? ?? false,
+            ),
       answerHe: j['answer_he'] as String,
       speechHe: j['speech_he'] as String? ?? j['answer_he'] as String,
       proposal: p == null
@@ -174,6 +186,28 @@ class AssistantTurnResult {
   final String answerHe;
   final String speechHe;
   final AssistantProposalData? proposal;
+
+  /// The message interpreted as one supported command (Gemini as a fallback interpreter).
+  final AssistantCommandData? command;
+}
+
+class AssistantCommandData {
+  const AssistantCommandData({
+    required this.action,
+    this.stepId,
+    this.actionId,
+    this.timerId,
+    this.seconds,
+    this.lowConfidence = false,
+    this.userUncertain = false,
+  });
+  final String action;
+  final String? stepId;
+  final String? actionId;
+  final String? timerId;
+  final int? seconds;
+  final bool lowConfidence;
+  final bool userUncertain;
 }
 
 class AssistantProposalData {

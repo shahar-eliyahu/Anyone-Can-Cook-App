@@ -3,7 +3,7 @@
 Frequently changing status. Permanent rules are in `CLAUDE.md`; the approved design is `docs/PLAN.md`.
 Update this file at the end of every work step.
 
-_Last updated: 2026-10-24 (Phase 3C `536436c`, 3A `9e888f7`, 3B local commit; nothing pushed)_
+_Last updated: 2026-10-24 (Phase 3C `536436c`, 3A `9e888f7`, 3B `cd82fa6`, 3D local-first commit; nothing pushed)_
 
 ## Phase status
 
@@ -12,7 +12,7 @@ _Last updated: 2026-10-24 (Phase 3C `536436c`, 3A `9e888f7`, 3B local commit; no
 | 0 — Local foundations | ✅ Complete, committed and pushed (`1196478`). Render verified: `/health` 200, `/internal/ai-check` 404. |
 | 1 — Deterministic cooking core (no AI) | ✅ Implemented, verified (automated + emulator), approved by the user, committed and pushed to `main` (see `git log`). |
 | 2 — AI recipe analysis & planning | ✅ Complete, committed and pushed (`a6bd1f3` Phase 2, `a372736` app icon, `fa87e71` quota handling). Deployed on Render; live Gemini recipe test by the user passed (details below). |
-| 3 — Beginner cooking experience + assistant | 🔄 3C, 3A and 3B implemented and verified locally (tests + emulator), committed locally, not pushed or deployed. 3D (voice) not started. |
+| 3 — Beginner cooking experience + assistant | 🔄 3C, 3A, 3B and 3D's local-first understanding + voice seams implemented and verified locally, committed locally, not pushed or deployed. Speech packages (3D) wait for approval. |
 | 4 — Polish & release | ⏸ Not started. |
 
 ## Phase 1 — what exists
@@ -313,7 +313,7 @@ Checked what existed, changed only what was missing.
   ≤ 10 calls).
 - Mid-cooking substitutions are Phase 3B.
 
-### Phase 3B — Remy, implemented 2026-10-24 (local commit)
+### Phase 3B — Remy, implemented 2026-10-24 (local commit `cd82fa6`)
 
 - **Pipeline** (`app/lib/features/assistant/`): `AssistantInput(text, modality)` → `AssistantService.interpret`
   (local parser first, Remy for questions) → `AssistantReply` (answer, plain `speechHe` for future TTS, optional
@@ -353,9 +353,39 @@ Checked what existed, changed only what was missing.
   ≤ 20 calls).
 - The emulator's old sample recipe has no help texts (seeded before 3C); help falls back to the instruction.
 
+### Phase 3D — local-first Remy and voice seams, implemented 2026-10-24 (local commit)
+
+- **Local understanding:** word families instead of exact phrases (next, back, time, pause/resume, extend, help,
+  what now, next step), one Hebrew prefix handled ("שסיימתי"), one-letter tolerance for longer words
+  (transcription slips → confirmed first), uncertainty markers ("אולי", "נראה לי") → confirmed first, "מוכן?" is a
+  question (answered with the cue), Hebrew number words with prefixes ("בחמש דקות"), "עוד קצת" → the plan's re-check
+  time (asked), local answers: "כמה מלח?", "כמה מעלות?", "מה השלב הבא?", "מה צריך לשלב הזה?", "כמה שלבים נשארו?".
+  Transcript noise ("…", one letter) → "לא הבנתי" with no call.
+- **Gemini fallback interpreter:** `command` in `/v1/assistant/turn` (supported set only), validated on the server
+  (ids, running timers, completed steps, bounds) and again in the app (live state); info commands answered from
+  local data; real-world facts and undo always confirmed; unsure / low-confidence → confirmed. One call per
+  request: no repair, `max_attempts=1` (no retry on unavailable, quota or rate limits). Minimal context.
+- **Voice seams:** `voice.dart` (`SpeechRecognizer`, `SpeechSynthesizer`, silent default),
+  `AssistantController.sendSpoken()`; spoken requests get `speechHe` spoken (recorded in tests).
+- **Tests (fakes only, zero Gemini calls):** backend **186/186** (13 new: command interpretation, invalid commands,
+  unsupported command, command vs proposal, no retry for unavailable / rate limit / quota, minimal context, schema
+  failure after one call; 3 repair-based tests changed to the one-call behaviour); Flutter **227/227**, analyzer clean
+  (46 new in `local_first_test.dart` + 1 spoken-input widget test: phrasings with zero calls, local Q&A, local
+  clarification, noise, fallback interpretation, unsure interpretation, real-world facts confirmed, 5 invalid
+  interpretations rejected, offline/timeout/quota/rate-limit/unavailable with one attempt, spoken = typed).
+- **Emulator (offline, no backend), 2026-10-24:** Remy sheet: "done" finished the step, "back" undid it; test
+  session abandoned afterwards.
+
+### Phase 3D — pending / limitations
+
+- Speech recognition and text-to-speech packages, the microphone button and hands-free mode wait for dependency
+  approval; the wake phrase stays later.
+- Local understanding is rule-based; unusual phrasings still go to Gemini (online).
+- The server interpretation is untested against real Gemini (needs approval).
+
 ## Next step
 
-1. User reviews 3C + 3A + 3B (commits are local only).
+1. User reviews 3C + 3A + 3B + 3D local-first (commits are local only); approves (or not) the speech packages.
 2. With approval: small live checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 / ≤ 10 calls;
    3B Remy ≈ 15 questions / ≤ 20 calls), then push and deploy.
 3. Phase 3D (voice) only after approval.

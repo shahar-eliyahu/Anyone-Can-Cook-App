@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:anyone_can_cook/core/api_client.dart';
+import 'package:anyone_can_cook/features/assistant/voice.dart';
 import 'package:anyone_can_cook/features/import/image_store.dart';
 import 'package:anyone_can_cook/features/prepare/preparation.dart';
 import 'package:anyone_can_cook/features/timers/timer_notifier.dart';
@@ -162,4 +163,13 @@ class FakeApi extends ApiClient {
   }
 
   ({String message, String modality, Map<String, Object?> snapshot, List<Map<String, String>> history})? lastTurn;
+}
+
+/// Records what Remy would say aloud (text-to-speech is a Phase 3D package).
+class RecordingSpeechSynthesizer implements SpeechSynthesizer {
+  final spoken = <String>[];
+  @override
+  Future<void> speak(String textHe) async => spoken.add(textHe);
+  @override
+  Future<void> stop() async {}
 }

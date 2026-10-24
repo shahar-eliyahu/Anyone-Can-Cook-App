@@ -784,5 +784,83 @@
       }
     }
   },
-  "changesDuringCooking": "שינויים בזמן הבישול"
+  "changesDuringCooking": "שינויים בזמן הבישול",
+  "remyNextPreview": "אחרי זה: {title}.",
+  "@remyNextPreview": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "remyLastStep": "זה השלב האחרון.",
+  "remyIngredientAmount": "{name}: {amount}.",
+  "@remyIngredientAmount": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "remyTemperature": "{title}: {value}°.",
+  "@remyTemperature": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "value": {
+        "type": "int"
+      }
+    }
+  },
+  "remyNoTemperature": "בשלב הזה אין טמפרטורה מוגדרת.",
+  "remyStepIngredients": "בשלב הזה: {items}.",
+  "@remyStepIngredients": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "remyNoStepIngredients": "אין מצרכים מיוחדים בשלב הזה.",
+  "remyStepsLeft": "נשארו {left} שלבים מתוך {total}.",
+  "@remyStepsLeft": {
+    "placeholders": {
+      "left": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "remyDidntCatch": "לא הבנתי, אפשר לנסח שוב?",
+  "remyConfirmUndo": "לבטל את הפעולה האחרונה?",
+  "remyConfirmPause": "להשהות את הטיימר \"{label}\"?",
+  "@remyConfirmPause": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyConfirmResume": "להמשיך את הטיימר \"{label}\"?",
+  "@remyConfirmResume": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyConfirmNext": "לסיים את \"{title}\" ולעבור לשלב הבא?",
+  "@remyConfirmNext": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  }
 }

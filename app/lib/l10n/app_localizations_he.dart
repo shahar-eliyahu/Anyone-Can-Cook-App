@@ -1105,4 +1105,59 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get changesDuringCooking => 'שינויים בזמן הבישול';
+
+  @override
+  String remyNextPreview(String title) {
+    return 'אחרי זה: $title.';
+  }
+
+  @override
+  String get remyLastStep => 'זה השלב האחרון.';
+
+  @override
+  String remyIngredientAmount(String name, String amount) {
+    return '$name: $amount.';
+  }
+
+  @override
+  String remyTemperature(String title, int value) {
+    return '$title: $value°.';
+  }
+
+  @override
+  String get remyNoTemperature => 'בשלב הזה אין טמפרטורה מוגדרת.';
+
+  @override
+  String remyStepIngredients(String items) {
+    return 'בשלב הזה: $items.';
+  }
+
+  @override
+  String get remyNoStepIngredients => 'אין מצרכים מיוחדים בשלב הזה.';
+
+  @override
+  String remyStepsLeft(int left, int total) {
+    return 'נשארו $left שלבים מתוך $total.';
+  }
+
+  @override
+  String get remyDidntCatch => 'לא הבנתי, אפשר לנסח שוב?';
+
+  @override
+  String get remyConfirmUndo => 'לבטל את הפעולה האחרונה?';
+
+  @override
+  String remyConfirmPause(String label) {
+    return 'להשהות את הטיימר \"$label\"?';
+  }
+
+  @override
+  String remyConfirmResume(String label) {
+    return 'להמשיך את הטיימר \"$label\"?';
+  }
+
+  @override
+  String remyConfirmNext(String title) {
+    return 'לסיים את \"$title\" ולעבור לשלב הבא?';
+  }
 }

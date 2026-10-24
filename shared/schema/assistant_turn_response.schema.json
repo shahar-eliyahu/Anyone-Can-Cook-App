@@ -27,6 +27,96 @@
       "title": "AddStepNote",
       "type": "object"
     },
+    "AssistantCommand": {
+      "additionalProperties": false,
+      "description": "The cook's message interpreted as one supported app command (Gemini as a fallback\ninterpreter). The app validates it against the live engine state before anything runs.",
+      "properties": {
+        "action": {
+          "enum": [
+            "complete_step",
+            "undo",
+            "get_timer_status",
+            "extend_timer",
+            "pause_timer",
+            "resume_timer",
+            "start_timer_action",
+            "whats_next",
+            "help"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "action_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Action Id"
+        },
+        "confidence": {
+          "default": "high",
+          "enum": [
+            "high",
+            "low"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 3600,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seconds"
+        },
+        "step_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Step Id"
+        },
+        "timer_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Timer Id"
+        },
+        "user_uncertain": {
+          "default": false,
+          "title": "User Uncertain",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "title": "AssistantCommand",
+      "type": "object"
+    },
     "AssistantProposal": {
       "additionalProperties": false,
       "properties": {
@@ -487,6 +577,17 @@
     "answer_he": {
       "title": "Answer He",
       "type": "string"
+    },
+    "command": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AssistantCommand"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "intent": {
       "enum": [

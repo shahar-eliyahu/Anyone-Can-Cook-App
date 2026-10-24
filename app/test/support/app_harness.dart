@@ -10,6 +10,7 @@ import 'package:anyone_can_cook/data/recipe_repository.dart';
 import 'package:anyone_can_cook/data/sample_seeder.dart';
 import 'package:anyone_can_cook/data/session_repository.dart';
 import 'package:anyone_can_cook/data/settings_repository.dart';
+import 'package:anyone_can_cook/features/assistant/voice.dart';
 import 'package:anyone_can_cook/features/import/image_store.dart';
 import 'package:anyone_can_cook/features/kitchen/backend_status.dart';
 import 'package:anyone_can_cook/features/timers/timer_notifier.dart';
@@ -36,6 +37,7 @@ class AppHarness {
   /// The backend double: queue responses; every call is recorded in `api.calls`.
   final api = FakeApi();
   final images = FakeImageStore();
+  final speech = RecordingSpeechSynthesizer();
 
   /// What the camera/gallery picker returns (null: the user cancelled).
   String? pickedPhoto;
@@ -70,6 +72,7 @@ class AppHarness {
           timerNotifierProvider.overrideWithValue(notifier),
           apiClientProvider.overrideWithValue(api),
           imageStoreProvider.overrideWithValue(images),
+          speechSynthesizerProvider.overrideWithValue(speech),
           photoPickerProvider.overrideWithValue(({required bool camera}) async => pickedPhoto),
           healthProvider.overrideWith(
             (ref) => (health ??
