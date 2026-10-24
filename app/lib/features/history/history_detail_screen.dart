@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/format.dart';
+import '../../core/theme.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/components.dart';
 import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
 import '../../data/session_repository.dart';
@@ -69,43 +71,65 @@ class _DetailView extends ConsumerWidget {
     final state = CookingEngine.replay(detail.plan, detail.events);
 
     return ListView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(Space.page, Space.s, Space.page, Space.xxl),
       children: [
-        Text(recipe.displayTitle, style: theme.textTheme.headlineSmall),
-        const SizedBox(height: 4),
-        Text('${formatDateTime(session.startedAt)} · ${sessionStatusLabel(l10n, session.status)}'),
-        if (session.endedAt != null)
-          Text(l10n.cookingTime(cookingDurationLabel(l10n, session.startedAt, session.endedAt!))),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(Space.l + 2),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: Space.s,
+              children: [
+                Text(recipe.displayTitle, style: theme.textTheme.headlineSmall),
+                Wrap(
+                  spacing: Space.s,
+                  runSpacing: Space.s,
+                  children: [
+                    InfoPill(icon: Icons.event_outlined, label: formatDateTime(session.startedAt)),
+                    InfoPill(icon: sessionStatusIcon(session.status), label: sessionStatusLabel(l10n, session.status)),
+                    if (session.endedAt case final end?)
+                      InfoPill(icon: Icons.schedule_rounded, label: l10n.cookingTime(cookingDurationLabel(l10n, session.startedAt, end))),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
         if (session.notes != null) ...[
           SectionTitle(l10n.notes),
-          Text(session.notes!),
+          NoteBanner(session.notes!, kind: NoteKind.tip, icon: Icons.sticky_note_2_outlined),
         ],
         if (state.patches.isNotEmpty) ...[
           SectionTitle(l10n.changesDuringCooking),
-          for (final p in state.patches) Text('• ${p.summaryHe}'),
+          for (final p in state.patches) NoteBanner(p.summaryHe, icon: Icons.swap_horiz_rounded),
         ],
         SectionTitle(l10n.stepsCompletedTitle),
-        for (final step in detail.plan.steps)
-          ListTile(
-            dense: true,
-            contentPadding: EdgeInsets.zero,
-            leading: Icon(
-              state.isStepDone(step) ? Icons.check_circle : Icons.radio_button_unchecked,
-              color: state.isStepDone(step) ? theme.colorScheme.primary : theme.disabledColor,
-            ),
-            title: Text(step.title),
-            subtitle: state.isStepDone(step) ? null : Text(l10n.stepNotDone),
+        Card(
+          child: Column(
+            children: [
+              for (final step in detail.plan.steps)
+                ListTile(
+                  leading: Icon(
+                    state.isStepDone(step) ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                    color: state.isStepDone(step) ? context.palette.success : theme.colorScheme.outline,
+                  ),
+                  title: Text(step.title),
+                  subtitle: state.isStepDone(step) ? null : Text(l10n.stepNotDone),
+                ),
+            ],
           ),
-        const SizedBox(height: 16),
+        ),
+        const SizedBox(height: Space.xl),
         if (session.status == SessionStatus.inProgress)
           FilledButton(
             onPressed: () => context.go('/cook/${session.id}'),
             child: Text(l10n.continueCooking),
           )
         else
-          FilledButton(
+          FilledButton.icon(
             onPressed: () => startCooking(context, ref, recipe.id),
-            child: Text(l10n.cookAgain),
+            icon: const Icon(Icons.replay_rounded),
+            label: Text(l10n.cookAgain),
           ),
       ],
     );

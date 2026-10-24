@@ -24,12 +24,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('לבשל כל אחד יכול'), findsOneWidget);
-    expect(find.text('המטבח שלי'), findsOneWidget);
-    expect(find.text('המשך בישול'), findsOneWidget);
-    expect(find.text('אין בישול פעיל כרגע'), findsOneWidget);
-    for (final tile in ['המתכונים שלי', 'מועדפים', 'היסטוריית בישול', 'הגדרות']) {
-      expect(find.text(tile), findsOneWidget);
-    }
+    expect(find.text('מה מבשלים היום?'), findsOneWidget);
+    expect(find.text('מתכון חדש'), findsOneWidget);
+    expect(find.text('המתכונים שלי'), findsOneWidget);
+    expect(find.text('לכל המתכונים'), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing); // nothing floats over the list
+    // No cooking in progress: no "continue" card at all.
+    expect(find.text('מבשלים עכשיו'), findsNothing);
+    expect(find.text('תפריט'), findsOneWidget);
     expectNoDeveloperText();
     expect(calls, 1); // the server is still woken quietly
 
@@ -41,7 +43,7 @@ void main() {
     await tester.pumpWidget(h.build(health: () async => throw Exception('offline')));
     await tester.pumpAndSettle();
     expectNoDeveloperText();
-    await tester.tap(find.text('המתכונים שלי'));
+    await tester.tap(find.text('לכל המתכונים'));
     await tester.pumpAndSettle();
     expect(find.text('אין מתכונים עדיין'), findsOneWidget);
   });
@@ -51,6 +53,6 @@ void main() {
     await tester.pumpWidget(h.build(health: () => never.future));
     await tester.pump(const Duration(seconds: 30));
     expectNoDeveloperText();
-    expect(find.text('המטבח שלי'), findsOneWidget);
+    expect(find.text('לבשל כל אחד יכול'), findsOneWidget);
   });
 }

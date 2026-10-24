@@ -44,7 +44,7 @@ void main() {
     expect(await SettingsRepository(h.db, h.clock.call).get(SettingKeys.importPrivacyAccepted), 'true');
 
     await tester.enterText(find.byType(TextField), 'כרעי עוף בתנור עם אורז');
-    await tapText(tester, 'ניתוח המתכון');
+    await tapText(tester, 'קריאת המתכון');
 
     // Overview, not a detailed review: a short "שימו לב" card; a limitation needs one acknowledgement.
     expect(find.text('בדיקת התוכנית'), findsNothing);
@@ -81,11 +81,11 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField), 'עוגה');
-    await tapText(tester, 'ניתוח המתכון');
+    await tapText(tester, 'קריאת המתכון');
     expect(find.text('מה גודל התבנית?'), findsOneWidget);
     expect(h.api.calls, ['analyzeText']);
 
-    await tapText(tester, 'לא יודע/ת');
+    await tapText(tester, 'לא בטוח/ה, תחליטו בשבילי');
     expect(find.byType(TextField), findsNothing);
     await tapText(tester, 'בניית התוכנית');
 
@@ -105,7 +105,7 @@ void main() {
     await tapText(tester, 'תמונה');
     await tapText(tester, 'מהגלריה');
     expect(h.images.saved, {'/images/1.jpg'});
-    await tapText(tester, 'ניתוח המתכון');
+    await tapText(tester, 'קריאת המתכון');
 
     expect(h.api.calls, ['analyzeImage', 'plan']);
     await expectSeen(tester, find.textContaining('המתכון נקרא מתמונה'));
@@ -125,7 +125,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.enterText(find.byType(TextField), 'מרק עדשים');
-    await tapText(tester, 'ניתוח המתכון');
+    await tapText(tester, 'קריאת המתכון');
     await expectSeen(tester, find.textContaining('אין חיבור לאינטרנט'));
     expect(find.text('מרק עדשים'), findsOneWidget);
     expect(await allRecipes(h), isEmpty);
@@ -163,7 +163,7 @@ void main() {
     await tester.tap(find.byWidgetPredicate((w) => w is PopupMenuButton).first);
     await tester.pumpAndSettle();
     await tapText(tester, 'עריכה מתקדמת');
-    await tapText(tester, 'בדקתי — התוכנית נכונה');
+    await tapText(tester, 'בדקתי, התוכנית נכונה');
     expect(find.text('התוכנית לא מעודכנת לשינויים במתכון'), findsNothing);
     await tapText(tester, 'בדקתי את הערכים המסומנים');
     await tapText(tester, 'אישור התוכנית');
@@ -188,7 +188,7 @@ void main() {
     await tester.pumpAndSettle();
     await tapText(tester, 'מתכון חדש');
     await tester.enterText(find.byType(TextField), 'שקשוקה לארבעה');
-    await tapText(tester, 'ניתוח המתכון');
+    await tapText(tester, 'קריאת המתכון');
 
     await expectSeen(tester, find.textContaining('מכסת השימוש היומית'));
     await expectSeen(tester, find.textContaining('המתכונים השמורים והבישול ממשיכים לעבוד'));
@@ -204,7 +204,7 @@ void main() {
     await expectSeen(tester, find.text('שחזרנו את מה שהזנתם בניסיון הקודם.'));
 
     // The service is back: one retry goes through.
-    await tapText(tester, 'ניתוח המתכון');
+    await tapText(tester, 'קריאת המתכון');
     await expectSeen(tester, find.text('מתחילים לבשל'));
     expect(h.api.calls, ['analyzeText', 'analyzeText', 'plan']);
   });
@@ -218,7 +218,7 @@ void main() {
     await tester.pumpWidget(h.build(initialLocation: '/import'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'עוגת גבינה');
-    await tapText(tester, 'ניתוח המתכון');
+    await tapText(tester, 'קריאת המתכון');
     await expectSeen(tester, find.textContaining("בעוד כ-2 דק'"));
 
     await tapText(tester, 'נסו שוב');
@@ -234,7 +234,7 @@ void main() {
     await tester.pumpWidget(h.build(initialLocation: '/import'));
     await tester.pumpAndSettle();
     await tester.enterText(find.byType(TextField), 'עוף בתנור');
-    await tapText(tester, 'ניתוח המתכון');
+    await tapText(tester, 'קריאת המתכון');
 
     await expectSeen(tester, find.textContaining('מכסת השימוש היומית'));
     await expectSeen(tester, find.textContaining('המתכון נקרא ונשמר'));

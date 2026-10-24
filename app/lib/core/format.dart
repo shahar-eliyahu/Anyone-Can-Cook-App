@@ -43,3 +43,13 @@ String formatApproxDuration(int minutes, AppLocalizations l10n) {
   final hours = halfHours ~/ 2;
   return l10n.durationHours(halfHours.isOdd ? '$hours½' : '$hours');
 }
+
+final _dashSeparator = RegExp(r'\s+[—–-]\s+');
+
+/// Hebrew copy uses no dashes as separators (docs/DESIGN.md §9). Text written by people or
+/// the AI ("לקפל — לערבב בעדינות") is shown with a comma instead; hyphens inside words
+/// ("כ-5") are left alone.
+String tidyHe(String text) => text.replaceAll(_dashSeparator, ', ');
+
+/// Keeps a left-to-right fragment (a URL, "200°C", "1:05:00") in one piece inside Hebrew text.
+String ltr(String text) => '\u2066$text\u2069';

@@ -3,7 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/db/database.dart';
+import '../../core/theme.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/components.dart';
+import '../../core/widgets/motion_widgets.dart';
 import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
 import '../../l10n/app_localizations.dart';
@@ -34,29 +37,26 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+            padding: const EdgeInsets.fromLTRB(Space.page, Space.s, Space.page, Space.s),
             child: TextField(
-              decoration: InputDecoration(
-                prefixIcon: const Icon(Icons.search),
-                hintText: l10n.searchRecipes,
-                border: const OutlineInputBorder(),
-                isDense: true,
-              ),
+              decoration: InputDecoration(prefixIcon: const Icon(Icons.search_rounded), hintText: l10n.searchRecipes),
+              textInputAction: TextInputAction.search,
               onChanged: (v) => setState(() => _query = v),
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: Space.page),
             child: Row(
+              spacing: Space.s,
               children: [
                 ChoiceChip(
                   label: Text(l10n.allRecipes),
                   selected: !_favoritesOnly,
                   onSelected: (_) => setState(() => _favoritesOnly = false),
                 ),
-                const SizedBox(width: 8),
                 ChoiceChip(
-                  label: Text('⭐ ${l10n.favorites}'),
+                  avatar: const Icon(Icons.star_rounded, size: 18),
+                  label: Text(l10n.favorites),
                   selected: _favoritesOnly,
                   onSelected: (_) => setState(() => _favoritesOnly = true),
                 ),
@@ -70,25 +70,32 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
                 final rows = snapshot.data;
                 if (rows == null) return const Center(child: CircularProgressIndicator());
                 if (rows.isEmpty) {
-                  return Center(
-                    child: Text(_favoritesOnly ? l10n.noFavorites : l10n.noRecipes),
+                  return EmptyState(
+                    icon: _favoritesOnly ? Icons.star_outline_rounded : Icons.menu_book_outlined,
+                    title: _query.trim().isNotEmpty
+                        ? l10n.recipesSearchEmpty
+                        : _favoritesOnly
+                            ? l10n.noFavorites
+                            : l10n.noRecipes,
+                    action: _favoritesOnly || _query.trim().isNotEmpty
+                        ? null
+                        : FilledButton.icon(
+                            onPressed: () => context.push('/import'),
+                            icon: const Icon(Icons.add_rounded),
+                            label: Text(l10n.newRecipe),
+                          ),
                   );
                 }
                 return ListView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(Space.page, Space.s, Space.page, Space.xxl),
                   children: [
-                    for (final r in rows)
-                      Card(
-                        child: ListTile(
-                          title: Text(r.displayTitle),
-                          subtitle: r.sourceType == 'sample' ? Text(l10n.sampleRecipeLabel) : null,
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (r.isFavorite) const Icon(Icons.star, color: Colors.amber),
-                              const Icon(Icons.chevron_left),
-                            ],
-                          ),
+                    for (final (i, r) in rows.indexed)
+                      Appear(
+                        index: i,
+                        child: RecipeTile(
+                          title: r.displayTitle,
+                          subtitle: r.sourceType == 'sample' ? l10n.sampleRecipeLabel : null,
+                          favorite: r.isFavorite,
                           onTap: () => context.push('/recipes/${r.id}'),
                         ),
                       ),

@@ -103,7 +103,7 @@ class PlanStepCard extends StatelessWidget {
             for (final u in step.ingredientUses)
               if (ingredients[u.ingredientId] case final i?)
                 ProvenancedText(
-                  '• ${i.name}${u.quantity == null ? '' : ' — ${u.quantity!.display}'}',
+                  '• ${i.name}${u.quantity == null ? '' : ': ${u.quantity!.display}'}',
                   u.quantity?.provenance ?? i.quantity?.provenance ?? Provenance.original,
                   note: u.noteHe,
                 ),

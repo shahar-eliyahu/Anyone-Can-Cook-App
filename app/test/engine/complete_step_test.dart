@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/sample.dart';
 
-/// Phase 3C: one primary action per step ("סיימתי — לשלב הבא"), explicit timer
+/// Phase 3C: one primary action per step ("סיימתי, לשלב הבא"), explicit timer
 /// starts, and "חזרה" that undoes the last tap — all as existing events.
 void main() {
   late EngineHarness h;

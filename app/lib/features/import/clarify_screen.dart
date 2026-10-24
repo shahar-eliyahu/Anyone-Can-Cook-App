@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/format.dart';
+import '../../core/theme.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/components.dart';
+import '../../core/widgets/motion_widgets.dart';
 import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
 import '../../l10n/app_localizations.dart';
@@ -121,94 +125,98 @@ class _ClarifyScreenState extends ConsumerState<ClarifyScreen> {
 
     return AppScaffold(
       title: l10n.clarifyTitle,
+      bottomBar: _busy
+          ? null
+          : FilledButton.icon(
+              onPressed: _continue,
+              icon: Icon(_failed ? Icons.refresh_rounded : Icons.checklist_rounded),
+              label: Text(_failed ? l10n.importRetry : l10n.clarifyContinue),
+            ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(Space.page, Space.s, Space.page, Space.xl),
         children: [
-          if (analysis.recipe?.title case final t?) Text(t, style: theme.textTheme.titleLarge),
+          if (analysis.recipe?.title case final t?) Text(tidyHe(t), style: theme.textTheme.headlineSmall),
           if (analysis.questions.isNotEmpty) ...[
-            const SizedBox(height: 8),
-            Text(l10n.clarifyIntro),
+            const SizedBox(height: Space.s),
+            Text(l10n.clarifyIntro, style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
           ],
-          const SizedBox(height: 8),
-          for (final q in analysis.questions)
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 8,
-                  children: [
-                    if (q.required || q.category == GapCategory.safety)
-                      Text('⚠️ ${l10n.clarifyRequired}', style: TextStyle(color: theme.colorScheme.error)),
-                    Text(q.textHe, style: theme.textTheme.titleSmall),
-                    Text(q.whyHe, style: theme.textTheme.bodySmall),
-                    if (!_unknown.contains(q.id))
-                      if (q.kind == QuestionKind.choice)
-                        Wrap(
-                          spacing: 6,
-                          runSpacing: 6,
+          const SizedBox(height: Space.m),
+          for (final (i, q) in analysis.questions.indexed)
+            Appear(
+              index: i,
+              child: Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(Space.l),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: Space.s,
+                    children: [
+                      if (q.required || q.category == GapCategory.safety)
+                        Row(
+                          spacing: Space.xs,
                           children: [
-                            for (final o in q.options)
-                              ChoiceChip(
-                                label: Text(o),
-                                selected: _choices[q.id] == o,
-                                onSelected: _busy ? null : (_) => setState(() => _choices[q.id] = o),
-                              ),
+                            Icon(Icons.health_and_safety_outlined, size: 18, color: theme.colorScheme.error),
+                            Text(l10n.clarifyRequired, style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.error)),
                           ],
-                        )
-                      else
-                        TextField(
-                          controller: _fields[q.id],
-                          enabled: !_busy,
-                          keyboardType: q.kind == QuestionKind.number
-                              ? const TextInputType.numberWithOptions(decimal: true)
-                              : TextInputType.text,
-                          decoration: InputDecoration(
-                            hintText: l10n.clarifyAnswerHint,
-                            suffixText: q.unitHe,
-                            border: const OutlineInputBorder(),
-                          ),
                         ),
-                    FilterChip(
-                      label: Text(l10n.clarifyDontKnow),
-                      selected: _unknown.contains(q.id),
-                      onSelected: _busy
-                          ? null
-                          : (on) => setState(() => on ? _unknown.add(q.id) : _unknown.remove(q.id)),
-                    ),
-                  ],
+                      Text(tidyHe(q.textHe), style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+                      Text(tidyHe(q.whyHe), style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                      if (!_unknown.contains(q.id))
+                        if (q.kind == QuestionKind.choice)
+                          Wrap(
+                            spacing: Space.s,
+                            runSpacing: Space.s,
+                            children: [
+                              for (final o in q.options)
+                                ChoiceChip(
+                                  label: Text(o),
+                                  selected: _choices[q.id] == o,
+                                  onSelected: _busy ? null : (_) => setState(() => _choices[q.id] = o),
+                                ),
+                            ],
+                          )
+                        else
+                          TextField(
+                            controller: _fields[q.id],
+                            enabled: !_busy,
+                            keyboardType: q.kind == QuestionKind.number
+                                ? const TextInputType.numberWithOptions(decimal: true)
+                                : TextInputType.text,
+                            decoration: InputDecoration(hintText: l10n.clarifyAnswerHint, suffixText: q.unitHe),
+                          ),
+                      FilterChip(
+                        label: Text(l10n.clarifyDontKnow),
+                        selected: _unknown.contains(q.id),
+                        onSelected: _busy
+                            ? null
+                            : (on) => setState(() => on ? _unknown.add(q.id) : _unknown.remove(q.id)),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          const SizedBox(height: 16),
-          if (_busy)
-            Row(
-              spacing: 16,
-              children: [
-                const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 3)),
-                Text(l10n.importStagePlanning),
-              ],
-            )
-          else
-            FilledButton.icon(
-              onPressed: _continue,
-              icon: Icon(_failed ? Icons.refresh : Icons.auto_awesome),
-              label: Text(_failed ? l10n.importRetry : l10n.clarifyContinue),
-            ),
-          if (_error case final e?) ...[
-            const SizedBox(height: 16),
-            Text(e, style: TextStyle(color: theme.colorScheme.error)),
+          if (_busy) ...[
+            const SizedBox(height: Space.m),
+            StageLoader(stages: [l10n.importStagePlanning], current: 0),
           ],
-          const SizedBox(height: 8),
-          TextButton(
-            onPressed: _busy
-                ? null
-                : () async {
-                    final router = GoRouter.of(context);
-                    await ref.read(importServiceProvider).discard(widget.draftId);
-                    router.go('/');
-                  },
-            child: Text(l10n.reviewCancelImport),
+          if (_error case final e?) ...[
+            const SizedBox(height: Space.m),
+            NoteBanner(e, kind: NoteKind.warning),
+          ],
+          const SizedBox(height: Space.s),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton(
+              onPressed: _busy
+                  ? null
+                  : () async {
+                      final router = GoRouter.of(context);
+                      await ref.read(importServiceProvider).discard(widget.draftId);
+                      router.go('/');
+                    },
+              child: Text(l10n.reviewCancelImport),
+            ),
           ),
         ],
       ),

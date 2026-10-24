@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../l10n/app_localizations.dart';
 import 'assistant_controller.dart';
+import 'assistant_models.dart';
 import 'voice.dart';
 
 enum VoicePhase { idle, preparing, listening, processing, speaking }
@@ -44,9 +45,9 @@ class VoiceState {
 /// reply aloud. Uses the phone's own speech services; every problem becomes a friendly
 /// message and typing keeps working.
 class VoiceController extends Notifier<VoiceState> {
-  VoiceController(this.sessionId);
+  VoiceController(this.scope);
 
-  final String sessionId;
+  final RemyScope scope;
 
   /// Continuous mode stops after this many silent turns in a row.
   static const maxSilentTurns = 2;
@@ -120,7 +121,7 @@ class VoiceController extends Notifier<VoiceState> {
       }
       _silentTurns = 0;
       state = state.copyWith(phase: VoicePhase.processing, partial: text, clearMessage: true);
-      final reply = await ref.read(assistantControllerProvider(sessionId).notifier).sendSpoken(text);
+      final reply = await ref.read(assistantControllerProvider(scope).notifier).sendSpoken(text);
       if (!_active) return;
       if (reply != null && voice) {
         state = state.copyWith(phase: VoicePhase.speaking);
@@ -152,4 +153,4 @@ class VoiceController extends Notifier<VoiceState> {
 }
 
 final voiceControllerProvider =
-    NotifierProvider.autoDispose.family<VoiceController, VoiceState, String>(VoiceController.new);
+    NotifierProvider.autoDispose.family<VoiceController, VoiceState, RemyScope>(VoiceController.new);

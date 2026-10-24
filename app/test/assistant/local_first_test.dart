@@ -72,7 +72,7 @@ void main() {
       expect((await ask('מה השלב הבא?')).answerHe, 'אחרי זה: תיבול העוף.');
       expect((await ask('מה צריך לשלב הזה?')).answerHe, startsWith('בשלב הזה: תפוחי אדמה בינוניים'));
       expect((await ask('כמה שלבים נשארו?')).answerHe, 'נשארו 5 שלבים מתוך 5.');
-      expect((await ask('כמה מעלות?')).answerHe, 'אפיית העוף ותפוחי האדמה: 200°.');
+      expect((await ask('כמה מעלות?')).answerHe, 'אפיית העוף ותפוחי האדמה: 200 מעלות.');
     });
 
     test('"מוכן?" asks whether it is ready: the step\'s cue, no action', () async {

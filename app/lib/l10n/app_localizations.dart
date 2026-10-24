@@ -307,7 +307,7 @@ abstract class AppLocalizations {
   /// No description provided for @estimateHint.
   ///
   /// In he, this message translates to:
-  /// **'ערך משוער — המתכון המקורי לא ציין אותו'**
+  /// **'ערך משוער. המתכון המקורי לא ציין אותו.'**
   String get estimateHint;
 
   /// No description provided for @prepTasks.
@@ -349,7 +349,7 @@ abstract class AppLocalizations {
   /// No description provided for @temperatureLabel.
   ///
   /// In he, this message translates to:
-  /// **'טמפרטורה: {value}°'**
+  /// **'טמפרטורה: {value} מעלות'**
   String temperatureLabel(int value);
 
   /// No description provided for @leadTime.
@@ -445,7 +445,7 @@ abstract class AppLocalizations {
   /// No description provided for @undoNotAllowed.
   ///
   /// In he, this message translates to:
-  /// **'אי אפשר לבטל — כבר התחלתם שלב שתלוי בזה'**
+  /// **'אי אפשר לבטל, כי כבר התחלתם שלב שתלוי בזה.'**
   String get undoNotAllowed;
 
   /// No description provided for @timersTitle.
@@ -475,7 +475,7 @@ abstract class AppLocalizations {
   /// No description provided for @removeMinute.
   ///
   /// In he, this message translates to:
-  /// **'− דקה'**
+  /// **'הורדת דקה'**
   String get removeMinute;
 
   /// No description provided for @nextStepPreview.
@@ -595,7 +595,7 @@ abstract class AppLocalizations {
   /// No description provided for @addMinute.
   ///
   /// In he, this message translates to:
-  /// **'+ דקה'**
+  /// **'הוספת דקה'**
   String get addMinute;
 
   /// No description provided for @dismissTimer.
@@ -607,7 +607,7 @@ abstract class AppLocalizations {
   /// No description provided for @allStepsDone.
   ///
   /// In he, this message translates to:
-  /// **'כל השלבים הושלמו! 🎉'**
+  /// **'כל השלבים הושלמו!'**
   String get allStepsDone;
 
   /// No description provided for @goToFinish.
@@ -679,7 +679,7 @@ abstract class AppLocalizations {
   /// No description provided for @historyEmpty.
   ///
   /// In he, this message translates to:
-  /// **'עוד לא בישלתם. בחרו מתכון מהרשימה והתחילו.'**
+  /// **'כשתסיימו לבשל, הבישול יופיע כאן.'**
   String get historyEmpty;
 
   /// No description provided for @statusCompleted.
@@ -739,7 +739,7 @@ abstract class AppLocalizations {
   /// No description provided for @notificationsOff.
   ///
   /// In he, this message translates to:
-  /// **'ההתראות חסומות — טיימרים לא יתריעו'**
+  /// **'ההתראות חסומות, ולכן הטיימרים לא יתריעו'**
   String get notificationsOff;
 
   /// No description provided for @enableNotifications.
@@ -757,7 +757,7 @@ abstract class AppLocalizations {
   /// No description provided for @exactAlarmsOff.
   ///
   /// In he, this message translates to:
-  /// **'תזמון מדויק כבוי — התראות עלולות להתעכב בכמה דקות'**
+  /// **'התזמון המדויק כבוי, ולכן התראות עלולות להתעכב בכמה דקות'**
   String get exactAlarmsOff;
 
   /// No description provided for @enableExactAlarms.
@@ -799,7 +799,7 @@ abstract class AppLocalizations {
   /// No description provided for @testNotification.
   ///
   /// In he, this message translates to:
-  /// **'בדיקת התראות (תגיע בעוד 10 שניות)'**
+  /// **'שליחת התראת בדיקה'**
   String get testNotification;
 
   /// No description provided for @testNotificationScheduled.
@@ -823,7 +823,7 @@ abstract class AppLocalizations {
   /// No description provided for @aboutBody.
   ///
   /// In he, this message translates to:
-  /// **'בזמן הבישול האפליקציה עובדת גם בלי אינטרנט: השלבים, הטיימרים וההתקדמות נשמרים במכשיר.'**
+  /// **'בזמן הבישול האפליקציה עובדת גם בלי אינטרנט. השלבים, הטיימרים וההתקדמות נשמרים בטלפון.'**
   String get aboutBody;
 
   /// No description provided for @refresh.
@@ -835,7 +835,7 @@ abstract class AppLocalizations {
   /// No description provided for @importTitle.
   ///
   /// In he, this message translates to:
-  /// **'ייבוא מתכון'**
+  /// **'מתכון חדש'**
   String get importTitle;
 
   /// No description provided for @importTabText.
@@ -889,25 +889,25 @@ abstract class AppLocalizations {
   /// No description provided for @importAnalyze.
   ///
   /// In he, this message translates to:
-  /// **'ניתוח המתכון'**
+  /// **'קריאת המתכון'**
   String get importAnalyze;
 
   /// No description provided for @importStageReading.
   ///
   /// In he, this message translates to:
-  /// **'בודקים את המצרכים וההוראות…'**
+  /// **'רמי קורא את המתכון ובודק את המצרכים…'**
   String get importStageReading;
 
   /// No description provided for @importStagePlanning.
   ///
   /// In he, this message translates to:
-  /// **'מסדרים לך את שלבי הבישול…'**
+  /// **'מכינים את תוכנית הבישול…'**
   String get importStagePlanning;
 
   /// No description provided for @importStageSlow.
   ///
   /// In he, this message translates to:
-  /// **'זה לוקח קצת יותר זמן מהרגיל…'**
+  /// **'זה לוקח קצת יותר זמן מהרגיל. אפשר להמשיך לחכות.'**
   String get importStageSlow;
 
   /// No description provided for @importDuplicateTitle.
@@ -961,7 +961,7 @@ abstract class AppLocalizations {
   /// No description provided for @draftsTitle.
   ///
   /// In he, this message translates to:
-  /// **'ייבואים שלא הושלמו'**
+  /// **'מתכונים שהתחלתם להוסיף'**
   String get draftsTitle;
 
   /// No description provided for @draftDiscard.
@@ -979,7 +979,7 @@ abstract class AppLocalizations {
   /// No description provided for @clarifyIntro.
   ///
   /// In he, this message translates to:
-  /// **'חסר במתכון מידע שחשוב לתוכנית. ענו על מה שאתם יודעים.'**
+  /// **'חסר במתכון מידע שחשוב לתוכנית. ענו על מה שאתם יודעים, והשאר עלינו.'**
   String get clarifyIntro;
 
   /// No description provided for @clarifyRequired.
@@ -991,7 +991,7 @@ abstract class AppLocalizations {
   /// No description provided for @clarifyDontKnow.
   ///
   /// In he, this message translates to:
-  /// **'לא יודע/ת'**
+  /// **'לא בטוח/ה, תחליטו בשבילי'**
   String get clarifyDontKnow;
 
   /// No description provided for @clarifyContinue.
@@ -1069,7 +1069,7 @@ abstract class AppLocalizations {
   /// No description provided for @reviewPhotoCheck.
   ///
   /// In he, this message translates to:
-  /// **'התוכנית נבנתה מתמונה — בדקו שהכמויות והזמנים נקראו נכון.'**
+  /// **'התוכנית נבנתה מתמונה. בדקו שהכמויות והזמנים נקראו נכון.'**
   String get reviewPhotoCheck;
 
   /// No description provided for @reviewSafetyCheckbox.
@@ -1111,7 +1111,7 @@ abstract class AppLocalizations {
   /// No description provided for @reviewStillCorrect.
   ///
   /// In he, this message translates to:
-  /// **'בדקתי — התוכנית נכונה'**
+  /// **'בדקתי, התוכנית נכונה'**
   String get reviewStillCorrect;
 
   /// No description provided for @provenanceAnswered.
@@ -1321,7 +1321,7 @@ abstract class AppLocalizations {
   /// No description provided for @stepPrimaryNext.
   ///
   /// In he, this message translates to:
-  /// **'סיימתי — לשלב הבא'**
+  /// **'סיימתי, לשלב הבא'**
   String get stepPrimaryNext;
 
   /// No description provided for @stepPrimaryLast.
@@ -1333,7 +1333,7 @@ abstract class AppLocalizations {
   /// No description provided for @stepPrimaryReady.
   ///
   /// In he, this message translates to:
-  /// **'מוכן — לשלב הבא'**
+  /// **'מוכן, לשלב הבא'**
   String get stepPrimaryReady;
 
   /// No description provided for @stepPrimaryReadyLast.
@@ -1549,7 +1549,7 @@ abstract class AppLocalizations {
   /// No description provided for @attentionPhoto.
   ///
   /// In he, this message translates to:
-  /// **'המתכון נקרא מתמונה — כדאי לוודא שהכמויות נכונות.'**
+  /// **'המתכון נקרא מתמונה. כדאי לוודא שהכמויות נכונות.'**
   String get attentionPhoto;
 
   /// No description provided for @planOutdated.
@@ -1657,13 +1657,13 @@ abstract class AppLocalizations {
   /// No description provided for @attentionSafetyEstimate.
   ///
   /// In he, this message translates to:
-  /// **'זמן הבישול בשלב \"{title}\" הוא הערכה — בדקו מוכנות לפי הסימנים בשלב.'**
+  /// **'זמן הבישול בשלב \"{title}\" הוא הערכה. בדקו מוכנות לפי הסימנים בשלב.'**
   String attentionSafetyEstimate(String title);
 
   /// No description provided for @remyTitle.
   ///
   /// In he, this message translates to:
-  /// **'רמי — עוזר הבישול'**
+  /// **'רמי, העוזר שלך לבישול'**
   String get remyTitle;
 
   /// No description provided for @remyOpen.
@@ -1675,7 +1675,7 @@ abstract class AppLocalizations {
   /// No description provided for @remyHint.
   ///
   /// In he, this message translates to:
-  /// **'שאלו את רמי או כתבו פקודה'**
+  /// **'כתבו לרמי…'**
   String get remyHint;
 
   /// No description provided for @remyGreeting.
@@ -1855,7 +1855,7 @@ abstract class AppLocalizations {
   /// No description provided for @remyTimerStarted.
   ///
   /// In he, this message translates to:
-  /// **'⏱ הטיימר \"{label}\" התחיל — לבדוק בעוד {time}.'**
+  /// **'⏱ הטיימר \"{label}\" התחיל. לבדוק בעוד {time}.'**
   String remyTimerStarted(String label, String time);
 
   /// No description provided for @remyMarked.
@@ -1987,7 +1987,7 @@ abstract class AppLocalizations {
   /// No description provided for @remyTemperature.
   ///
   /// In he, this message translates to:
-  /// **'{title}: {value}°.'**
+  /// **'{title}: {value} מעלות.'**
   String remyTemperature(String title, int value);
 
   /// No description provided for @remyNoTemperature.
@@ -2077,7 +2077,7 @@ abstract class AppLocalizations {
   /// No description provided for @voiceSpeaking.
   ///
   /// In he, this message translates to:
-  /// **'רמי מדבר… (לחצו כדי לעצור)'**
+  /// **'רמי מדבר…'**
   String get voiceSpeaking;
 
   /// No description provided for @voiceStop.
@@ -2113,7 +2113,7 @@ abstract class AppLocalizations {
   /// No description provided for @voiceNetwork.
   ///
   /// In he, this message translates to:
-  /// **'זיהוי הדיבור בטלפון הזה צריך חיבור לאינטרנט. אפשר להקליד — פקודות הבישול עובדות גם בלי אינטרנט.'**
+  /// **'זיהוי הדיבור בטלפון הזה צריך חיבור לאינטרנט. אפשר להקליד, ופקודות הבישול עובדות גם בלי אינטרנט.'**
   String get voiceNetwork;
 
   /// No description provided for @voiceNoSpeech.
@@ -2133,6 +2133,252 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'אין בטלפון קול עברי להקראה, אז התשובות יופיעו כטקסט.'**
   String get voiceNoHebrewVoice;
+
+  /// No description provided for @menu.
+  ///
+  /// In he, this message translates to:
+  /// **'תפריט'**
+  String get menu;
+
+  /// No description provided for @homeGreeting.
+  ///
+  /// In he, this message translates to:
+  /// **'מה מבשלים היום?'**
+  String get homeGreeting;
+
+  /// No description provided for @newRecipeSubtitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מטקסט, מתמונה או מקישור'**
+  String get newRecipeSubtitle;
+
+  /// No description provided for @allRecipesLink.
+  ///
+  /// In he, this message translates to:
+  /// **'לכל המתכונים'**
+  String get allRecipesLink;
+
+  /// No description provided for @homeEmptyRecipes.
+  ///
+  /// In he, this message translates to:
+  /// **'עוד אין כאן מתכונים. אפשר להתחיל מ\"מתכון חדש\".'**
+  String get homeEmptyRecipes;
+
+  /// No description provided for @cookingNowTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מבשלים עכשיו'**
+  String get cookingNowTitle;
+
+  /// No description provided for @stepOfTotal.
+  ///
+  /// In he, this message translates to:
+  /// **'שלב {current} מתוך {total}'**
+  String stepOfTotal(Object current, Object total);
+
+  /// No description provided for @continueCookingCta.
+  ///
+  /// In he, this message translates to:
+  /// **'המשך לבשל'**
+  String get continueCookingCta;
+
+  /// No description provided for @recipesSearchEmpty.
+  ///
+  /// In he, this message translates to:
+  /// **'לא מצאנו מתכון כזה'**
+  String get recipesSearchEmpty;
+
+  /// No description provided for @importIntro.
+  ///
+  /// In he, this message translates to:
+  /// **'איך המתכון אצלכם?'**
+  String get importIntro;
+
+  /// No description provided for @importLeave.
+  ///
+  /// In he, this message translates to:
+  /// **'יציאה'**
+  String get importLeave;
+
+  /// No description provided for @importLeaveNote.
+  ///
+  /// In he, this message translates to:
+  /// **'אפשר לצאת מהמסך. כשהמתכון יהיה מוכן, הוא יחכה לכם במטבח.'**
+  String get importLeaveNote;
+
+  /// No description provided for @overviewReady.
+  ///
+  /// In he, this message translates to:
+  /// **'הכול מוכן. אפשר להתחיל לבשל!'**
+  String get overviewReady;
+
+  /// No description provided for @overviewWhatYouNeed.
+  ///
+  /// In he, this message translates to:
+  /// **'מה צריך'**
+  String get overviewWhatYouNeed;
+
+  /// No description provided for @overviewMore.
+  ///
+  /// In he, this message translates to:
+  /// **'פעולות למתכון'**
+  String get overviewMore;
+
+  /// No description provided for @remyAsk.
+  ///
+  /// In he, this message translates to:
+  /// **'שאלו את רמי'**
+  String get remyAsk;
+
+  /// No description provided for @remySheetSubtitle.
+  ///
+  /// In he, this message translates to:
+  /// **'אפשר לכתוב או לדבר'**
+  String get remySheetSubtitle;
+
+  /// No description provided for @remyPrepGreeting.
+  ///
+  /// In he, this message translates to:
+  /// **'היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.'**
+  String get remyPrepGreeting;
+
+  /// No description provided for @remyPrepChipFirst.
+  ///
+  /// In he, this message translates to:
+  /// **'במה מתחילים?'**
+  String get remyPrepChipFirst;
+
+  /// No description provided for @remyPrepChipTime.
+  ///
+  /// In he, this message translates to:
+  /// **'כמה זמן זה לוקח?'**
+  String get remyPrepChipTime;
+
+  /// No description provided for @remyPrepChipMissing.
+  ///
+  /// In he, this message translates to:
+  /// **'חסר לי מצרך'**
+  String get remyPrepChipMissing;
+
+  /// No description provided for @remyPrepNotYet.
+  ///
+  /// In he, this message translates to:
+  /// **'את זה עושים כשמתחילים לבשל. בינתיים אפשר לשאול אותי על המתכון.'**
+  String get remyPrepNotYet;
+
+  /// No description provided for @remyPrepFirstStep.
+  ///
+  /// In he, this message translates to:
+  /// **'מתחילים ב: {title}. {instruction}'**
+  String remyPrepFirstStep(Object title, Object instruction);
+
+  /// No description provided for @remyPrepTotalTime.
+  ///
+  /// In he, this message translates to:
+  /// **'המתכון לוקח בערך {total}, מתוכם {active} עבודה בפועל.'**
+  String remyPrepTotalTime(Object total, Object active);
+
+  /// No description provided for @remyPrepMissing.
+  ///
+  /// In he, this message translates to:
+  /// **'סמנו \"חסר לי\" ליד המצרך ברשימה, ואציע לכם תחליף מתאים.'**
+  String get remyPrepMissing;
+
+  /// No description provided for @remyListeningTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מקשיב לכם'**
+  String get remyListeningTitle;
+
+  /// No description provided for @remyTypeInstead.
+  ///
+  /// In he, this message translates to:
+  /// **'להקליד במקום'**
+  String get remyTypeInstead;
+
+  /// No description provided for @remyClose.
+  ///
+  /// In he, this message translates to:
+  /// **'סגירה'**
+  String get remyClose;
+
+  /// No description provided for @stepIngredientsTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מה צריך לשלב הזה'**
+  String get stepIngredientsTitle;
+
+  /// No description provided for @finishCelebrate.
+  ///
+  /// In he, this message translates to:
+  /// **'בתאבון!'**
+  String get finishCelebrate;
+
+  /// No description provided for @finishBackHome.
+  ///
+  /// In he, this message translates to:
+  /// **'חזרה למטבח'**
+  String get finishBackHome;
+
+  /// No description provided for @historyEmptyTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'עוד אין היסטוריה'**
+  String get historyEmptyTitle;
+
+  /// No description provided for @settingsTimersReady.
+  ///
+  /// In he, this message translates to:
+  /// **'הטיימרים יתריעו בזמן'**
+  String get settingsTimersReady;
+
+  /// No description provided for @settingsAboutVersionless.
+  ///
+  /// In he, this message translates to:
+  /// **'לבשל כל אחד יכול עוזרת לבשל צעד אחר צעד, עם טיימרים, תזכורות ורמי לצידכם.'**
+  String get settingsAboutVersionless;
+
+  /// No description provided for @fontLicense.
+  ///
+  /// In he, this message translates to:
+  /// **'הגופן Heebo מופץ ברישיון SIL Open Font License.'**
+  String get fontLicense;
+
+  /// No description provided for @timerPaused.
+  ///
+  /// In he, this message translates to:
+  /// **'מושהה'**
+  String get timerPaused;
+
+  /// No description provided for @timerRunningUntil.
+  ///
+  /// In he, this message translates to:
+  /// **'עד {time}'**
+  String timerRunningUntil(Object time);
+
+  /// No description provided for @progressLabel.
+  ///
+  /// In he, this message translates to:
+  /// **'התקדמות הבישול'**
+  String get progressLabel;
+
+  /// No description provided for @prepTaskDone.
+  ///
+  /// In he, this message translates to:
+  /// **'בוצע'**
+  String get prepTaskDone;
+
+  /// No description provided for @remyAmountUnknown.
+  ///
+  /// In he, this message translates to:
+  /// **'הכמות לא צוינה'**
+  String get remyAmountUnknown;
+
+  /// No description provided for @remyPrepStepCount.
+  ///
+  /// In he, this message translates to:
+  /// **'במתכון יש {count} שלבים.'**
+  String remyPrepStepCount(int count);
 }
 
 class _AppLocalizationsDelegate

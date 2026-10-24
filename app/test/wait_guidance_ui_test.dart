@@ -34,7 +34,7 @@ void main() {
     await h.advance(tester, const Duration(minutes: 60));
     await expectSeen(tester, find.text('זמן לבדוק!'));
     await expectSeen(tester, find.textContaining('👀 הבצק הכפיל את נפחו'));
-    await expectSeen(tester, find.widgetWithText(FilledButton, 'מוכן — לשלב הבא'));
+    await expectSeen(tester, find.widgetWithText(FilledButton, 'מוכן, לשלב הבא'));
     final recheck = find.text("צריך עוד זמן (+10 דק')");
     await expectSeen(tester, recheck);
     await tester.ensureVisible(recheck);

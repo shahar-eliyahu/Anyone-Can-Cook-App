@@ -117,7 +117,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get estimate => 'הערכה';
 
   @override
-  String get estimateHint => 'ערך משוער — המתכון המקורי לא ציין אותו';
+  String get estimateHint => 'ערך משוער. המתכון המקורי לא ציין אותו.';
 
   @override
   String get prepTasks => 'הכנות מראש';
@@ -145,7 +145,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String temperatureLabel(int value) {
-    return 'טמפרטורה: $value°';
+    return 'טמפרטורה: $value מעלות';
   }
 
   @override
@@ -201,7 +201,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get undoLastAction => 'ביטול הפעולה האחרונה';
 
   @override
-  String get undoNotAllowed => 'אי אפשר לבטל — כבר התחלתם שלב שתלוי בזה';
+  String get undoNotAllowed => 'אי אפשר לבטל, כי כבר התחלתם שלב שתלוי בזה.';
 
   @override
   String get timersTitle => 'טיימרים';
@@ -220,7 +220,7 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get removeMinute => '− דקה';
+  String get removeMinute => 'הורדת דקה';
 
   @override
   String nextStepPreview(String title) {
@@ -297,13 +297,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get resume => 'המשך';
 
   @override
-  String get addMinute => '+ דקה';
+  String get addMinute => 'הוספת דקה';
 
   @override
   String get dismissTimer => 'סגירת הטיימר';
 
   @override
-  String get allStepsDone => 'כל השלבים הושלמו! 🎉';
+  String get allStepsDone => 'כל השלבים הושלמו!';
 
   @override
   String get goToFinish => 'לסיום הבישול';
@@ -345,7 +345,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get saveAndFinish => 'שמירה וסיום';
 
   @override
-  String get historyEmpty => 'עוד לא בישלתם. בחרו מתכון מהרשימה והתחילו.';
+  String get historyEmpty => 'כשתסיימו לבשל, הבישול יופיע כאן.';
 
   @override
   String get statusCompleted => 'הושלם';
@@ -379,7 +379,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get notificationsOn => 'ההתראות מאופשרות';
 
   @override
-  String get notificationsOff => 'ההתראות חסומות — טיימרים לא יתריעו';
+  String get notificationsOff => 'ההתראות חסומות, ולכן הטיימרים לא יתריעו';
 
   @override
   String get enableNotifications => 'אפשר התראות';
@@ -389,7 +389,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get exactAlarmsOff =>
-      'תזמון מדויק כבוי — התראות עלולות להתעכב בכמה דקות';
+      'התזמון המדויק כבוי, ולכן התראות עלולות להתעכב בכמה דקות';
 
   @override
   String get enableExactAlarms => 'אפשר תזמון מדויק';
@@ -412,7 +412,7 @@ class AppLocalizationsHe extends AppLocalizations {
       'בטלפונים של שיאומי, סמסונג, וואווי ו-וואן פלוס יש לפעמים הגבלות נוספות. אם טיימר לא התריע, ודאו בהגדרות הסוללה של הטלפון שהאפליקציה מורשית לפעול ברקע.';
 
   @override
-  String get testNotification => 'בדיקת התראות (תגיע בעוד 10 שניות)';
+  String get testNotification => 'שליחת התראת בדיקה';
 
   @override
   String get testNotificationScheduled => 'התראת הבדיקה תגיע בעוד 10 שניות';
@@ -427,13 +427,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get aboutBody =>
-      'בזמן הבישול האפליקציה עובדת גם בלי אינטרנט: השלבים, הטיימרים וההתקדמות נשמרים במכשיר.';
+      'בזמן הבישול האפליקציה עובדת גם בלי אינטרנט. השלבים, הטיימרים וההתקדמות נשמרים בטלפון.';
 
   @override
   String get refresh => 'רענון';
 
   @override
-  String get importTitle => 'ייבוא מתכון';
+  String get importTitle => 'מתכון חדש';
 
   @override
   String get importTabText => 'טקסט';
@@ -460,16 +460,17 @@ class AppLocalizationsHe extends AppLocalizations {
   String get importPhotoNote => 'התמונה נשמרת רק עד שתאשרו את התוכנית.';
 
   @override
-  String get importAnalyze => 'ניתוח המתכון';
+  String get importAnalyze => 'קריאת המתכון';
 
   @override
-  String get importStageReading => 'בודקים את המצרכים וההוראות…';
+  String get importStageReading => 'רמי קורא את המתכון ובודק את המצרכים…';
 
   @override
-  String get importStagePlanning => 'מסדרים לך את שלבי הבישול…';
+  String get importStagePlanning => 'מכינים את תוכנית הבישול…';
 
   @override
-  String get importStageSlow => 'זה לוקח קצת יותר זמן מהרגיל…';
+  String get importStageSlow =>
+      'זה לוקח קצת יותר זמן מהרגיל. אפשר להמשיך לחכות.';
 
   @override
   String get importDuplicateTitle => 'המתכון כבר יובא';
@@ -499,7 +500,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get privacyAccept => 'הבנתי, להמשיך';
 
   @override
-  String get draftsTitle => 'ייבואים שלא הושלמו';
+  String get draftsTitle => 'מתכונים שהתחלתם להוסיף';
 
   @override
   String get draftDiscard => 'מחיקה';
@@ -509,13 +510,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get clarifyIntro =>
-      'חסר במתכון מידע שחשוב לתוכנית. ענו על מה שאתם יודעים.';
+      'חסר במתכון מידע שחשוב לתוכנית. ענו על מה שאתם יודעים, והשאר עלינו.';
 
   @override
   String get clarifyRequired => 'חשוב לבטיחות';
 
   @override
-  String get clarifyDontKnow => 'לא יודע/ת';
+  String get clarifyDontKnow => 'לא בטוח/ה, תחליטו בשבילי';
 
   @override
   String get clarifyContinue => 'בניית התוכנית';
@@ -558,7 +559,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get reviewPhotoCheck =>
-      'התוכנית נבנתה מתמונה — בדקו שהכמויות והזמנים נקראו נכון.';
+      'התוכנית נבנתה מתמונה. בדקו שהכמויות והזמנים נקראו נכון.';
 
   @override
   String get reviewSafetyCheckbox => 'בדקתי את הערכים המסומנים';
@@ -580,7 +581,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get reviewRegenerate => 'יצירת התוכנית מחדש';
 
   @override
-  String get reviewStillCorrect => 'בדקתי — התוכנית נכונה';
+  String get reviewStillCorrect => 'בדקתי, התוכנית נכונה';
 
   @override
   String get provenanceAnswered => 'לפי תשובתך';
@@ -702,13 +703,13 @@ class AppLocalizationsHe extends AppLocalizations {
       'המתכון נקרא ונשמר. אפשר לנסות שוב לבנות את התוכנית בלי לקרוא אותו מחדש.';
 
   @override
-  String get stepPrimaryNext => 'סיימתי — לשלב הבא';
+  String get stepPrimaryNext => 'סיימתי, לשלב הבא';
 
   @override
   String get stepPrimaryLast => 'סיימתי';
 
   @override
-  String get stepPrimaryReady => 'מוכן — לשלב הבא';
+  String get stepPrimaryReady => 'מוכן, לשלב הבא';
 
   @override
   String get stepPrimaryReadyLast => 'מוכן';
@@ -838,7 +839,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get attentionPhoto =>
-      'המתכון נקרא מתמונה — כדאי לוודא שהכמויות נכונות.';
+      'המתכון נקרא מתמונה. כדאי לוודא שהכמויות נכונות.';
 
   @override
   String get planOutdated =>
@@ -898,17 +899,17 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String attentionSafetyEstimate(String title) {
-    return 'זמן הבישול בשלב \"$title\" הוא הערכה — בדקו מוכנות לפי הסימנים בשלב.';
+    return 'זמן הבישול בשלב \"$title\" הוא הערכה. בדקו מוכנות לפי הסימנים בשלב.';
   }
 
   @override
-  String get remyTitle => 'רמי — עוזר הבישול';
+  String get remyTitle => 'רמי, העוזר שלך לבישול';
 
   @override
   String get remyOpen => 'רמי';
 
   @override
-  String get remyHint => 'שאלו את רמי או כתבו פקודה';
+  String get remyHint => 'כתבו לרמי…';
 
   @override
   String get remyGreeting =>
@@ -1028,7 +1029,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String remyTimerStarted(String label, String time) {
-    return '⏱ הטיימר \"$label\" התחיל — לבדוק בעוד $time.';
+    return '⏱ הטיימר \"$label\" התחיל. לבדוק בעוד $time.';
   }
 
   @override
@@ -1121,7 +1122,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String remyTemperature(String title, int value) {
-    return '$title: $value°.';
+    return '$title: $value מעלות.';
   }
 
   @override
@@ -1177,7 +1178,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get voiceProcessing => 'רגע…';
 
   @override
-  String get voiceSpeaking => 'רמי מדבר… (לחצו כדי לעצור)';
+  String get voiceSpeaking => 'רמי מדבר…';
 
   @override
   String get voiceStop => 'עצירה';
@@ -1199,7 +1200,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get voiceNetwork =>
-      'זיהוי הדיבור בטלפון הזה צריך חיבור לאינטרנט. אפשר להקליד — פקודות הבישול עובדות גם בלי אינטרנט.';
+      'זיהוי הדיבור בטלפון הזה צריך חיבור לאינטרנט. אפשר להקליד, ופקודות הבישול עובדות גם בלי אינטרנט.';
 
   @override
   String get voiceNoSpeech => 'לא שמעתי. אפשר לנסות שוב.';
@@ -1211,4 +1212,143 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get voiceNoHebrewVoice =>
       'אין בטלפון קול עברי להקראה, אז התשובות יופיעו כטקסט.';
+
+  @override
+  String get menu => 'תפריט';
+
+  @override
+  String get homeGreeting => 'מה מבשלים היום?';
+
+  @override
+  String get newRecipeSubtitle => 'מטקסט, מתמונה או מקישור';
+
+  @override
+  String get allRecipesLink => 'לכל המתכונים';
+
+  @override
+  String get homeEmptyRecipes =>
+      'עוד אין כאן מתכונים. אפשר להתחיל מ\"מתכון חדש\".';
+
+  @override
+  String get cookingNowTitle => 'מבשלים עכשיו';
+
+  @override
+  String stepOfTotal(Object current, Object total) {
+    return 'שלב $current מתוך $total';
+  }
+
+  @override
+  String get continueCookingCta => 'המשך לבשל';
+
+  @override
+  String get recipesSearchEmpty => 'לא מצאנו מתכון כזה';
+
+  @override
+  String get importIntro => 'איך המתכון אצלכם?';
+
+  @override
+  String get importLeave => 'יציאה';
+
+  @override
+  String get importLeaveNote =>
+      'אפשר לצאת מהמסך. כשהמתכון יהיה מוכן, הוא יחכה לכם במטבח.';
+
+  @override
+  String get overviewReady => 'הכול מוכן. אפשר להתחיל לבשל!';
+
+  @override
+  String get overviewWhatYouNeed => 'מה צריך';
+
+  @override
+  String get overviewMore => 'פעולות למתכון';
+
+  @override
+  String get remyAsk => 'שאלו את רמי';
+
+  @override
+  String get remySheetSubtitle => 'אפשר לכתוב או לדבר';
+
+  @override
+  String get remyPrepGreeting =>
+      'היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.';
+
+  @override
+  String get remyPrepChipFirst => 'במה מתחילים?';
+
+  @override
+  String get remyPrepChipTime => 'כמה זמן זה לוקח?';
+
+  @override
+  String get remyPrepChipMissing => 'חסר לי מצרך';
+
+  @override
+  String get remyPrepNotYet =>
+      'את זה עושים כשמתחילים לבשל. בינתיים אפשר לשאול אותי על המתכון.';
+
+  @override
+  String remyPrepFirstStep(Object title, Object instruction) {
+    return 'מתחילים ב: $title. $instruction';
+  }
+
+  @override
+  String remyPrepTotalTime(Object total, Object active) {
+    return 'המתכון לוקח בערך $total, מתוכם $active עבודה בפועל.';
+  }
+
+  @override
+  String get remyPrepMissing =>
+      'סמנו \"חסר לי\" ליד המצרך ברשימה, ואציע לכם תחליף מתאים.';
+
+  @override
+  String get remyListeningTitle => 'מקשיב לכם';
+
+  @override
+  String get remyTypeInstead => 'להקליד במקום';
+
+  @override
+  String get remyClose => 'סגירה';
+
+  @override
+  String get stepIngredientsTitle => 'מה צריך לשלב הזה';
+
+  @override
+  String get finishCelebrate => 'בתאבון!';
+
+  @override
+  String get finishBackHome => 'חזרה למטבח';
+
+  @override
+  String get historyEmptyTitle => 'עוד אין היסטוריה';
+
+  @override
+  String get settingsTimersReady => 'הטיימרים יתריעו בזמן';
+
+  @override
+  String get settingsAboutVersionless =>
+      'לבשל כל אחד יכול עוזרת לבשל צעד אחר צעד, עם טיימרים, תזכורות ורמי לצידכם.';
+
+  @override
+  String get fontLicense => 'הגופן Heebo מופץ ברישיון SIL Open Font License.';
+
+  @override
+  String get timerPaused => 'מושהה';
+
+  @override
+  String timerRunningUntil(Object time) {
+    return 'עד $time';
+  }
+
+  @override
+  String get progressLabel => 'התקדמות הבישול';
+
+  @override
+  String get prepTaskDone => 'בוצע';
+
+  @override
+  String get remyAmountUnknown => 'הכמות לא צוינה';
+
+  @override
+  String remyPrepStepCount(int count) {
+    return 'במתכון יש $count שלבים.';
+  }
 }

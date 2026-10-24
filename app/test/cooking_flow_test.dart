@@ -28,14 +28,14 @@ void main() {
     await expectSeen(tester, find.text('חימום תנור'));
 
     // One tap finishes a step (even one planned with "התחלתי" + "סיימתי").
-    await tapButton(tester, 'סיימתי — לשלב הבא');
+    await tapButton(tester, 'סיימתי, לשלב הבא');
     await expectSeen(tester, find.text('1 מתוך 5 שלבים הושלמו'));
     expect(find.byType(SnackBar), findsNothing);
     // "חזרה" undoes the last tap; then continue.
     await tapText(tester, 'חזרה');
     await expectSeen(tester, find.text('0 מתוך 5 שלבים הושלמו'));
-    await tapButton(tester, 'סיימתי — לשלב הבא');
-    await tapButton(tester, 'סיימתי — לשלב הבא');
+    await tapButton(tester, 'סיימתי, לשלב הבא');
+    await tapButton(tester, 'סיימתי, לשלב הבא');
     await expectSeen(tester, find.text('2 מתוך 5 שלבים הושלמו'));
 
     // A timed step: the start is an explicit tap, and only then the 45-minute timer runs.
@@ -61,11 +61,11 @@ void main() {
 
     // Poultry: at check time the cook ticks the short doneness check — inline, no popup.
     await h.advance(tester, const Duration(minutes: 27));
-    await expectSeen(tester, find.text('מוכן — לשלב הבא'));
-    expect(onPressedOf(tester, 'מוכן — לשלב הבא'), isNull);
+    await expectSeen(tester, find.text('מוכן, לשלב הבא'));
+    expect(onPressedOf(tester, 'מוכן, לשלב הבא'), isNull);
     expect(find.byType(AlertDialog), findsNothing);
     await tapText(tester, 'בדקתי: העוף שחום, ובחיתוך ליד העצם הנוזלים שקופים ולא ורודים.');
-    await tapButton(tester, 'מוכן — לשלב הבא');
+    await tapButton(tester, 'מוכן, לשלב הבא');
     await expectSeen(tester, find.text('4 מתוך 5 שלבים הושלמו'));
     expect(h.notifier.scheduled.containsKey('${session.id}/t1'), isFalse);
 
@@ -77,7 +77,7 @@ void main() {
     expect(h.notifier.scheduled['${session.id}/t3'], h.clock.now.add(const Duration(minutes: 5)));
     await h.advance(tester, const Duration(minutes: 5));
     await tapButton(tester, 'מוכן');
-    await expectSeen(tester, find.text('כל השלבים הושלמו! 🎉'));
+    await expectSeen(tester, find.text('כל השלבים הושלמו!'));
 
     await tapButton(tester, 'לסיום הבישול');
     await tester.enterText(find.byType(TextField), 'בפעם הבאה פחות מלח');
@@ -118,7 +118,8 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('עוף בתנור עם תפוחי אדמה ואורז'), findsOneWidget);
 
-    await tester.tap(find.text('המשך בישול'));
+    expect(find.text('מבשלים עכשיו'), findsOneWidget);
+    await tester.tap(find.text('המשך לבשל'));
     await tester.pumpAndSettle();
     expect(find.text('2 מתוך 5 שלבים הושלמו'), findsOneWidget);
     expect(find.text('35:00'), findsOneWidget);
@@ -132,7 +133,7 @@ void main() {
     final recipeId = await h.seedSample();
     await tester.pumpWidget(h.build(initialLocation: '/recipes'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('⭐ מועדפים'));
+    await tester.tap(find.text('מועדפים'));
     await tester.pumpAndSettle();
     expect(find.text('עוד לא סימנתם מתכונים כמועדפים'), findsOneWidget);
 

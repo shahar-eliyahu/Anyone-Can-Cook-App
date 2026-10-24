@@ -35,7 +35,7 @@
   "undo": "בטל",
   "cannotDeleteActive": "אי אפשר למחוק מתכון בזמן בישול. סיימו או הפסיקו את הבישול קודם.",
   "estimate": "הערכה",
-  "estimateHint": "ערך משוער — המתכון המקורי לא ציין אותו",
+  "estimateHint": "ערך משוער. המתכון המקורי לא ציין אותו.",
   "prepTasks": "הכנות מראש",
   "steps": "שלבים",
   "stepNumber": "שלב {number}",
@@ -66,7 +66,7 @@
       }
     }
   },
-  "temperatureLabel": "טמפרטורה: {value}°",
+  "temperatureLabel": "טמפרטורה: {value} מעלות",
   "@temperatureLabel": {
     "placeholders": {
       "value": {
@@ -113,7 +113,7 @@
   "prepNeededNow": "נדרש עכשיו",
   "allSteps": "כל השלבים",
   "undoLastAction": "ביטול הפעולה האחרונה",
-  "undoNotAllowed": "אי אפשר לבטל — כבר התחלתם שלב שתלוי בזה",
+  "undoNotAllowed": "אי אפשר לבטל, כי כבר התחלתם שלב שתלוי בזה.",
   "timersTitle": "טיימרים",
   "timerCheckDue": "זמן לבדוק!",
   "checkAtLabel": "לבדוק בערך ב-{time}",
@@ -132,7 +132,7 @@
       }
     }
   },
-  "removeMinute": "− דקה",
+  "removeMinute": "הורדת דקה",
   "nextStepPreview": "אחרי זה: {title}",
   "@nextStepPreview": {
     "placeholders": {
@@ -211,9 +211,9 @@
   "channelPrepDescription": "תזכורות שקטות להכנות לקראת השלב הבא",
   "pause": "השהיה",
   "resume": "המשך",
-  "addMinute": "+ דקה",
+  "addMinute": "הוספת דקה",
   "dismissTimer": "סגירת הטיימר",
-  "allStepsDone": "כל השלבים הושלמו! 🎉",
+  "allStepsDone": "כל השלבים הושלמו!",
   "goToFinish": "לסיום הבישול",
   "abandonCooking": "הפסקת הבישול",
   "abandonConfirm": "להפסיק את הבישול? מה שעשיתם יישמר בהיסטוריה.",
@@ -246,7 +246,7 @@
   },
   "notesLabel": "הערות לפעם הבאה (לא חובה)",
   "saveAndFinish": "שמירה וסיום",
-  "historyEmpty": "עוד לא בישלתם. בחרו מתכון מהרשימה והתחילו.",
+  "historyEmpty": "כשתסיימו לבשל, הבישול יופיע כאן.",
   "statusCompleted": "הושלם",
   "statusAbandoned": "הופסק",
   "statusInProgress": "בתהליך",
@@ -270,17 +270,17 @@
   "cookAgain": "לבשל שוב",
   "settingsNotifications": "התראות טיימר",
   "notificationsOn": "ההתראות מאופשרות",
-  "notificationsOff": "ההתראות חסומות — טיימרים לא יתריעו",
+  "notificationsOff": "ההתראות חסומות, ולכן הטיימרים לא יתריעו",
   "enableNotifications": "אפשר התראות",
   "exactAlarmsOn": "תזמון מדויק מאופשר",
-  "exactAlarmsOff": "תזמון מדויק כבוי — התראות עלולות להתעכב בכמה דקות",
+  "exactAlarmsOff": "התזמון המדויק כבוי, ולכן התראות עלולות להתעכב בכמה דקות",
   "enableExactAlarms": "אפשר תזמון מדויק",
   "batteryTitle": "חיסכון בסוללה",
   "batteryRestricted": "חיסכון בסוללה מגביל את האפליקציה. מומלץ לבטל את ההגבלה כדי שהטיימרים יתריעו בזמן.",
   "batteryOk": "חיסכון בסוללה לא מגביל את האפליקציה",
   "openBatterySettings": "פתיחת הגדרות הסוללה",
   "batteryVendorHint": "בטלפונים של שיאומי, סמסונג, וואווי ו-וואן פלוס יש לפעמים הגבלות נוספות. אם טיימר לא התריע, ודאו בהגדרות הסוללה של הטלפון שהאפליקציה מורשית לפעול ברקע.",
-  "testNotification": "בדיקת התראות (תגיע בעוד 10 שניות)",
+  "testNotification": "שליחת התראת בדיקה",
   "testNotificationScheduled": "התראת הבדיקה תגיע בעוד 10 שניות",
   "serverAddress": "כתובת השרת (מצב פיתוח): {url}",
   "@serverAddress": {
@@ -291,9 +291,9 @@
     }
   },
   "aboutTitle": "אודות",
-  "aboutBody": "בזמן הבישול האפליקציה עובדת גם בלי אינטרנט: השלבים, הטיימרים וההתקדמות נשמרים במכשיר.",
+  "aboutBody": "בזמן הבישול האפליקציה עובדת גם בלי אינטרנט. השלבים, הטיימרים וההתקדמות נשמרים בטלפון.",
   "refresh": "רענון",
-  "importTitle": "ייבוא מתכון",
+  "importTitle": "מתכון חדש",
   "importTabText": "טקסט",
   "importTabPhoto": "תמונה",
   "importTabUrl": "קישור",
@@ -302,10 +302,10 @@
   "importTakePhoto": "צילום",
   "importPickPhoto": "מהגלריה",
   "importPhotoNote": "התמונה נשמרת רק עד שתאשרו את התוכנית.",
-  "importAnalyze": "ניתוח המתכון",
-  "importStageReading": "בודקים את המצרכים וההוראות…",
-  "importStagePlanning": "מסדרים לך את שלבי הבישול…",
-  "importStageSlow": "זה לוקח קצת יותר זמן מהרגיל…",
+  "importAnalyze": "קריאת המתכון",
+  "importStageReading": "רמי קורא את המתכון ובודק את המצרכים…",
+  "importStagePlanning": "מכינים את תוכנית הבישול…",
+  "importStageSlow": "זה לוקח קצת יותר זמן מהרגיל. אפשר להמשיך לחכות.",
   "importDuplicateTitle": "המתכון כבר יובא",
   "importDuplicateBody": "כבר ייבאתם את המתכון הזה: {title}. לפתוח אותו במקום לייבא שוב?",
   "@importDuplicateBody": {
@@ -321,12 +321,12 @@
   "privacyTitle": "לפני הייבוא הראשון",
   "privacyBody": "כדי להכין את המתכון, הטקסט, הקישור או התמונה נשלחים לשירות בינה מלאכותית של Google. בשירות החינמי Google עשויה להשתמש במידע לשיפור המוצרים שלה. אל תשלחו מידע אישי. התמונה נשמרת במכשיר רק עד שתאשרו את התוכנית.",
   "privacyAccept": "הבנתי, להמשיך",
-  "draftsTitle": "ייבואים שלא הושלמו",
+  "draftsTitle": "מתכונים שהתחלתם להוסיף",
   "draftDiscard": "מחיקה",
   "clarifyTitle": "כמה שאלות קצרות",
-  "clarifyIntro": "חסר במתכון מידע שחשוב לתוכנית. ענו על מה שאתם יודעים.",
+  "clarifyIntro": "חסר במתכון מידע שחשוב לתוכנית. ענו על מה שאתם יודעים, והשאר עלינו.",
   "clarifyRequired": "חשוב לבטיחות",
-  "clarifyDontKnow": "לא יודע/ת",
+  "clarifyDontKnow": "לא בטוח/ה, תחליטו בשבילי",
   "clarifyContinue": "בניית התוכנית",
   "clarifyAnswerHint": "התשובה שלכם",
   "reviewTitle": "בדיקת התוכנית",
@@ -346,14 +346,14 @@
       }
     }
   },
-  "reviewPhotoCheck": "התוכנית נבנתה מתמונה — בדקו שהכמויות והזמנים נקראו נכון.",
+  "reviewPhotoCheck": "התוכנית נבנתה מתמונה. בדקו שהכמויות והזמנים נקראו נכון.",
   "reviewSafetyCheckbox": "בדקתי את הערכים המסומנים",
   "reviewApprove": "אישור התוכנית",
   "reviewCancelImport": "ביטול הייבוא",
   "reviewOutdatedTitle": "התוכנית לא מעודכנת לשינויים במתכון",
   "reviewOutdatedBody": "שיניתם מצרכים או הוראות. צרו את התוכנית מחדש, או אשרו שבדקתם שהיא עדיין נכונה.",
   "reviewRegenerate": "יצירת התוכנית מחדש",
-  "reviewStillCorrect": "בדקתי — התוכנית נכונה",
+  "reviewStillCorrect": "בדקתי, התוכנית נכונה",
   "provenanceAnswered": "לפי תשובתך",
   "provenanceReference": "לפי מקור בטיחות מזון",
   "provenanceUser": "ערך שלך",
@@ -395,9 +395,9 @@
   "importRetry": "נסו שוב",
   "importRestored": "שחזרנו את מה שהזנתם בניסיון הקודם.",
   "importPlanFailedNote": "המתכון נקרא ונשמר. אפשר לנסות שוב לבנות את התוכנית בלי לקרוא אותו מחדש.",
-  "stepPrimaryNext": "סיימתי — לשלב הבא",
+  "stepPrimaryNext": "סיימתי, לשלב הבא",
   "stepPrimaryLast": "סיימתי",
-  "stepPrimaryReady": "מוכן — לשלב הבא",
+  "stepPrimaryReady": "מוכן, לשלב הבא",
   "stepPrimaryReadyLast": "מוכן",
   "stepNeedMoreTime": "צריך עוד זמן (+{minutes} דק')",
   "@stepNeedMoreTime": {
@@ -503,7 +503,7 @@
   "advancedEdit": "עריכה מתקדמת",
   "attentionTitle": "שימו לב",
   "attentionAck": "קראתי",
-  "attentionPhoto": "המתכון נקרא מתמונה — כדאי לוודא שהכמויות נכונות.",
+  "attentionPhoto": "המתכון נקרא מתמונה. כדאי לוודא שהכמויות נכונות.",
   "planOutdated": "התוכנית לא מעודכנת לשינויים שעשיתם. אפשר לטפל בזה בעריכה המתקדמת.",
   "cookingNowLocked": "המתכון בבישול עכשיו. אפשר לשנות אותו אחרי שתסיימו.",
   "sheetTitle": "אין לכם {name}?",
@@ -528,7 +528,7 @@
   "substitutionFailed": "לא הצלחנו להחיל את הפתרון. אפשר לנסות שוב, או לשנות ידנית בעריכה המתקדמת.",
   "draftCancel": "ביטול הייבוא",
   "fullPlan": "כל שלבי הבישול",
-  "attentionSafetyEstimate": "זמן הבישול בשלב \"{title}\" הוא הערכה — בדקו מוכנות לפי הסימנים בשלב.",
+  "attentionSafetyEstimate": "זמן הבישול בשלב \"{title}\" הוא הערכה. בדקו מוכנות לפי הסימנים בשלב.",
   "@attentionSafetyEstimate": {
     "placeholders": {
       "title": {
@@ -536,9 +536,9 @@
       }
     }
   },
-  "remyTitle": "רמי — עוזר הבישול",
+  "remyTitle": "רמי, העוזר שלך לבישול",
   "remyOpen": "רמי",
-  "remyHint": "שאלו את רמי או כתבו פקודה",
+  "remyHint": "כתבו לרמי…",
   "remyGreeting": "היי, אני רמי! אפשר לשאול אותי על הבישול, או לבקש: \"הבא\", \"חזרה\", \"כמה זמן נשאר?\", \"תוסיף 5 דקות\".",
   "remyChipNow": "מה עכשיו?",
   "remyChipTime": "כמה זמן נשאר?",
@@ -684,7 +684,7 @@
       }
     }
   },
-  "remyTimerStarted": "⏱ הטיימר \"{label}\" התחיל — לבדוק בעוד {time}.",
+  "remyTimerStarted": "⏱ הטיימר \"{label}\" התחיל. לבדוק בעוד {time}.",
   "@remyTimerStarted": {
     "placeholders": {
       "label": {
@@ -805,7 +805,7 @@
       }
     }
   },
-  "remyTemperature": "{title}: {value}°.",
+  "remyTemperature": "{title}: {value} מעלות.",
   "@remyTemperature": {
     "placeholders": {
       "title": {
@@ -868,14 +868,85 @@
   "voicePreparing": "מכינים את המיקרופון…",
   "voiceListening": "מקשיב…",
   "voiceProcessing": "רגע…",
-  "voiceSpeaking": "רמי מדבר… (לחצו כדי לעצור)",
+  "voiceSpeaking": "רמי מדבר…",
   "voiceStop": "עצירה",
   "voiceContinuous": "שיחה רציפה",
   "voicePermissionDenied": "כדי לדבר עם רמי צריך לאשר גישה למיקרופון. אפשר לאשר בהגדרות הטלפון, או פשוט להקליד.",
   "voiceUnavailable": "זיהוי דיבור לא זמין בטלפון הזה. אפשר להקליד לרמי.",
   "voiceHebrewUnsupported": "זיהוי דיבור בעברית לא זמין בטלפון הזה. אפשר להקליד לרמי.",
-  "voiceNetwork": "זיהוי הדיבור בטלפון הזה צריך חיבור לאינטרנט. אפשר להקליד — פקודות הבישול עובדות גם בלי אינטרנט.",
+  "voiceNetwork": "זיהוי הדיבור בטלפון הזה צריך חיבור לאינטרנט. אפשר להקליד, ופקודות הבישול עובדות גם בלי אינטרנט.",
   "voiceNoSpeech": "לא שמעתי. אפשר לנסות שוב.",
   "voiceError": "משהו השתבש בזיהוי הדיבור. אפשר לנסות שוב או להקליד.",
-  "voiceNoHebrewVoice": "אין בטלפון קול עברי להקראה, אז התשובות יופיעו כטקסט."
+  "voiceNoHebrewVoice": "אין בטלפון קול עברי להקראה, אז התשובות יופיעו כטקסט.",
+  "menu": "תפריט",
+  "homeGreeting": "מה מבשלים היום?",
+  "newRecipeSubtitle": "מטקסט, מתמונה או מקישור",
+  "allRecipesLink": "לכל המתכונים",
+  "homeEmptyRecipes": "עוד אין כאן מתכונים. אפשר להתחיל מ\"מתכון חדש\".",
+  "cookingNowTitle": "מבשלים עכשיו",
+  "stepOfTotal": "שלב {current} מתוך {total}",
+  "@stepOfTotal": {
+    "placeholders": {
+      "current": {},
+      "total": {}
+    }
+  },
+  "continueCookingCta": "המשך לבשל",
+  "recipesSearchEmpty": "לא מצאנו מתכון כזה",
+  "importIntro": "איך המתכון אצלכם?",
+  "importLeave": "יציאה",
+  "importLeaveNote": "אפשר לצאת מהמסך. כשהמתכון יהיה מוכן, הוא יחכה לכם במטבח.",
+  "overviewReady": "הכול מוכן. אפשר להתחיל לבשל!",
+  "overviewWhatYouNeed": "מה צריך",
+  "overviewMore": "פעולות למתכון",
+  "remyAsk": "שאלו את רמי",
+  "remySheetSubtitle": "אפשר לכתוב או לדבר",
+  "remyPrepGreeting": "היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.",
+  "remyPrepChipFirst": "במה מתחילים?",
+  "remyPrepChipTime": "כמה זמן זה לוקח?",
+  "remyPrepChipMissing": "חסר לי מצרך",
+  "remyPrepNotYet": "את זה עושים כשמתחילים לבשל. בינתיים אפשר לשאול אותי על המתכון.",
+  "remyPrepFirstStep": "מתחילים ב: {title}. {instruction}",
+  "@remyPrepFirstStep": {
+    "placeholders": {
+      "title": {},
+      "instruction": {}
+    }
+  },
+  "remyPrepTotalTime": "המתכון לוקח בערך {total}, מתוכם {active} עבודה בפועל.",
+  "@remyPrepTotalTime": {
+    "placeholders": {
+      "total": {},
+      "active": {}
+    }
+  },
+  "remyPrepMissing": "סמנו \"חסר לי\" ליד המצרך ברשימה, ואציע לכם תחליף מתאים.",
+  "remyListeningTitle": "מקשיב לכם",
+  "remyTypeInstead": "להקליד במקום",
+  "remyClose": "סגירה",
+  "stepIngredientsTitle": "מה צריך לשלב הזה",
+  "finishCelebrate": "בתאבון!",
+  "finishBackHome": "חזרה למטבח",
+  "historyEmptyTitle": "עוד אין היסטוריה",
+  "settingsTimersReady": "הטיימרים יתריעו בזמן",
+  "settingsAboutVersionless": "לבשל כל אחד יכול עוזרת לבשל צעד אחר צעד, עם טיימרים, תזכורות ורמי לצידכם.",
+  "fontLicense": "הגופן Heebo מופץ ברישיון SIL Open Font License.",
+  "timerPaused": "מושהה",
+  "timerRunningUntil": "עד {time}",
+  "@timerRunningUntil": {
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "progressLabel": "התקדמות הבישול",
+  "prepTaskDone": "בוצע",
+  "remyAmountUnknown": "הכמות לא צוינה",
+  "remyPrepStepCount": "במתכון יש {count} שלבים.",
+  "@remyPrepStepCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

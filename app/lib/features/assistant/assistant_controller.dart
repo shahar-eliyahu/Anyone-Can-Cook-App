@@ -2,8 +2,10 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api_client.dart';
+import '../../core/clock.dart';
 import '../../l10n/app_localizations.dart';
 import '../cooking/cooking_controller.dart';
+import '../prepare/preparation_service.dart';
 import 'assistant_models.dart';
 import 'assistant_service.dart';
 import 'command_parser.dart';
@@ -35,12 +37,13 @@ class AssistantState {
 
 final assistantServiceProvider = Provider<AssistantService>((ref) => AssistantService(ref.watch(apiClientProvider)));
 
-/// One conversation with Remy per cooking session (kept in memory while the session is
-/// open). The single entry point [send] serves typed text now and speech in Phase 3D.
+/// One conversation with Remy per cooking session, or per recipe before cooking (kept in
+/// memory while open). The single entry point [send] serves typed and spoken requests.
 class AssistantController extends Notifier<AssistantState> {
-  AssistantController(this.sessionId);
+  AssistantController(this.scope);
 
-  final String sessionId;
+  final RemyScope scope;
+  String get sessionId => scope.id;
 
   @override
   AssistantState build() => const AssistantState();
@@ -71,6 +74,7 @@ class AssistantController extends Notifier<AssistantState> {
       busy: true,
       clearPending: true,
     );
+    if (!scope.isSession) return _sendAboutRecipe(input, history);
     try {
       final view = await ref.read(cookingControllerProvider(sessionId).future);
       final actions = _cooking.assistantActions;
@@ -107,6 +111,27 @@ class AssistantController extends Notifier<AssistantState> {
     return _say(AssistantReply(answerHe: lookupAppLocalizations(const Locale('he')).remyRejected));
   }
 
+  /// Before cooking: questions about the recipe only (never an action to approve).
+  Future<AssistantReply?> _sendAboutRecipe(AssistantInput input, List<ChatTurn> history) async {
+    try {
+      final view = await ref.read(preparationServiceProvider).load(scope.id);
+      final plan = view?.plan;
+      if (view == null || plan == null) {
+        return _say(AssistantReply(answerHe: lookupAppLocalizations(const Locale('he')).remyUnavailable));
+      }
+      final reply = await _service.interpretForPreparation(
+        input,
+        plan: plan,
+        recipe: view.recipe,
+        now: ref.read(clockProvider)().toUtc(),
+        history: history,
+      );
+      return _say(reply);
+    } finally {
+      if (ref.mounted) state = state.copyWith(busy: false);
+    }
+  }
+
   /// What speech recognition delivers: the same pipeline as typed text.
   Future<AssistantReply?> sendSpoken(String transcript) =>
       send(AssistantInput(transcript, modality: InputModality.voice));
@@ -134,4 +159,4 @@ bool? yesOrNo(String text) {
 }
 
 final assistantControllerProvider =
-    NotifierProvider.autoDispose.family<AssistantController, AssistantState, String>(AssistantController.new);
+    NotifierProvider.autoDispose.family<AssistantController, AssistantState, RemyScope>(AssistantController.new);

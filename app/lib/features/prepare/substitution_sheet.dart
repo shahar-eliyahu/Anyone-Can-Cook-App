@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api_client.dart';
+import '../../core/format.dart';
+import '../../core/theme.dart';
+import '../../core/widgets/components.dart';
 import '../../l10n/app_localizations.dart';
 import '../import/import_errors.dart';
 import 'preparation.dart';
@@ -20,7 +23,7 @@ Future<void> showSubstitutionSheet(
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      showDragHandle: true,
+      useSafeArea: true,
       builder: (context) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
         child: _SubstitutionSheet(view: view, kind: kind, targetId: targetId, name: name),
@@ -97,13 +100,24 @@ class _SubstitutionSheetState extends ConsumerState<_SubstitutionSheet> {
 
     return SafeArea(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        padding: const EdgeInsets.fromLTRB(Space.page, 0, Space.page, Space.l),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: 12,
+          spacing: Space.m,
           children: [
-            Text(l10n.sheetTitle(widget.name), style: theme.textTheme.titleLarge),
+            Row(
+              spacing: Space.m,
+              children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(color: context.palette.beige, shape: BoxShape.circle),
+                  child: Icon(Icons.swap_horiz_rounded, color: context.palette.wood),
+                ),
+                Expanded(child: Text(l10n.sheetTitle(widget.name), style: theme.textTheme.titleLarge)),
+              ],
+            ),
             if (p != null) ...[
               _ProposalCard(proposal: p),
               if (p.canApply) ...[
@@ -120,20 +134,14 @@ class _SubstitutionSheetState extends ConsumerState<_SubstitutionSheet> {
               TextField(
                 controller: _note,
                 enabled: !_busy,
-                decoration: InputDecoration(hintText: l10n.sheetNoteHint, border: const OutlineInputBorder()),
+                decoration: InputDecoration(hintText: l10n.sheetNoteHint),
               ),
               if (_busy)
-                Row(
-                  spacing: 12,
-                  children: [
-                    const SizedBox.square(dimension: 20, child: CircularProgressIndicator(strokeWidth: 2)),
-                    Text(l10n.sheetSearching),
-                  ],
-                )
+                StageLoader(stages: [l10n.sheetSearching], current: 0)
               else
                 FilledButton(onPressed: _find, child: Text(l10n.sheetFind)),
             ],
-            if (_error case final e?) Text(e, style: TextStyle(color: theme.colorScheme.error)),
+            if (_error case final e?) NoteBanner(e, kind: NoteKind.warning),
           ],
         ),
       ),
@@ -152,28 +160,34 @@ class _ProposalCard extends StatelessWidget {
     final theme = Theme.of(context);
     final p = proposal;
     final (IconData icon, String title) = switch (p.verdict) {
-      'works' => (Icons.check_circle_outline, l10n.verdictWorks),
-      'changes_result' => (Icons.info_outline, l10n.verdictChanges),
-      'not_recommended' => (Icons.warning_amber, l10n.verdictNotRecommended),
-      _ => (Icons.block, l10n.verdictNone),
+      'works' => (Icons.check_circle_outline_rounded, l10n.verdictWorks),
+      'changes_result' => (Icons.info_outline_rounded, l10n.verdictChanges),
+      'not_recommended' => (Icons.error_outline_rounded, l10n.verdictNotRecommended),
+      _ => (Icons.block_rounded, l10n.verdictNone),
     };
     final amount = p.ops
         .where((o) => o['op'] == 'replace_ingredient' && o['quantity'] != null)
         .map((o) => (o['quantity'] as Map)['display'] as String)
         .firstOrNull;
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 6,
-          children: [
-            Row(spacing: 8, children: [Icon(icon), Expanded(child: Text(title, style: theme.textTheme.titleMedium))]),
-            if (p.replacementNameHe case final r?) Text(amount == null ? r : '$r — $amount', style: theme.textTheme.titleSmall),
-            Text(p.explanationHe),
-            if (p.effectsHe case final e?) Text(e, style: theme.textTheme.bodySmall),
-          ],
-        ),
+    final kind = switch (p.verdict) {
+      'works' => NoteKind.success,
+      'changes_result' => NoteKind.tip,
+      'not_recommended' => NoteKind.warning,
+      _ => NoteKind.warning,
+    };
+    return NoteBanner(
+      tidyHe(p.explanationHe),
+      kind: kind,
+      icon: icon,
+      title: title,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: Space.xs,
+        children: [
+          if (p.replacementNameHe case final r?)
+            Text(amount == null ? r : '$r ($amount)', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+          if (p.effectsHe case final e?) Text(tidyHe(e), style: theme.textTheme.bodySmall),
+        ],
       ),
     );
   }

@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/db/database.dart';
 import '../../data/providers.dart';
+import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/components.dart';
 import '../../l10n/app_localizations.dart';
 import 'import_service.dart';
 
@@ -19,7 +21,7 @@ Future<void> openDraft(BuildContext context, WidgetRef ref, String draftId, {boo
   replace ? router.pushReplacement(path) : router.push(path);
 }
 
-/// "ייבואים שלא הושלמו" on the home screen (hidden when there are none).
+/// Unfinished new recipes on home (hidden when there are none): continue or delete.
 class DraftsCard extends ConsumerWidget {
   const DraftsCard({super.key});
 
@@ -29,30 +31,22 @@ class DraftsCard extends ConsumerWidget {
     final drafts = ref.watch(draftsProvider).value ?? const [];
     if (drafts.isEmpty) return const SizedBox.shrink();
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(l10n.draftsTitle, style: Theme.of(context).textTheme.titleSmall),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SectionTitle(l10n.draftsTitle),
+        for (final d in drafts)
+          RecipeTile(
+            title: d.title.isEmpty ? l10n.importTitle : d.title,
+            leadingIcon: Icons.edit_note_rounded,
+            onTap: () => openDraft(context, ref, d.id),
+            trailing: IconButton(
+              tooltip: l10n.draftDiscard,
+              icon: const Icon(Icons.delete_outline_rounded),
+              onPressed: () => ref.read(importServiceProvider).discard(d.id),
             ),
-            for (final d in drafts)
-              ListTile(
-                leading: const Icon(Icons.edit_note),
-                title: Text(d.title.isEmpty ? l10n.importTitle : d.title),
-                onTap: () => openDraft(context, ref, d.id),
-                trailing: IconButton(
-                  tooltip: l10n.draftDiscard,
-                  icon: const Icon(Icons.delete_outline),
-                  onPressed: () => ref.read(importServiceProvider).discard(d.id),
-                ),
-              ),
-          ],
-        ),
-      ),
+          ),
+      ],
     );
   }
 }

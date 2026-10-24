@@ -18,7 +18,7 @@ void main() {
     final session = await h.sessions.startSession(recipeId: recipeId, planId: plan.id);
     await tester.pumpWidget(h.build(initialLocation: '/cook/${session.id}'));
     await tester.pumpAndSettle();
-    await tester.tap(find.byTooltip('רמי — עוזר הבישול'));
+    await tester.tap(find.byTooltip('רמי, העוזר שלך לבישול'));
     await tester.pumpAndSettle();
     return session.id;
   }

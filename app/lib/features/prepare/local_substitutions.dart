@@ -190,7 +190,7 @@ SubstitutionProposal _noMixer(Equipment eq, CookingPlan plan, String context) {
     verdict: whipping ? 'changes_result' : 'works',
     explanationHe: 'אפשר להסתדר בלי מיקסר: טורפים ביד במטרפה או במזלג.',
     replacementNameHe: 'מטרפה ידנית',
-    effectsHe: whipping ? 'להגיע לקצף יציב ביד דורש סבלנות — כ-5 עד 10 דקות של טריפה נמרצת.' : null,
+    effectsHe: whipping ? 'להגיע לקצף יציב ביד דורש סבלנות: כ-5 עד 10 דקות של טריפה נמרצת.' : null,
     ops: [
       {'op': 'replace_equipment', 'equipment_id': eq.id, 'name': 'מטרפה ידנית'},
       ..._notes(eq, plan, 'בלי מיקסר: טורפים ביד במטרפה. זה לוקח יותר זמן ומאמץ, אבל עובד.'),
@@ -204,12 +204,12 @@ SubstitutionProposal _noMixer(Equipment eq, CookingPlan plan, String context) {
 SubstitutionProposal _noThermometer(Equipment eq, CookingPlan plan) {
   String signsOnly(String line) {
     if (line.contains('טחון') || line.contains('71')) {
-      return 'בלי מדחום: מבשלים עד שאין ורוד בפנים והנוזלים שקופים. הצבע לבדו לא תמיד אמין — אם יש ספק, עוד כמה דקות.';
+      return 'בלי מדחום: מבשלים עד שאין ורוד בפנים והנוזלים שקופים. הצבע לבדו לא תמיד אמין, ולכן אם יש ספק, עוד כמה דקות.';
     }
     if (line.contains('עוף') || line.contains('74')) {
-      return 'בלי מדחום: חותכים בחלק העבה — אין ורוד והנוזלים שקופים. אם יש ספק, עוד כמה דקות בישול.';
+      return 'בלי מדחום: חותכים בחלק העבה ובודקים שאין ורוד והנוזלים שקופים. אם יש ספק, עוד כמה דקות בישול.';
     }
-    return 'בלי מדחום: סומכים על הסימנים שבמתכון, ואם יש ספק — עוד כמה דקות בישול.';
+    return 'בלי מדחום: סומכים על הסימנים שבמתכון, ואם יש ספק, עוד כמה דקות בישול.';
   }
 
   final ops = <PatchOp>[{'op': 'omit_equipment', 'equipment_id': eq.id}];
@@ -230,7 +230,7 @@ SubstitutionProposal _noThermometer(Equipment eq, CookingPlan plan) {
     explanationHe: needed
         ? 'אפשר לבשל בלי מדחום ולבדוק לפי הסימנים שבשלבים.'
         : 'המתכון לא צריך מדחום.',
-    effectsHe: needed ? 'הבדיקה פחות מדויקת — אם יש ספק, בשלו עוד מעט.' : null,
+    effectsHe: needed ? 'הבדיקה פחות מדויקת. אם יש ספק, בשלו עוד מעט.' : null,
     ops: ops,
     source: SubstitutionSource.local,
   );
@@ -300,7 +300,7 @@ SubstitutionProposal _noScale(Equipment eq, Recipe recipe, CookingPlan plan) {
         ? 'המרנו את הכמויות לכוסות ולכפות. 1 כוס = 240 מ"ל.'
         : 'אין במתכון כמויות שצריך לשקול.',
     effectsHe: leftInGrams.isEmpty
-        ? (converted ? 'במדידה בכוסות הכמויות פחות מדויקות — מלאו את הכוס בלי לדחוס.' : null)
+        ? (converted ? 'במדידה בכוסות הכמויות פחות מדויקות. מלאו את הכוס בלי לדחוס.' : null)
         : 'לא הצלחנו להמיר: ${leftInGrams.join(', ')}. אפשר להיעזר בסימון על האריזה.',
     ops: converted ? ops : [{'op': 'omit_equipment', 'equipment_id': eq.id}],
     source: SubstitutionSource.local,

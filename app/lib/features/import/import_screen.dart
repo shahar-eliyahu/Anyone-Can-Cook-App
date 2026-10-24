@@ -6,7 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/motion.dart';
+import '../../core/theme.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/components.dart';
 import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
 import '../../data/settings_repository.dart';
@@ -25,8 +28,9 @@ class ImportScreen extends ConsumerStatefulWidget {
   ConsumerState<ImportScreen> createState() => _ImportScreenState();
 }
 
-class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerProviderStateMixin {
-  late final _tabs = TabController(length: 3, vsync: this)..addListener(() => setState(() {}));
+class _ImportScreenState extends ConsumerState<ImportScreen> {
+  /// 0 text, 1 photo, 2 link.
+  int _tab = 0;
   final _text = TextEditingController();
   final _url = TextEditingController();
   String? _imagePath;
@@ -57,7 +61,6 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
     if (_imagePath != null && _imagePath != _pendingImage) {
       unawaited(ref.read(imageStoreProvider).delete(_imagePath));
     }
-    _tabs.dispose();
     _text.dispose();
     _url.dispose();
     super.dispose();
@@ -100,14 +103,14 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
     setState(() {
       if (pending.text case final t?) {
         _text.text = t;
-        _tabs.index = 0;
+        _tab = 0;
       } else if (pending.url case final u?) {
         _url.text = u;
-        _tabs.index = 2;
+        _tab = 2;
       } else if (bytes != null) {
         _imagePath = _pendingImage = image;
         _imageBytes = bytes;
-        _tabs.index = 1;
+        _tab = 1;
       } else {
         return;
       }
@@ -139,7 +142,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
     setState(() => _imagePath = _imageBytes = null);
   }
 
-  ImportSource? get _source => switch (_tabs.index) {
+  ImportSource? get _source => switch (_tab) {
         0 when _text.text.trim().isNotEmpty => ImportSource.text(_text.text.trim()),
         1 when _imagePath != null => ImportSource.image(_imagePath!, _imageBytes!),
         2 when _url.text.trim().isNotEmpty => ImportSource.url(_url.text.trim()),
@@ -229,137 +232,132 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
 
     return AppScaffold(
       title: l10n.importTitle,
-      body: Column(
+      bottomBar: _busy
+          ? null
+          : FilledButton.icon(
+              onPressed: _source == null ? null : _analyze,
+              icon: Icon(_canRetry ? Icons.refresh_rounded : Icons.menu_book_rounded),
+              label: Text(_canRetry ? l10n.importRetry : l10n.importAnalyze),
+            ),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(Space.page, Space.s, Space.page, Space.xl),
         children: [
+          Text(l10n.importIntro, style: theme.textTheme.titleLarge),
+          const SizedBox(height: Space.m),
           IgnorePointer(
             ignoring: _busy,
-            child: TabBar(
-              controller: _tabs,
-              tabs: [
-                Tab(icon: const Icon(Icons.notes), text: l10n.importTabText),
-                Tab(icon: const Icon(Icons.photo_camera_outlined), text: l10n.importTabPhoto),
-                Tab(icon: const Icon(Icons.link), text: l10n.importTabUrl),
+            child: SegmentedButton<int>(
+              showSelectedIcon: false,
+              segments: [
+                ButtonSegment(value: 0, icon: const Icon(Icons.notes_rounded), label: Text(l10n.importTabText)),
+                ButtonSegment(value: 1, icon: const Icon(Icons.photo_camera_outlined), label: Text(l10n.importTabPhoto)),
+                ButtonSegment(value: 2, icon: const Icon(Icons.link_rounded), label: Text(l10n.importTabUrl)),
               ],
+              selected: {_tab},
+              onSelectionChanged: (v) => setState(() => _tab = v.first),
             ),
           ),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                switch (_tabs.index) {
-                  0 => TextField(
-                      controller: _text,
-                      enabled: !_busy,
-                      minLines: 8,
-                      maxLines: 16,
-                      maxLength: 20000,
-                      onChanged: (_) => setState(() {}),
-                      decoration: InputDecoration(hintText: l10n.importTextHint, border: const OutlineInputBorder()),
-                    ),
-                  1 => Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      spacing: 8,
-                      children: [
-                        if (_imagePath != null)
-                          Stack(
-                            children: [
-                              if (File(_imagePath!).existsSync())
-                                Image.file(
-                                  File(_imagePath!),
-                                  height: 260,
-                                  fit: BoxFit.contain,
-                                  width: double.infinity,
-                                  errorBuilder: (_, _, _) => const SizedBox(height: 260, child: Icon(Icons.broken_image)),
-                                )
-                              else
-                                const SizedBox(height: 260, child: Center(child: Icon(Icons.image_outlined, size: 48))),
-                              if (!_busy)
-                                IconButton.filledTonal(
-                                  tooltip: l10n.delete,
-                                  onPressed: _removePhoto,
-                                  icon: const Icon(Icons.close),
-                                ),
-                            ],
-                          ),
-                        Row(
-                          spacing: 8,
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _busy ? null : () => _pickPhoto(camera: true),
-                                icon: const Icon(Icons.photo_camera_outlined),
-                                label: Text(l10n.importTakePhoto),
-                              ),
-                            ),
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _busy ? null : () => _pickPhoto(camera: false),
-                                icon: const Icon(Icons.photo_library_outlined),
-                                label: Text(l10n.importPickPhoto),
-                              ),
-                            ),
-                          ],
-                        ),
-                        Text(l10n.importPhotoNote, style: theme.textTheme.bodySmall),
-                      ],
-                    ),
-                  _ => TextField(
-                      controller: _url,
-                      enabled: !_busy,
-                      keyboardType: TextInputType.url,
-                      textDirection: TextDirection.ltr,
-                      onChanged: (_) => setState(() {}),
-                      decoration: InputDecoration(hintText: l10n.importUrlHint, border: const OutlineInputBorder()),
-                    ),
-                },
-                const SizedBox(height: 16),
-                if (_busy)
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Row(
-                        spacing: 16,
-                        children: [
-                          const SizedBox.square(dimension: 24, child: CircularProgressIndicator(strokeWidth: 3)),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(_stage == ImportStage.planning ? l10n.importStagePlanning : l10n.importStageReading),
-                                if (_slow) Text(l10n.importStageSlow, style: theme.textTheme.bodySmall),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  FilledButton.icon(
-                    onPressed: _source == null ? null : _analyze,
-                    icon: Icon(_canRetry ? Icons.refresh : Icons.auto_awesome),
-                    label: Text(_canRetry ? l10n.importRetry : l10n.importAnalyze),
-                  ),
-                if (_message case final m?) ...[
-                  const SizedBox(height: 16),
-                  Card(
-                    color: _info ? theme.colorScheme.secondaryContainer : theme.colorScheme.errorContainer,
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: Text(
-                        m,
-                        style: TextStyle(
-                          color: _info ? theme.colorScheme.onSecondaryContainer : theme.colorScheme.onErrorContainer,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
+          const SizedBox(height: Space.l),
+          AnimatedSwitcher(
+            duration: Motion.of(context, Motion.medium),
+            child: KeyedSubtree(key: ValueKey(_tab), child: _input(l10n, theme)),
           ),
+          if (_busy) ...[
+            const SizedBox(height: Space.l),
+            StageLoader(
+              stages: [l10n.importStageReading, l10n.importStagePlanning],
+              current: _stage == ImportStage.planning ? 1 : 0,
+              note: _slow ? '${l10n.importStageSlow} ${l10n.importLeaveNote}' : null,
+              action: _slow
+                  ? Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: OutlinedButton(onPressed: () => context.pop(), child: Text(l10n.importLeave)),
+                    )
+                  : null,
+            ),
+          ],
+          if (_message case final m?) ...[
+            const SizedBox(height: Space.m),
+            NoteBanner(m, kind: _info ? NoteKind.info : NoteKind.warning),
+          ],
         ],
       ),
     );
   }
+
+  Widget _input(AppLocalizations l10n, ThemeData theme) => switch (_tab) {
+        0 => TextField(
+            controller: _text,
+            enabled: !_busy,
+            minLines: 8,
+            maxLines: 16,
+            maxLength: 20000,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(hintText: l10n.importTextHint, counterText: ''),
+          ),
+        1 => Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            spacing: Space.m,
+            children: [
+              if (_imagePath != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(Radii.card),
+                  child: Stack(
+                    children: [
+                      ColoredBox(
+                        color: theme.colorScheme.surfaceContainer,
+                        child: File(_imagePath!).existsSync()
+                            ? Image.file(
+                                File(_imagePath!),
+                                height: 260,
+                                fit: BoxFit.contain,
+                                width: double.infinity,
+                                errorBuilder: (_, _, _) => const SizedBox(height: 260, child: Icon(Icons.broken_image_outlined)),
+                              )
+                            : const SizedBox(height: 260, width: double.infinity, child: Center(child: Icon(Icons.image_outlined, size: 48))),
+                      ),
+                      if (!_busy)
+                        PositionedDirectional(
+                          top: Space.s,
+                          end: Space.s,
+                          child: IconButton.filledTonal(
+                            tooltip: l10n.delete,
+                            onPressed: _removePhoto,
+                            icon: const Icon(Icons.close_rounded),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              Row(
+                spacing: Space.s,
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _busy ? null : () => _pickPhoto(camera: true),
+                      icon: const Icon(Icons.photo_camera_outlined),
+                      label: Text(l10n.importTakePhoto),
+                    ),
+                  ),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: _busy ? null : () => _pickPhoto(camera: false),
+                      icon: const Icon(Icons.photo_library_outlined),
+                      label: Text(l10n.importPickPhoto),
+                    ),
+                  ),
+                ],
+              ),
+              Text(l10n.importPhotoNote, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+            ],
+          ),
+        _ => TextField(
+            controller: _url,
+            enabled: !_busy,
+            keyboardType: TextInputType.url,
+            textDirection: TextDirection.ltr,
+            onChanged: (_) => setState(() {}),
+            decoration: InputDecoration(hintText: l10n.importUrlHint, prefixIcon: const Icon(Icons.link_rounded)),
+          ),
+      };
 }

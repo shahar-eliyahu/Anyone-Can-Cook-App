@@ -3,7 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/clock.dart';
+import '../../core/motion.dart';
+import '../../core/theme.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/brand.dart';
+import '../../core/widgets/components.dart';
+import '../../core/widgets/motion_widgets.dart';
 import '../../l10n/app_localizations.dart';
 import '../history/history_screen.dart';
 import 'cooking_controller.dart';
@@ -46,31 +51,60 @@ class _FinishScreenState extends ConsumerState<FinishScreen> {
     }
     final ended = ref.read(clockProvider)();
 
+    final theme = Theme.of(context);
+    final title = view.recipeRow.customTitle ?? view.recipe.title;
+
     return AppScaffold(
       title: l10n.finishTitle,
+      bottomBar: FilledButton.icon(
+        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
+        onPressed: _saving || !view.isActive ? null : _finish,
+        icon: const Icon(Icons.check_rounded),
+        label: Text(l10n.saveAndFinish),
+      ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(Space.page, Space.xl, Space.page, Space.xl),
         children: [
-          Text(
-            l10n.finishSummary(view.recipeRow.customTitle ?? view.recipe.title),
-            style: Theme.of(context).textTheme.headlineSmall,
+          Center(
+            child: TweenAnimationBuilder<double>(
+              // The logo tilts once, like a little bow. No confetti.
+              tween: Tween(begin: Motion.reduced(context) ? 0 : -0.08, end: 0),
+              duration: Motion.of(context, const Duration(milliseconds: 600)),
+              curve: Curves.elasticOut,
+              builder: (context, turn, child) => Transform.rotate(angle: turn * 6.283, child: child),
+              child: const LogoMark(size: 88),
+            ),
           ),
-          const SizedBox(height: 8),
-          Text(l10n.cookingTime(cookingDurationLabel(l10n, view.session.startedAt, ended))),
-          Text(l10n.cookingProgress(view.state.doneStepCount, view.state.plan.steps.length)),
-          const SizedBox(height: 16),
+          const SizedBox(height: Space.l),
+          Appear(
+            child: Column(
+              spacing: Space.s,
+              children: [
+                Text(l10n.finishCelebrate, style: theme.textTheme.displaySmall?.copyWith(color: AppColors.onSoftBlue)),
+                Text(l10n.finishSummary(title), textAlign: TextAlign.center, style: theme.textTheme.titleMedium),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: Space.s,
+                  runSpacing: Space.s,
+                  children: [
+                    InfoPill(
+                      icon: Icons.schedule_rounded,
+                      label: l10n.cookingTime(cookingDurationLabel(l10n, view.session.startedAt, ended)),
+                    ),
+                    InfoPill(
+                      icon: Icons.check_circle_outline_rounded,
+                      label: l10n.cookingProgress(view.state.doneStepCount, view.state.plan.steps.length),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: Space.xl),
           TextField(
             controller: _notes,
             maxLines: 3,
-            decoration: InputDecoration(
-              labelText: l10n.notesLabel,
-              border: const OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: _saving || !view.isActive ? null : _finish,
-            child: Text(l10n.saveAndFinish),
+            decoration: InputDecoration(labelText: l10n.notesLabel, alignLabelWithHint: true),
           ),
         ],
       ),

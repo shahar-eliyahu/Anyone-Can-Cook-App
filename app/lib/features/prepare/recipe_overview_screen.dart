@@ -4,13 +4,19 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/db/database.dart';
 import '../../core/format.dart';
+import '../../core/motion.dart';
+import '../../core/theme.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/components.dart';
+import '../../core/widgets/motion_widgets.dart';
 import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/cooking_plan.dart';
 import '../../models/recipe.dart';
 import '../../models/recipe_analysis.dart';
+import '../assistant/assistant_models.dart';
+import '../assistant/remy_widgets.dart';
 import '../cooking/start_cooking.dart';
 import '../import/import_service.dart';
 import 'plan_estimate.dart';
@@ -97,6 +103,11 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
           e.name,
     ];
     final canStart = plan != null && !row.planStale && (!needsAck || _acknowledged) && !_busy;
+    bool settled(ItemStatus st, bool omitted, bool substituted) => st == ItemStatus.have || omitted || substituted;
+    final allReady = plan != null &&
+        recipe.ingredients.every((i) => settled(prep.statusOf(i.id), i.omitted, prep.substitutionFor(ItemKind.ingredient, i.id) != null)) &&
+        recipe.equipment.every((e) => settled(prep.statusOf(e.id), e.omitted, prep.substitutionFor(ItemKind.equipment, e.id) != null));
+    final remy = RemyButton(scope: RemyScope.recipe(row.id));
 
     return AppScaffold(
       title: row.displayTitle,
@@ -104,10 +115,12 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
         if (!row.isDraft)
           IconButton(
             tooltip: row.isFavorite ? l10n.removeFavorite : l10n.addFavorite,
-            icon: Icon(row.isFavorite ? Icons.star : Icons.star_outline),
+            icon: Icon(row.isFavorite ? Icons.star_rounded : Icons.star_outline_rounded, color: row.isFavorite ? context.palette.woodLight : null),
             onPressed: () => ref.read(recipeRepositoryProvider).setFavorite(row.id, !row.isFavorite),
           ),
         PopupMenuButton<_Menu>(
+          tooltip: l10n.overviewMore,
+          icon: const Icon(Icons.more_vert_rounded),
           onSelected: (m) => _onMenu(m, view),
           itemBuilder: (context) => [
             if (!row.isDraft) PopupMenuItem(value: _Menu.rename, child: Text(l10n.rename)),
@@ -122,14 +135,22 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
         ),
       ],
       bottomBar: view.cookingNow
-          ? FilledButton(
-              style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-              onPressed: () async {
-                final router = GoRouter.of(context);
-                final session = await ref.read(sessionRepositoryProvider).activeSession();
-                if (session != null) router.go('/cook/${session.id}');
-              },
-              child: Text(l10n.continueCooking),
+          ? Row(
+              spacing: Space.m,
+              children: [
+                remy,
+                Expanded(
+                  child: FilledButton(
+                    style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
+                    onPressed: () async {
+                      final router = GoRouter.of(context);
+                      final session = await ref.read(sessionRepositoryProvider).activeSession();
+                      if (session != null) router.go('/cook/${session.id}');
+                    },
+                    child: Text(l10n.continueCooking),
+                  ),
+                ),
+              ],
             )
           : Column(
               mainAxisSize: MainAxisSize.min,
@@ -137,116 +158,146 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
               children: [
                 if (missing.isNotEmpty)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: Text(l10n.stillMissing(missing.join(', ')), style: theme.textTheme.bodySmall),
+                    padding: const EdgeInsets.only(bottom: Space.s),
+                    child: Text(
+                      l10n.stillMissing(missing.join(', ')),
+                      style: theme.textTheme.bodySmall?.copyWith(color: context.palette.onTimerDoneContainer),
+                    ),
                   ),
-                FilledButton(
-                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-                  onPressed: canStart ? () => _start(view) : null,
-                  child: Text(l10n.startCookingCta),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  spacing: Space.m,
+                  children: [
+                    remy,
+                    Expanded(
+                      child: FilledButton.icon(
+                        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(56)),
+                        onPressed: canStart ? () => _start(view) : null,
+                        icon: const Icon(Icons.local_fire_department_rounded),
+                        label: Text(l10n.startCookingCta),
+                      ),
+                    ),
+                  ],
                 ),
                 if (row.isDraft)
                   TextButton(onPressed: canStart ? () => _saveDraft(view) : null, child: Text(l10n.saveToMyRecipes)),
               ],
             ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+        padding: const EdgeInsets.fromLTRB(Space.page, Space.s, Space.page, Space.xl),
         children: [
-          Text(row.displayTitle, style: theme.textTheme.headlineSmall),
-          if (recipe.description case final d?) Padding(padding: const EdgeInsets.only(top: 4), child: Text(d)),
-          const SizedBox(height: 8),
-          Wrap(
-            spacing: 8,
-            runSpacing: 4,
-            children: [
-              if (recipe.servings case final s?)
-                Chip(avatar: const Icon(Icons.restaurant, size: 18), label: Text('${_number(s.amount)} ${s.unit}')),
-              if (estimate != null) ...[
-                Chip(
-                  avatar: const Icon(Icons.schedule, size: 18),
-                  label: Text(l10n.overviewTotalTime(formatApproxDuration(estimate.totalMinutes, l10n))),
-                ),
-                Chip(
-                  avatar: const Icon(Icons.back_hand_outlined, size: 18),
-                  label: Text(l10n.overviewActiveTime(formatApproxDuration(estimate.activeMinutes, l10n))),
-                ),
-              ],
-            ],
-          ),
-          if (row.planStale) _notice(context, l10n.planOutdated, error: true),
-          if (view.cookingNow) _notice(context, l10n.cookingNowLocked),
-          if (plan?.advanceNoticeHe case final n?) _notice(context, '🕒 $n'),
-          if (attention.isNotEmpty)
-            Card(
-              color: theme.colorScheme.secondaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 4,
+          Appear(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: Space.s,
+              children: [
+                Text(row.displayTitle, style: theme.textTheme.headlineSmall),
+                if (recipe.description case final d?)
+                  Text(tidyHe(d), style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                Wrap(
+                  spacing: Space.s,
+                  runSpacing: Space.s,
                   children: [
-                    Text(l10n.attentionTitle, style: theme.textTheme.titleSmall),
-                    for (final a in attention) Text('• $a'),
-                    if (needsAck)
-                      CheckboxListTile(
-                        contentPadding: EdgeInsets.zero,
-                        controlAffinity: ListTileControlAffinity.leading,
-                        value: _acknowledged,
-                        onChanged: (v) => setState(() => _acknowledged = v ?? false),
-                        title: Text(l10n.attentionAck),
-                      ),
+                    if (recipe.servings case final s?) InfoPill(icon: Icons.restaurant_rounded, label: '${_number(s.amount)} ${s.unit}'),
+                    if (estimate != null) ...[
+                      InfoPill(icon: Icons.schedule_rounded, label: l10n.overviewTotalTime(formatApproxDuration(estimate.totalMinutes, l10n))),
+                      InfoPill(icon: Icons.back_hand_outlined, label: l10n.overviewActiveTime(formatApproxDuration(estimate.activeMinutes, l10n))),
+                    ],
                   ],
                 ),
+              ],
+            ),
+          ),
+          const SizedBox(height: Space.s),
+          if (row.planStale) NoteBanner(l10n.planOutdated, kind: NoteKind.warning),
+          if (view.cookingNow) NoteBanner(l10n.cookingNowLocked, icon: Icons.local_fire_department_outlined),
+          if (plan?.advanceNoticeHe case final n?) NoteBanner(tidyHe(n), kind: NoteKind.tip, icon: Icons.schedule_rounded),
+          if (attention.isNotEmpty)
+            NoteBanner(
+              '',
+              kind: NoteKind.warning,
+              title: l10n.attentionTitle,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: Space.xs,
+                children: [
+                  for (final a in attention) Text('• ${tidyHe(a)}'),
+                  if (needsAck)
+                    CheckboxListTile(
+                      contentPadding: EdgeInsets.zero,
+                      controlAffinity: ListTileControlAffinity.leading,
+                      value: _acknowledged,
+                      onChanged: (v) => setState(() => _acknowledged = v ?? false),
+                      title: Text(l10n.attentionAck),
+                    ),
+                ],
               ),
             ),
-          const SizedBox(height: 8),
-          Text(l10n.overviewChecklistIntro),
-          Row(
-            children: [
-              Expanded(child: SectionTitle(l10n.ingredients)),
-              if (!view.cookingNow)
-                TextButton(onPressed: () => _service.markAllHave(row.id), child: Text(l10n.haveAll)),
-            ],
+          SectionTitle(
+            l10n.ingredients,
+            trailing: view.cookingNow
+                ? null
+                : TextButton.icon(
+                    onPressed: () => _service.markAllHave(row.id),
+                    icon: const Icon(Icons.done_all_rounded),
+                    label: Text(l10n.haveAll),
+                  ),
           ),
-          for (final i in recipe.ingredients)
-            _ItemRow(
-              name: i.name,
-              detail: i.omitted ? null : i.quantity?.display,
-              optional: i.optional,
-              substitutedFor: i.substitutedFor,
-              omitted: i.omitted,
-              status: prep.statusOf(i.id),
-              substitution: prep.substitutionFor(ItemKind.ingredient, i.id),
-              readOnly: view.cookingNow || plan == null,
-              onStatus: (s) => _service.setStatus(row.id, i.id, s),
-              onSolve: () => _solve(view, ItemKind.ingredient, i.id, i.name),
-              onUndo: (sub) => _undo(row.id, sub),
+          Text(l10n.overviewChecklistIntro, style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+          const SizedBox(height: Space.s),
+          Card(
+            child: Column(
+              children: [
+                for (final i in recipe.ingredients)
+                  _ItemRow(
+                    name: i.name,
+                    detail: i.omitted ? null : i.quantity?.display,
+                    optional: i.optional,
+                    substitutedFor: i.substitutedFor,
+                    omitted: i.omitted,
+                    status: prep.statusOf(i.id),
+                    substitution: prep.substitutionFor(ItemKind.ingredient, i.id),
+                    readOnly: view.cookingNow || plan == null,
+                    onStatus: (s) => _service.setStatus(row.id, i.id, s),
+                    onSolve: () => _solve(view, ItemKind.ingredient, i.id, i.name),
+                    onUndo: (sub) => _undo(row.id, sub),
+                  ),
+              ],
             ),
+          ),
           if (recipe.equipment.isNotEmpty) ...[
             SectionTitle(l10n.equipment),
-            for (final e in recipe.equipment)
-              _ItemRow(
-                name: e.name,
-                substitutedFor: e.substitutedFor,
-                omitted: e.omitted,
-                status: prep.statusOf(e.id),
-                substitution: prep.substitutionFor(ItemKind.equipment, e.id),
-                readOnly: view.cookingNow || plan == null,
-                onStatus: (s) => _service.setStatus(row.id, e.id, s),
-                onSolve: () => _solve(view, ItemKind.equipment, e.id, e.name),
-                onUndo: (sub) => _undo(row.id, sub),
+            Card(
+              child: Column(
+                children: [
+                  for (final e in recipe.equipment)
+                    _ItemRow(
+                      name: e.name,
+                      substitutedFor: e.substitutedFor,
+                      omitted: e.omitted,
+                      status: prep.statusOf(e.id),
+                      substitution: prep.substitutionFor(ItemKind.equipment, e.id),
+                      readOnly: view.cookingNow || plan == null,
+                      onStatus: (s) => _service.setStatus(row.id, e.id, s),
+                      onSolve: () => _solve(view, ItemKind.equipment, e.id, e.name),
+                      onUndo: (sub) => _undo(row.id, sub),
+                    ),
+                ],
               ),
+            ),
           ],
+          AnimatedSwitcher(
+            duration: Motion.of(context, Motion.medium),
+            child: allReady && !view.cookingNow
+                ? Padding(
+                    key: const ValueKey('ready'),
+                    padding: const EdgeInsets.only(top: Space.m),
+                    child: NoteBanner(l10n.overviewReady, kind: NoteKind.success),
+                  )
+                : const SizedBox(key: ValueKey('not-ready'), width: double.infinity),
+          ),
         ],
       ),
-    );
-  }
-
-  Widget _notice(BuildContext context, String text, {bool error = false}) {
-    final scheme = Theme.of(context).colorScheme;
-    return Card(
-      color: error ? scheme.errorContainer : scheme.surfaceContainerHigh,
-      child: Padding(padding: const EdgeInsets.all(12), child: Text(text)),
     );
   }
 
@@ -413,33 +464,62 @@ class _ItemRow extends StatelessWidget {
             : resolved || status == ItemStatus.have
                 ? null
                 : missing
-                    ? FilledButton.tonal(onPressed: onSolve, child: Text(l10n.findSolution))
+                    ? FilledButton.tonal(
+                        style: FilledButton.styleFrom(minimumSize: const Size(48, 44)),
+                        onPressed: onSolve,
+                        child: Text(l10n.findSolution),
+                      )
                     : TextButton(onPressed: onSolve, child: Text(l10n.missingIt));
+    final canToggle = !readOnly && !resolved;
 
     return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Checkbox(
-        value: checked,
-        onChanged: readOnly || resolved ? null : (v) => onStatus(v == true ? ItemStatus.have : ItemStatus.unknown),
+      onTap: canToggle ? () => onStatus(checked ? ItemStatus.unknown : ItemStatus.have) : null,
+      leading: _CheckCircle(
+        checked: checked,
+        missing: missing,
+        onChanged: canToggle ? (v) => onStatus(v ? ItemStatus.have : ItemStatus.unknown) : null,
       ),
       title: Text(
-        optional ? '$name · ${l10n.optionalItem}' : name,
+        name,
         style: omitted
-            ? TextStyle(decoration: TextDecoration.lineThrough, color: theme.disabledColor)
+            ? TextStyle(decoration: TextDecoration.lineThrough, color: theme.colorScheme.onSurfaceVariant)
             : missing
-                ? TextStyle(color: theme.colorScheme.error)
+                ? TextStyle(color: context.palette.onTimerDoneContainer, fontWeight: FontWeight.w700)
                 : null,
       ),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (detail case final d?) Text(d),
+          if (optional) Text(l10n.optionalItem, style: theme.textTheme.labelMedium?.copyWith(color: context.palette.wood)),
           if (substitutedFor case final o? when o != name) Text(l10n.insteadOf(o), style: theme.textTheme.bodySmall),
           if (omitted) Text(l10n.notUsed, style: theme.textTheme.bodySmall),
-          if (sub?.effectsHe case final e? when !omitted) Text(e, style: theme.textTheme.bodySmall),
+          if (sub?.effectsHe case final e? when !omitted) Text(tidyHe(e), style: theme.textTheme.bodySmall),
         ],
       ),
       trailing: trailing,
+    );
+  }
+}
+
+/// The "have it" tick: a round checkbox, amber-edged while the item is missing.
+class _CheckCircle extends StatelessWidget {
+  const _CheckCircle({required this.checked, required this.missing, required this.onChanged});
+
+  final bool checked;
+  final bool missing;
+  final ValueChanged<bool>? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final theme = Theme.of(context);
+    return Checkbox(
+      value: checked,
+      onChanged: onChanged == null ? null : (v) => onChanged!(v ?? false),
+      shape: const CircleBorder(),
+      activeColor: p.success,
+      side: BorderSide(color: missing ? p.timerDone : theme.colorScheme.outline, width: 1.8),
     );
   }
 }

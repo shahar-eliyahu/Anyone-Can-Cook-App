@@ -16,7 +16,7 @@ void main() {
     await tester.pumpWidget(h.build(initialLocation: '/cook/${session.id}'));
     await tester.pumpAndSettle();
     if (openSheet) {
-      await tester.tap(find.byTooltip('רמי — עוזר הבישול'));
+      await tester.tap(find.byTooltip('רמי, העוזר שלך לבישול'));
       await tester.pumpAndSettle();
     }
     return session.id;
@@ -188,11 +188,12 @@ void main() {
     expect(find.textContaining('מקשיב'), findsNothing);
   });
 
-  testApp('the cooking screen microphone opens Remy already listening', (tester, h) async {
+  testApp('a long press on Remy in the cooking screen opens him already listening', (tester, h) async {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h, openSheet: false);
     h.mic.utterances.add('סיימתי');
-    await tester.tap(find.byTooltip('דיבור עם רמי'));
+    // A long press on Remy is the quick voice shortcut.
+    await tester.longPress(find.byTooltip('רמי, העוזר שלך לבישול'));
     await tester.pumpAndSettle();
     expect(find.text(doneFirst), findsOneWidget);
     expect(h.speech.spoken, [doneFirstSpoken]);

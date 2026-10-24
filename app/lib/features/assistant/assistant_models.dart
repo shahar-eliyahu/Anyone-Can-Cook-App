@@ -7,6 +7,22 @@ library;
 
 enum InputModality { text, voice }
 
+/// Where Remy is talking: inside a cooking session (he can act on it), or about a recipe
+/// before cooking (questions only; nothing changes from the chat).
+class RemyScope {
+  const RemyScope.session(this.id) : isSession = true;
+  const RemyScope.recipe(this.id) : isSession = false;
+
+  final String id;
+  final bool isSession;
+
+  @override
+  bool operator ==(Object other) => other is RemyScope && other.id == id && other.isSession == isSession;
+
+  @override
+  int get hashCode => Object.hash(id, isSession);
+}
+
 class AssistantInput {
   const AssistantInput(this.text, {this.modality = InputModality.text});
   final String text;

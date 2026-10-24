@@ -82,6 +82,18 @@ flutter:
   # Copy of shared/fixtures/sample_recipe.json (kept identical by test/contract_test.dart).
   assets:
     - assets/recipes/sample_recipe.json
+    - assets/branding/logo_mark.png
+    - assets/fonts/OFL.txt
+
+  # Heebo (SIL Open Font License, assets/fonts/OFL.txt): bundled so Hebrew looks the same offline.
+  fonts:
+    - family: Heebo
+      fonts:
+        - asset: assets/fonts/Heebo-Regular.ttf
+        - asset: assets/fonts/Heebo-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Heebo-Bold.ttf
+          weight: 700
 
   # To add assets to your application, add an assets section, like this:
   # assets:

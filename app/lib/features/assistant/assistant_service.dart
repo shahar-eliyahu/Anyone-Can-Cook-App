@@ -1,11 +1,13 @@
 import 'package:flutter/widgets.dart';
 
 import '../../core/api_client.dart';
+import '../../core/format.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/cooking_plan.dart';
 import '../../models/recipe.dart';
 import '../cooking/engine/action_dispatcher.dart';
 import '../cooking/engine/cooking_engine.dart';
+import '../prepare/plan_estimate.dart';
 import 'assistant_models.dart';
 import 'command_parser.dart';
 
@@ -64,6 +66,63 @@ class AssistantService {
     final local = interpretLocally(input, state: state, recipe: recipe, now: now);
     if (local != null) return local;
     return _askRemy(input, state: state, recipe: recipe, now: now, history: history);
+  }
+
+  /// Remy before cooking (the recipe overview): questions about the recipe, answered from
+  /// the saved recipe and plan, Remy only for the rest. Nothing is changed from the chat:
+  /// cooking actions wait for the session, substitutions go through the checklist (which
+  /// has its own undo).
+  Future<AssistantReply> interpretForPreparation(
+    AssistantInput input, {
+    required CookingPlan plan,
+    required Recipe recipe,
+    required DateTime now,
+    List<ChatTurn> history = const [],
+  }) async {
+    final l10n = _l10n;
+    if (!_intelligible(input.text)) return AssistantReply(answerHe: l10n.remyDidntCatch);
+    final state = CookingEngine.replay(plan, const []);
+    final local = _resolvePreparation(input.text, state, recipe, now);
+    if (local != null) return local;
+    final reply = await _askRemy(input, state: state, recipe: recipe, now: now, history: history);
+    return switch (reply.action) {
+      null => reply,
+      PatchPlanAction() => AssistantReply(answerHe: '${reply.answerHe}\n${l10n.remyPrepMissing}', source: ReplySource.ai),
+      _ => AssistantReply(answerHe: l10n.remyPrepNotYet, source: ReplySource.ai),
+    };
+  }
+
+  AssistantReply? _resolvePreparation(String text, CookingState state, Recipe recipe, DateTime now) {
+    final l10n = _l10n;
+    final normalized = normalizeCommand(text);
+    final first = state.plan.steps.firstOrNull;
+    if (normalized.contains('חסר')) return AssistantReply(answerHe: l10n.remyPrepMissing);
+    if (normalized.contains('מתחיל') && first != null) {
+      return AssistantReply(answerHe: l10n.remyPrepFirstStep(first.title, first.instructionHe));
+    }
+    final cmd = parseCommand(text);
+    if (cmd == null) return null;
+    switch (cmd.kind) {
+      case CommandKind.whatNow || CommandKind.nextStepPreview || CommandKind.help:
+        if (first == null) return null;
+        return AssistantReply(answerHe: l10n.remyPrepFirstStep(first.title, first.instructionHe));
+      case CommandKind.timeLeft:
+        final e = estimatePlan(state.plan);
+        return AssistantReply(
+          answerHe: l10n.remyPrepTotalTime(formatApproxDuration(e.totalMinutes, l10n), formatApproxDuration(e.activeMinutes, l10n)),
+        );
+      case CommandKind.stepsLeft:
+        return AssistantReply(answerHe: l10n.remyPrepStepCount(state.plan.steps.length));
+      case CommandKind.temperature || CommandKind.ingredientAmount || CommandKind.stepIngredients:
+        return _resolve(cmd, state: state, now: now, recipe: recipe);
+      case CommandKind.next ||
+            CommandKind.back ||
+            CommandKind.pauseTimer ||
+            CommandKind.resumeTimer ||
+            CommandKind.extendTimer ||
+            CommandKind.reportedAction:
+        return AssistantReply(answerHe: l10n.remyPrepNotYet);
+    }
   }
 
   /// Noise from speech recognition ("…", a stray letter) never goes to the server.
@@ -132,7 +191,7 @@ class AssistantService {
         final hits = [for (final i in recipe.ingredients) if (!i.omitted && stemsOf(i.name).any(wanted.contains)) i];
         if (hits.isEmpty) return null; // not an ingredient here: Remy may know what was meant
         return AssistantReply(
-          answerHe: [for (final i in hits) l10n.remyIngredientAmount(i.name, i.quantity?.display ?? '—')].join(' '),
+          answerHe: [for (final i in hits) l10n.remyIngredientAmount(i.name, i.quantity?.display ?? l10n.remyAmountUnknown)].join(' '),
         );
       case CommandKind.pauseTimer || CommandKind.resumeTimer:
         final pause = cmd.kind == CommandKind.pauseTimer;

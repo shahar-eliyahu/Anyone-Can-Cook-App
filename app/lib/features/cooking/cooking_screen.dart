@@ -4,17 +4,22 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/clock.dart';
 import '../../core/format.dart';
+import '../../core/motion.dart';
+import '../../core/theme.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/widgets/components.dart';
+import '../../core/widgets/motion_widgets.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/cooking_plan.dart';
-import '../assistant/assistant_sheet.dart';
-import '../assistant/voice.dart';
+import '../assistant/assistant_models.dart';
+import '../assistant/remy_widgets.dart';
 import 'cooking_controller.dart';
 import 'engine/cooking_engine.dart';
 
-/// The cooking screen: the current step big and clear, with one main button
-/// (docs/DECISIONS.md #35, #36). Timers, prep tasks and parallel steps stay
-/// available but compact; technical details are not shown.
+/// The cooking screen: the current step big and clear, with one main button and Remy beside
+/// it at the bottom (docs/DECISIONS.md #35, #36; docs/DESIGN.md §5). Timers, prep tasks and
+/// parallel steps stay available but compact; technical details are not shown. Leaving the
+/// screen never stops cooking.
 class CookingScreen extends ConsumerWidget {
   const CookingScreen({super.key, required this.sessionId});
 
@@ -87,17 +92,14 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
   Future<void> _abandon() async {
     final l10n = AppLocalizations.of(context);
     final router = GoRouter.of(context);
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        content: Text(l10n.abandonConfirm),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.cancel)),
-          FilledButton(onPressed: () => Navigator.pop(context, true), child: Text(l10n.abandonAction)),
-        ],
-      ),
+    final ok = await confirmDialog(
+      context,
+      message: l10n.abandonConfirm,
+      confirmLabel: l10n.abandonAction,
+      cancelLabel: l10n.cancel,
+      destructive: true,
     );
-    if (ok != true) return;
+    if (!ok) return;
     await _controller.abandon();
     router.go('/');
   }
@@ -105,6 +107,7 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final view = widget.view;
     final plan = _state.plan;
     final title = view.recipeRow.customTitle ?? view.recipe.title;
@@ -112,16 +115,12 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
     if (!view.isActive) {
       return AppScaffold(
         title: title,
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l10n.sessionEnded),
-              TextButton(
-                onPressed: () => context.go('/history/${widget.sessionId}'),
-                child: Text(l10n.cookingHistory),
-              ),
-            ],
+        body: EmptyState(
+          icon: Icons.check_circle_outline_rounded,
+          title: l10n.sessionEnded,
+          action: OutlinedButton(
+            onPressed: () => context.go('/history/${widget.sessionId}'),
+            child: Text(l10n.cookingHistory),
           ),
         ),
       );
@@ -143,51 +142,75 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
     ];
     final prepIds = <String>{};
     prep.retainWhere((v) => prepIds.add(v.task.id));
+    final total = plan.steps.length;
+    final done = _state.doneStepCount;
 
     return AppScaffold(
       title: title,
-      actions: [
-        IconButton(
-          tooltip: l10n.remyTitle,
-          icon: const Icon(Icons.assistant_outlined),
-          onPressed: () => showAssistantSheet(context, widget.sessionId),
-        ),
-        if (ref.watch(speechRecognizerProvider) != null)
-          IconButton(
-            tooltip: l10n.voiceMic,
-            icon: const Icon(Icons.mic_none),
-            onPressed: () => showAssistantSheet(context, widget.sessionId, listen: true),
-          ),
-        PopupMenuButton<String>(
-          onSelected: (_) => _abandon(),
-          itemBuilder: (context) => [PopupMenuItem(value: 'abandon', child: Text(l10n.abandonCooking))],
-        ),
-      ],
       bottomBar: _state.isComplete
           ? null
-          : _BottomBar(
-              primary: focus == null || primary == null ? const SizedBox.shrink() : _primaryButtons(focus, primary),
-              onBack: _state.log.isEmpty ? null : _back,
+          : Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              spacing: Space.m,
+              children: [
+                RemyButton(scope: RemyScope.session(widget.sessionId)),
+                Expanded(
+                  child: focus == null || primary == null ? const SizedBox.shrink() : _primaryButtons(focus, primary),
+                ),
+              ],
             ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+        padding: const EdgeInsets.fromLTRB(Space.page, Space.s, Space.page, Space.xl),
         children: [
-          Text(l10n.cookingProgress(_state.doneStepCount, plan.steps.length)),
-          const SizedBox(height: 4),
-          LinearProgressIndicator(value: _state.doneStepCount / plan.steps.length),
-          if (plan.advanceNoticeHe case final notice? when _state.doneStepCount == 0)
-            Padding(padding: const EdgeInsets.only(top: 8), child: Text('🕒 $notice')),
+          // Progress, with the one-tap undo next to it.
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: 2,
+                  children: [
+                    if (!_state.isComplete && focus != null)
+                      Text(
+                        l10n.stepOfTotal(plan.steps.indexOf(focus) + 1, total),
+                        style: theme.textTheme.labelLarge?.copyWith(color: AppColors.primary, fontWeight: FontWeight.w700),
+                      ),
+                    Text(l10n.cookingProgress(done, total), style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                  ],
+                ),
+              ),
+              TextButton.icon(
+                onPressed: _state.log.isEmpty ? null : _back,
+                icon: const Icon(Icons.undo_rounded),
+                label: Text(l10n.backButton),
+              ),
+            ],
+          ),
+          const SizedBox(height: Space.xs),
+          TweenAnimationBuilder<double>(
+            tween: Tween(end: total == 0 ? 0 : done / total),
+            duration: Motion.of(context, Motion.long),
+            curve: Motion.standard,
+            builder: (context, v, _) => LinearProgressIndicator(value: v, semanticsLabel: l10n.progressLabel),
+          ),
+          if (plan.advanceNoticeHe case final notice? when done == 0)
+            NoteBanner(tidyHe(notice), kind: NoteKind.tip, icon: Icons.schedule_rounded),
           if (prep.isNotEmpty) ...[
             SectionTitle(l10n.prepTasks),
-            for (final p in prep)
-              _PrepCard(view: p, onDone: () => _controller.completePrepTask(p.task.id)),
+            for (final p in prep) _PrepCard(view: p, onDone: () => _controller.completePrepTask(p.task.id)),
           ],
-          if (_state.isComplete)
-            _CompleteCard(onFinish: () => context.go('/cook/${widget.sessionId}/finish'))
-          else if (focus != null) ...[
-            const SizedBox(height: 12),
-            _stepCard(focus, primary, guidance, emphasized: true),
-          ],
+          const SizedBox(height: Space.m),
+          AnimatedSwitcher(
+            duration: Motion.of(context, Motion.medium),
+            switchInCurve: Motion.enter,
+            switchOutCurve: Motion.exit,
+            transitionBuilder: (child, animation) => _stepTransition(context, child, animation),
+            child: _state.isComplete
+                ? _CompleteCard(key: const ValueKey('complete'), onFinish: () => context.go('/cook/${widget.sessionId}/finish'))
+                : focus != null
+                    ? KeyedSubtree(key: ValueKey(focus.id), child: _stepCard(focus, primary, guidance, emphasized: true))
+                    : const SizedBox.shrink(),
+          ),
           if (otherTimers.isNotEmpty) ...[
             SectionTitle(l10n.timersTitle),
             for (final t in otherTimers) _timerTile(t, guidance[t.timerId]),
@@ -196,7 +219,7 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
             SectionTitle(l10n.meanwhileTitle),
             for (final s in meanwhile) _stepCard(s, _state.primaryFor(s, _now), guidance, emphasized: false),
           ],
-          const SizedBox(height: 8),
+          const SizedBox(height: Space.m),
           _AllStepsList(state: _state, onUndoStep: (id) async {
             final messenger = ScaffoldMessenger.of(context);
             final result = await _controller.undoStep(id);
@@ -204,8 +227,29 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
               messenger.showSnackBar(SnackBar(content: Text(l10n.undoNotAllowed)));
             }
           }),
+          const SizedBox(height: Space.s),
+          Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TextButton.icon(
+              style: TextButton.styleFrom(foregroundColor: theme.colorScheme.error),
+              onPressed: _abandon,
+              icon: const Icon(Icons.stop_circle_outlined),
+              label: Text(l10n.abandonCooking),
+            ),
+          ),
         ],
       ),
+    );
+  }
+
+  /// The next step slides in from the reading direction; reduced motion: a fade.
+  Widget _stepTransition(BuildContext context, Widget child, Animation<double> animation) {
+    final fade = FadeTransition(opacity: animation, child: child);
+    if (Motion.reduced(context)) return fade;
+    final sign = Directionality.of(context) == TextDirection.rtl ? -1.0 : 1.0;
+    return SlideTransition(
+      position: Tween(begin: Offset(0.06 * sign, 0), end: Offset.zero).animate(animation),
+      child: fade,
     );
   }
 
@@ -214,12 +258,13 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
     final l10n = AppLocalizations.of(context);
     final last = _isLastStep(step);
     final blocked = _blockedBySafety(step, p);
-    const big = Size.fromHeight(52);
+    const big = Size.fromHeight(56);
     return switch (p.kind) {
-      PrimaryKind.startTimer => FilledButton(
+      PrimaryKind.startTimer => FilledButton.icon(
           style: FilledButton.styleFrom(minimumSize: big),
           onPressed: () => _controller.confirmAction(step.id, p.action!.action.id),
-          child: Text(p.action!.action.labelHe),
+          icon: const Icon(Icons.timer_outlined),
+          label: Text(p.action!.action.labelHe),
         ),
       PrimaryKind.next => FilledButton(
           style: FilledButton.styleFrom(minimumSize: big),
@@ -229,7 +274,7 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
       PrimaryKind.checkDue => Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
-          spacing: 8,
+          spacing: Space.s,
           children: [
             OutlinedButton(
               onPressed: () => _controller.recheckTimer(p.timer!.timerId),
@@ -261,55 +306,98 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
     final helpOpen = _helpOpen.contains(step.id);
     final hasHelp = step.helpHe != null || (step.donenessCueHe != null && !checkDue);
     final showSafety = p != null && p.needsSafetyCheck && p.kind != PrimaryKind.startTimer;
+    final uses = [
+      for (final use in step.ingredientUses)
+        if (ingredients[use.ingredientId] case final i?) use.quantity == null ? i.name : '${i.name}: ${use.quantity!.display}',
+      if (step.ingredientUses.isEmpty)
+        for (final id in step.ingredientIds) ?ingredients[id]?.name,
+    ];
 
     return Card(
-      color: emphasized ? theme.colorScheme.primaryContainer : null,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(Radii.card),
+        side: BorderSide(color: emphasized ? AppColors.brandBlue.withValues(alpha: 0.5) : theme.colorScheme.outlineVariant, width: emphasized ? 1.5 : 1),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(emphasized ? Space.l + 4 : Space.l),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 6,
+          spacing: Space.s,
           children: [
-            Text(step.title, style: emphasized ? theme.textTheme.titleLarge : theme.textTheme.titleMedium),
-            Text(step.instructionHe, style: emphasized ? theme.textTheme.bodyLarge : null),
-            for (final n in step.notesHe) Text('🔄 $n', style: theme.textTheme.titleSmall),
-            for (final use in step.ingredientUses)
-              if (ingredients[use.ingredientId] case final i?)
-                Text(use.quantity == null ? '• ${i.name}' : '• ${i.name} — ${use.quantity!.display}'),
-            if (step.ingredientUses.isEmpty && step.ingredientIds.isNotEmpty)
-              Text(
-                [for (final id in step.ingredientIds) if (ingredients[id] case final i?) i.name].join(' · '),
-                style: theme.textTheme.bodySmall,
-              ),
-            if (step.temperature case final t?) Text(l10n.temperatureLabel(t.value)),
-            if (timer != null) _TimerStatus(timer: timer, now: _now, guidance: g, controller: _controller),
-            if (checkDue && cue != null) Text('👀 $cue', style: theme.textTheme.titleSmall),
-            if (p?.kind == PrimaryKind.startTimer)
-              if (p!.action!.timer case final t?)
-                Text(l10n.stepStartsTimer(formatSeconds(t.seconds)), style: theme.textTheme.bodySmall),
-            if (!showSafety)
-              for (final w in step.warningsHe) Text('⚠️ $w', style: theme.textTheme.bodySmall),
-            if (showSafety)
-              CheckboxListTile(
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                value: _safetyChecked.contains(step.id),
-                onChanged: (v) => setState(() => v == true ? _safetyChecked.add(step.id) : _safetyChecked.remove(step.id)),
-                title: Text(cue != null ? l10n.safetyCheckLabel(cue) : l10n.safetyCheckGeneric),
-              ),
-            if (hasHelp)
-              Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: TextButton.icon(
-                  onPressed: () => setState(() => helpOpen ? _helpOpen.remove(step.id) : _helpOpen.add(step.id)),
-                  icon: Icon(helpOpen ? Icons.expand_less : Icons.help_outline),
-                  label: Text(helpOpen ? l10n.stepHideHelp : l10n.stepHelp),
+            Text(step.title, style: emphasized ? theme.textTheme.headlineSmall : theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text(
+              tidyHe(step.instructionHe),
+              style: emphasized ? theme.textTheme.bodyLarge?.copyWith(fontSize: 20, height: 1.5) : theme.textTheme.bodyMedium,
+            ),
+            for (final n in step.notesHe)
+              Text('🔄 $n', style: theme.textTheme.titleSmall?.copyWith(color: context.palette.onBeige)),
+            if (uses.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(Space.m),
+                decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerLow, borderRadius: BorderRadius.circular(Radii.input)),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  spacing: Space.xs,
+                  children: [
+                    if (emphasized)
+                      Text(l10n.stepIngredientsTitle, style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+                    for (final u in uses) Text('• $u', style: theme.textTheme.bodyMedium),
+                  ],
                 ),
               ),
-            if (helpOpen) ...[
-              if (step.helpHe case final h?) Text(h),
-              if (step.donenessCueHe case final c? when !checkDue && !showSafety) Text('👀 $c'),
-            ],
+            if (step.temperature case final t?)
+              InfoPill(icon: Icons.thermostat_rounded, label: l10n.temperatureLabel(t.value)),
+            if (timer != null) _TimerStatus(timer: timer, now: _now, guidance: g, controller: _controller),
+            if (checkDue && cue != null) Text('👀 ${tidyHe(cue)}', style: theme.textTheme.titleSmall),
+            if (p?.kind == PrimaryKind.startTimer)
+              if (p!.action!.timer case final t?)
+                Row(
+                  spacing: Space.xs,
+                  children: [
+                    Icon(Icons.timer_outlined, size: 18, color: theme.colorScheme.onSurfaceVariant),
+                    Flexible(
+                      child: Text(
+                        l10n.stepStartsTimer(formatSeconds(t.seconds)),
+                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ),
+                  ],
+                ),
+            if (!showSafety)
+              for (final w in step.warningsHe) NoteBanner(tidyHe(w), kind: NoteKind.safety),
+            if (showSafety)
+              Material(
+                color: theme.colorScheme.errorContainer,
+                borderRadius: BorderRadius.circular(Radii.input),
+                child: CheckboxListTile(
+                  controlAffinity: ListTileControlAffinity.leading,
+                  value: _safetyChecked.contains(step.id),
+                  onChanged: (v) => setState(() => v == true ? _safetyChecked.add(step.id) : _safetyChecked.remove(step.id)),
+                  title: Text(cue != null ? l10n.safetyCheckLabel(cue) : l10n.safetyCheckGeneric),
+                ),
+              ),
+            if (hasHelp)
+              TextButton.icon(
+                onPressed: () => setState(() => helpOpen ? _helpOpen.remove(step.id) : _helpOpen.add(step.id)),
+                icon: Icon(helpOpen ? Icons.expand_less_rounded : Icons.help_outline_rounded),
+                label: Text(helpOpen ? l10n.stepHideHelp : l10n.stepHelp),
+              ),
+            AnimatedSize(
+              duration: Motion.of(context, Motion.medium),
+              curve: Motion.standard,
+              alignment: AlignmentDirectional.topStart,
+              child: helpOpen
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      spacing: Space.xs,
+                      children: [
+                        if (step.helpHe case final h?) NoteBanner(tidyHe(h), kind: NoteKind.tip),
+                        if (step.donenessCueHe case final c? when !checkDue && !showSafety) Text('👀 ${tidyHe(c)}'),
+                      ],
+                    )
+                  : const SizedBox(width: double.infinity),
+            ),
             if (!emphasized && p != null) _inlineButtons(step, p),
           ],
         ),
@@ -322,8 +410,8 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
     final l10n = AppLocalizations.of(context);
     final blocked = _blockedBySafety(step, p);
     return Wrap(
-      spacing: 8,
-      runSpacing: 4,
+      spacing: Space.s,
+      runSpacing: Space.xs,
       children: switch (p.kind) {
         PrimaryKind.startTimer => [
             FilledButton.tonal(
@@ -353,71 +441,46 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
   /// neither current nor suggested now).
   Widget _timerTile(TimerState t, WaitGuidance? g) {
     final l10n = AppLocalizations.of(context);
-    final theme = Theme.of(context);
     final checkDue = t.isFinished(_now);
     final step = t.stepId == null ? null : _state.plan.stepById(t.stepId!);
     final stepPrimary = step == null ? null : _state.primaryFor(step, _now);
-    return Card(
-      color: checkDue ? theme.colorScheme.errorContainer : null,
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          spacing: 4,
-          children: [
-            _TimerStatus(timer: t, now: _now, guidance: g, controller: _controller, showLabel: true),
-            if (checkDue)
-              Wrap(
-                spacing: 8,
-                runSpacing: 4,
-                children: [
-                  if (step != null && stepPrimary?.kind == PrimaryKind.checkDue) ...[
-                    FilledButton.tonal(
-                      onPressed: _blockedBySafety(step, stepPrimary!) ? null : () => _finishStep(step),
-                      child: Text(l10n.stepPrimaryReadyLast),
-                    ),
-                    OutlinedButton(
-                      onPressed: () => _controller.recheckTimer(t.timerId),
-                      child: Text(l10n.stepNeedMoreTime(_moreMinutes(t))),
-                    ),
-                  ] else
-                    FilledButton.tonal(
-                      onPressed: () => _controller.dismissTimer(t.timerId),
-                      child: Text(l10n.dismissTimer),
-                    ),
-                ],
-              ),
-          ],
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: Space.xs),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: Space.s,
+        children: [
+          _TimerStatus(timer: t, now: _now, guidance: g, controller: _controller, showLabel: true),
+          if (checkDue)
+            Wrap(
+              spacing: Space.s,
+              runSpacing: Space.xs,
+              children: [
+                if (step != null && stepPrimary?.kind == PrimaryKind.checkDue) ...[
+                  FilledButton.tonal(
+                    onPressed: _blockedBySafety(step, stepPrimary!) ? null : () => _finishStep(step),
+                    child: Text(l10n.stepPrimaryReadyLast),
+                  ),
+                  OutlinedButton(
+                    onPressed: () => _controller.recheckTimer(t.timerId),
+                    child: Text(l10n.stepNeedMoreTime(_moreMinutes(t))),
+                  ),
+                ] else
+                  FilledButton.tonal(
+                    onPressed: () => _controller.dismissTimer(t.timerId),
+                    child: Text(l10n.dismissTimer),
+                  ),
+              ],
+            ),
+        ],
       ),
     );
   }
 }
 
-/// The fixed bottom area: "חזרה" (undo the last tap) and the main button.
-class _BottomBar extends StatelessWidget {
-  const _BottomBar({required this.primary, required this.onBack});
-
-  final Widget primary;
-  final VoidCallback? onBack;
-
-  @override
-  Widget build(BuildContext context) => Row(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          TextButton.icon(
-            onPressed: onBack,
-            icon: const Icon(Icons.undo),
-            label: Text(AppLocalizations.of(context).backButton),
-          ),
-          const SizedBox(width: 8),
-          Expanded(child: primary),
-        ],
-      );
-}
-
-/// Countdown (or "time to check"), check time, what's happening, and a small
-/// menu for pause / ±1 minute / stop.
+/// A countdown that is easy to read from across the kitchen, with its controls in plain
+/// words. When time is up it turns amber and pulses a few times ("time to check", never
+/// "ready").
 class _TimerStatus extends StatelessWidget {
   const _TimerStatus({
     required this.timer,
@@ -437,57 +500,101 @@ class _TimerStatus extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final p = context.palette;
     final checkDue = timer.isFinished(now);
     final paused = timer.status == TimerStatus.paused;
     final g = guidance;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      spacing: 2,
-      children: [
-        Row(
+    final fg = checkDue ? p.onTimerDoneContainer : theme.colorScheme.onSurface;
+    final soft = checkDue ? p.onTimerDoneContainer : theme.colorScheme.onSurfaceVariant;
+
+    return AttentionPulse(
+      active: checkDue,
+      child: AnimatedContainer(
+        duration: Motion.of(context, Motion.medium),
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(Space.m + 2, Space.m, Space.m + 2, Space.s),
+        decoration: BoxDecoration(
+          color: checkDue ? p.timerDoneContainer : theme.colorScheme.primaryContainer.withValues(alpha: 0.55),
+          borderRadius: BorderRadius.circular(Radii.input + 2),
+          border: Border.all(color: checkDue ? p.timerDone : Colors.transparent, width: 1.5),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 2,
           children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (showLabel) Text(timer.labelHe, style: theme.textTheme.titleSmall),
-                  Text(
-                    checkDue ? l10n.timerCheckDue : formatDuration(timer.remaining(now)),
-                    textDirection: checkDue ? null : TextDirection.ltr,
-                    style: theme.textTheme.headlineMedium,
+            Row(
+              spacing: Space.m,
+              children: [
+                Icon(
+                  checkDue ? Icons.alarm_on_rounded : (paused ? Icons.pause_circle_outline_rounded : Icons.timer_outlined),
+                  color: checkDue ? p.timerDone : AppColors.primary,
+                  size: 28,
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (showLabel) Text(timer.labelHe, style: theme.textTheme.titleSmall?.copyWith(color: fg)),
+                      Text(
+                        checkDue ? l10n.timerCheckDue : formatDuration(timer.remaining(now)),
+                        textDirection: checkDue ? null : TextDirection.ltr,
+                        style: theme.textTheme.headlineMedium?.copyWith(color: fg, fontFeatures: tabularFigures),
+                      ),
+                      if (paused && !checkDue) Text(l10n.timerPaused, style: theme.textTheme.labelMedium?.copyWith(color: soft)),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            PopupMenuButton<String>(
-              tooltip: l10n.timerOptions,
-              icon: const Icon(Icons.more_vert),
-              onSelected: (v) => switch (v) {
-                'pause' => controller.pauseTimer(timer.timerId),
-                'resume' => controller.resumeTimer(timer.timerId),
-                'plus' => controller.extendTimer(timer.timerId),
-                'minus' => controller.shortenTimer(timer.timerId),
-                _ => controller.dismissTimer(timer.timerId),
-              },
-              itemBuilder: (context) => [
-                if (!checkDue) PopupMenuItem(value: paused ? 'resume' : 'pause', child: Text(paused ? l10n.resume : l10n.pause)),
-                PopupMenuItem(value: 'plus', child: Text(l10n.addMinute)),
-                if (!checkDue) PopupMenuItem(value: 'minus', child: Text(l10n.removeMinute)),
-                PopupMenuItem(value: 'stop', child: Text(l10n.dismissTimer)),
+            if (!checkDue && !paused) Text(l10n.checkAtLabel(formatWhen(timer.endsAt!, now, l10n)), style: TextStyle(color: soft)),
+            if (timer.rangeEndsAt case final end? when !timer.rechecked && end.isAfter(now))
+              Text(l10n.rangeUntil(formatWhen(end, now, l10n)), style: theme.textTheme.bodySmall?.copyWith(color: soft)),
+            if (!checkDue) ...[
+              if (g?.waitInfoHe case final info?) Text(tidyHe(info)),
+              for (final tip in g?.tips ?? const <String>[]) Text('💡 $tip'),
+              for (final next in g?.nextSteps ?? const <PlanStep>[])
+                Text(l10n.nextStepPreview(next.title), style: theme.textTheme.bodySmall?.copyWith(color: soft)),
+            ],
+            // Controls in words: one hand, wet fingers, no guessing.
+            Wrap(
+              spacing: Space.xs,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                if (!checkDue)
+                  TextButton.icon(
+                    onPressed: () => paused ? controller.resumeTimer(timer.timerId) : controller.pauseTimer(timer.timerId),
+                    icon: Icon(paused ? Icons.play_arrow_rounded : Icons.pause_rounded),
+                    label: Text(paused ? l10n.resume : l10n.pause),
+                  ),
+                TextButton.icon(
+                  onPressed: () => controller.extendTimer(timer.timerId),
+                  icon: const Icon(Icons.add_rounded),
+                  label: Text(l10n.addMinute),
+                ),
+                PopupMenuButton<String>(
+                  tooltip: l10n.timerOptions,
+                  onSelected: (v) => v == 'minus' ? controller.shortenTimer(timer.timerId) : controller.dismissTimer(timer.timerId),
+                  itemBuilder: (context) => [
+                    if (!checkDue) PopupMenuItem(value: 'minus', child: Text(l10n.removeMinute)),
+                    PopupMenuItem(value: 'stop', child: Text(l10n.dismissTimer)),
+                  ],
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: Space.m, vertical: Space.m),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      spacing: Space.xs,
+                      children: [
+                        Icon(Icons.more_horiz_rounded, color: AppColors.primary),
+                        Text(l10n.timerOptions, style: theme.textTheme.labelLarge?.copyWith(color: AppColors.primary)),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           ],
         ),
-        if (!checkDue && !paused) Text(l10n.checkAtLabel(formatWhen(timer.endsAt!, now, l10n))),
-        if (timer.rangeEndsAt case final end? when !timer.rechecked && end.isAfter(now))
-          Text(l10n.rangeUntil(formatWhen(end, now, l10n)), style: theme.textTheme.bodySmall),
-        if (!checkDue) ...[
-          if (g?.waitInfoHe case final info?) Text(info),
-          for (final tip in g?.tips ?? const <String>[]) Text('💡 $tip'),
-          for (final next in g?.nextSteps ?? const <PlanStep>[])
-            Text(l10n.nextStepPreview(next.title), style: theme.textTheme.bodySmall),
-        ],
-      ],
+      ),
     );
   }
 }
@@ -501,15 +608,19 @@ class _PrepCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final task = view.task;
     return Card(
+      color: view.urgent ? context.palette.timerDoneContainer : null,
       child: CheckboxListTile(
         value: false,
+        controlAffinity: ListTileControlAffinity.leading,
         onChanged: (_) => onDone(),
-        title: Text(task.textHe),
+        title: Text(tidyHe(task.textHe)),
         subtitle: view.urgent
-            ? Text(l10n.prepNeededNow, style: TextStyle(color: Theme.of(context).colorScheme.error))
+            ? Text(l10n.prepNeededNow, style: TextStyle(color: context.palette.onTimerDoneContainer, fontWeight: FontWeight.w700))
             : null,
+        secondary: Icon(Icons.kitchen_outlined, color: theme.colorScheme.onSurfaceVariant),
       ),
     );
   }
@@ -525,19 +636,26 @@ class _AllStepsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Card(
       child: ExpansionTile(
-        title: Text(l10n.allSteps),
+        shape: const Border(),
+        collapsedShape: const Border(),
+        leading: const Icon(Icons.format_list_numbered_rounded, color: AppColors.brandBlue),
+        title: Text(l10n.allSteps, style: theme.textTheme.titleMedium),
         children: [
           for (final (i, step) in state.plan.steps.indexed)
             ListTile(
-              leading: Icon(state.isStepDone(step) ? Icons.check_circle : Icons.radio_button_unchecked),
+              leading: Icon(
+                state.isStepDone(step) ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+                color: state.isStepDone(step) ? context.palette.success : theme.colorScheme.outline,
+              ),
               title: Text('${l10n.stepNumber(i + 1)} · ${step.title}'),
               trailing: state.confirmedIn(step.id).isEmpty
                   ? null
                   : IconButton(
                       tooltip: l10n.undoLastAction,
-                      icon: const Icon(Icons.undo),
+                      icon: const Icon(Icons.undo_rounded),
                       onPressed: () => onUndoStep(step.id),
                     ),
             ),
@@ -548,21 +666,29 @@ class _AllStepsList extends StatelessWidget {
 }
 
 class _CompleteCard extends StatelessWidget {
-  const _CompleteCard({required this.onFinish});
+  const _CompleteCard({super.key, required this.onFinish});
 
   final VoidCallback onFinish;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     return Card(
-      color: Theme.of(context).colorScheme.tertiaryContainer,
+      color: context.palette.successContainer,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(Space.xl),
         child: Column(
+          spacing: Space.m,
           children: [
-            Text(l10n.allStepsDone, style: Theme.of(context).textTheme.titleLarge),
-            const SizedBox(height: 8),
+            TweenAnimationBuilder<double>(
+              tween: Tween(begin: Motion.reduced(context) ? 1 : 0.6, end: 1),
+              duration: Motion.of(context, Motion.long),
+              curve: Curves.easeOutBack,
+              builder: (context, s, child) => Transform.scale(scale: s, child: child),
+              child: Icon(Icons.celebration_rounded, size: 48, color: context.palette.wood),
+            ),
+            Text(l10n.allStepsDone, style: theme.textTheme.titleLarge, textAlign: TextAlign.center),
             FilledButton(onPressed: onFinish, child: Text(l10n.goToFinish)),
           ],
         ),
