@@ -272,3 +272,20 @@ def test_quota_exhausted_during_planning_is_not_retried_or_repaired(client):
     r = c.post("/v1/recipes/plan", json={"analysis": analysis}, headers=auth())
     assert r.status_code == 429 and r.json()["error_code"] == "ai_quota_exhausted"
     assert [call["schema"] for call in provider.calls] == ["LlmAnalysis", "LlmPlan"]
+
+
+def test_where_a_shared_link_led_is_part_of_the_error(client, monkeypatch):
+    from app.errors import ApiError
+    from app.routers import recipes
+
+    async def blocked(url, *, settings):
+        raise ApiError(422, "site_blocked", "bot check: imperva",
+                       extra={"site": "chef-lavan.co.il", "resolved_url": "https://chef-lavan.co.il/r/"})
+
+    monkeypatch.setattr(recipes, "fetch_recipe_page", blocked)
+    c, provider = client()
+    r = c.post("/v1/recipes/analyze", json={"type": "url", "content": "https://share.google/abc"}, headers=auth())
+    assert r.status_code == 422
+    assert r.json() == {"error_code": "site_blocked", "detail": "bot check: imperva",
+                        "site": "chef-lavan.co.il", "resolved_url": "https://chef-lavan.co.il/r/"}
+    assert provider.calls == []  # no AI call for a page that couldn't be read

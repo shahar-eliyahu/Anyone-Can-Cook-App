@@ -21,7 +21,11 @@ String importErrorText(AppLocalizations l10n, Object error) {
     'unsupported_media' => l10n.errUnsupportedImage,
     'invalid_url' => l10n.errInvalidUrl,
     'fetch_failed' => l10n.errFetchFailed,
-    'site_blocked' => l10n.errSiteBlocked,
+    'site_blocked' => switch (failure!.site) {
+        final site? => l10n.errSiteBlockedNamed(site),
+        _ => l10n.errSiteBlocked,
+      },
+    'link_unresolved' => l10n.errLinkUnresolved,
     'no_recipe_found' => l10n.errNoRecipeFound,
     'not_a_recipe' => l10n.importNotRecipe,
     'unsafe_to_plan' => l10n.errUnsafeToPlan,
@@ -30,6 +34,11 @@ String importErrorText(AppLocalizations l10n, Object error) {
     _ => l10n.errGeneric,
   };
 }
+
+/// A link that couldn't be read: the cook gets alternatives (paste the recipe text, or copy
+/// the full address the shared link led to).
+bool isUnreadableLink(Object error) =>
+    error is ApiFailure && const {'site_blocked', 'link_unresolved', 'no_recipe_found', 'fetch_failed'}.contains(error.code);
 
 /// Failures where the same request can succeed later: offer "נסו שוב" and keep the input.
 bool isRetryable(Object error) =>

@@ -33,10 +33,15 @@ class HealthStatus {
 
 /// A backend error, or `offline` / `timeout` when the server could not be reached.
 class ApiFailure implements Exception {
-  const ApiFailure(this.code, {this.retryAfterSeconds});
+  const ApiFailure(this.code, {this.retryAfterSeconds, this.site, this.resolvedUrl});
 
   final String code;
   final int? retryAfterSeconds;
+
+  /// For a link import: the site the link led to, and its full address when the cook's link
+  /// was a shared/short one (the server followed it).
+  final String? site;
+  final String? resolvedUrl;
 
   @override
   String toString() => 'ApiFailure($code)';
@@ -141,7 +146,8 @@ class ApiClient {
         final data = e.response?.data;
         final code = data is Map && data['error_code'] is String ? data['error_code'] as String : 'server_error';
         final retry = int.tryParse(e.response?.headers.value('retry-after') ?? '');
-        return ApiFailure(code, retryAfterSeconds: retry);
+        String? text(String key) => data is Map && data[key] is String && (data[key] as String).isNotEmpty ? data[key] as String : null;
+        return ApiFailure(code, retryAfterSeconds: retry, site: text('site'), resolvedUrl: text('resolved_url'));
     }
   }
 }

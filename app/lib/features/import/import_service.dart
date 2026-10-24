@@ -186,3 +186,12 @@ final importServiceProvider = Provider<ImportService>(
     settings: ref.watch(settingsRepositoryProvider),
   ),
 );
+
+final _link = RegExp('https?://[^\\s<>"\u200e\u200f]+', caseSensitive: false);
+
+/// The first web address in what the cook pasted. Sharing from a phone often copies a title
+/// with the link ("עוגת ביסקוויטים… https://share.google/…"); trailing punctuation is dropped.
+String? findLink(String text) {
+  final m = _link.firstMatch(text);
+  return m?.group(0)?.replaceFirst(RegExp('[.,;:!?)\\]\u05f3\u05f4]+\$'), '');
+}

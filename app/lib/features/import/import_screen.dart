@@ -1,14 +1,15 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/motion.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/app_scaffold.dart';
+import '../../core/api_client.dart';
 import '../../core/widgets/components.dart';
 import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
@@ -41,6 +42,9 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
   String? _message;
   bool _info = false; // _message is a notice, not an error
   bool _canRetry = false;
+
+  /// A link that couldn't be read (blocked site, short link…): alternatives are offered.
+  ApiFailure? _linkFailure;
 
   /// The photo saved with the pending input (kept when the user leaves).
   String? _pendingImage;
@@ -145,7 +149,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
   ImportSource? get _source => switch (_tab) {
         0 when _text.text.trim().isNotEmpty => ImportSource.text(_text.text.trim()),
         1 when _imagePath != null => ImportSource.image(_imagePath!, _imageBytes!),
-        2 when _url.text.trim().isNotEmpty => ImportSource.url(_url.text.trim()),
+        2 when _url.text.trim().isNotEmpty => ImportSource.url(findLink(_url.text) ?? _url.text.trim()),
         _ => null,
       };
 
@@ -188,6 +192,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
       _stage = ImportStage.reading;
       _message = null;
       _info = _canRetry = false;
+      _linkFailure = null;
       _slow = false;
     });
     _slowTimer = Timer(const Duration(seconds: 12), () {
@@ -217,6 +222,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
         setState(() {
           _message = importErrorText(l10n, e);
           _canRetry = isRetryable(e);
+          _linkFailure = source.type == SourceType.url && isUnreadableLink(e) ? e as ApiFailure : null;
         });
       }
     } finally {
@@ -278,8 +284,51 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
           ],
           if (_message case final m?) ...[
             const SizedBox(height: Space.m),
-            NoteBanner(m, kind: _info ? NoteKind.info : NoteKind.warning),
+            NoteBanner(m, kind: _info ? NoteKind.info : NoteKind.warning, child: _linkAlternatives(l10n)),
           ],
+        ],
+      ),
+    );
+  }
+
+  /// When a link can't be read: where it led, and two ways forward. The link itself stays in
+  /// its field (and saved), so nothing typed is lost.
+  Widget? _linkAlternatives(AppLocalizations l10n) {
+    final failure = _linkFailure;
+    if (failure == null || _tab != 2) return null;
+    final resolved = failure.resolvedUrl;
+    return Padding(
+      padding: const EdgeInsets.only(top: Space.s),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        spacing: Space.xs,
+        children: [
+          if (resolved != null && failure.site != null) Text(l10n.importLinkLeadsTo(failure.site!)),
+          Wrap(
+            spacing: Space.s,
+            runSpacing: Space.xs,
+            children: [
+              FilledButton.tonalIcon(
+                onPressed: () => setState(() {
+                  _tab = 0;
+                  _message = null;
+                  _linkFailure = null;
+                }),
+                icon: const Icon(Icons.notes_rounded),
+                label: Text(l10n.importPasteTextInstead),
+              ),
+              if (resolved != null)
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    await Clipboard.setData(ClipboardData(text: resolved));
+                    messenger.showSnackBar(SnackBar(content: Text(l10n.importUrlCopied)));
+                  },
+                  icon: const Icon(Icons.copy_rounded),
+                  label: Text(l10n.importCopyFullUrl),
+                ),
+            ],
+          ),
         ],
       ),
     );

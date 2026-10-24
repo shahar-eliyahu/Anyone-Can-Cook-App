@@ -654,7 +654,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get errNoRecipeFound =>
-      'לא מצאנו מתכון בדף. נסו להדביק את טקסט המתכון במקום.';
+      'לא מצאנו מתכון בדף. אפשר להדביק את טקסט המתכון במקום.';
 
   @override
   String get errUnsafeToPlan =>
@@ -1354,4 +1354,27 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get remyAnswerHint => 'אפשר גם לומר \"כן\" או \"לא\"';
+
+  @override
+  String errSiteBlockedNamed(Object site) {
+    return 'האתר $site לא מאפשר לאפליקציות לקרוא את המתכונים שלו. אפשר לפתוח את המתכון בדפדפן, להעתיק את הטקסט ולהדביק אותו כאן.';
+  }
+
+  @override
+  String get errLinkUnresolved =>
+      'לא הצלחנו לפתוח את הקישור המשותף. אפשר לפתוח אותו בדפדפן ולהדביק כאן את הכתובת המלאה של המתכון, או להדביק את טקסט המתכון.';
+
+  @override
+  String importLinkLeadsTo(Object site) {
+    return 'הקישור מוביל אל $site.';
+  }
+
+  @override
+  String get importPasteTextInstead => 'להדביק את טקסט המתכון';
+
+  @override
+  String get importCopyFullUrl => 'העתקת הכתובת המלאה';
+
+  @override
+  String get importUrlCopied => 'הכתובת הועתקה. אפשר לפתוח אותה בדפדפן.';
 }

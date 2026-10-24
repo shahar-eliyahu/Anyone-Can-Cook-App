@@ -472,6 +472,28 @@ Checked what existed, changed only what was missing.
 - **Not verified:** saying "היי רמי" for real (the emulator has no microphone input), recognition accuracy for the
   phrase in a noisy kitchen, restart sounds on specific phones, battery use over a long cook, iOS.
 
+### Shared-link import (share.google), 2026-10-25 (local commit)
+
+- **Finding:** `https://share.google/8zYO39TZnZUazYh3t` → 302 `www.google.com/share.google?q=…` → 301 chef-lavan.co.il
+  (a recipe page, plus a `?shem=` tracking parameter). The redirects were already followed; the site answers servers
+  with an Imperva (Incapsula) bot-check page (HTTP 200, a 212-byte script), so the import ended as `no_recipe_found`
+  ("לא מצאנו מתכון בדף"), which was misleading. The protection is respected, not bypassed.
+- **Backend (`url_fetcher.py`, `errors.py`):** bot checks detected (only when no recipe was found) → `site_blocked`;
+  shortener dead ends → `link_unresolved`; redirect limit 3 → 5; link wrappers unwrapped; `<meta refresh>` pages
+  followed; errors carry `site` and `resolved_url` (tracking parameters removed). SSRF checks, timeouts and size
+  limits unchanged and covered for unwrapped and refreshed targets.
+- **App:** the site is named ("האתר chef-lavan.co.il לא מאפשר לאפליקציות לקרוא…", "הקישור מוביל אל …"), with
+  "להדביק את טקסט המתכון" (switches to the text tab) and "העתקת הכתובת המלאה" (clipboard); a link is picked out of
+  shared text ("כותרת… https://share.google/…"); the link stays in its field and in the saved pending input.
+- **Tests:** backend **200/200** on Python 3.14 and 3.12 (13 new: share chain, 5 hops, bot checks of several vendors,
+  no false positive on a real page with protection scripts, shortener dead end, wrappers, refresh pages, SSRF on
+  unwrapped/refreshed targets, error JSON with `site`/`resolved_url`); Flutter **283/283** (4 new).
+- **Live check (no Gemini):** the real fetch pipeline on the reported link returns `site_blocked` (imperva) with
+  site chef-lavan.co.il; on the emulator against a local mock backend the app showed the named message, copied the
+  address and kept the link. The emulator keeps that link as the saved pending input until the next import.
+- **Limits:** sites behind bot protection can't be imported by link (by design); links that resolve only with
+  JavaScript in a browser are reported, not resolved; the backend change ships only with an approved deploy.
+
 ## Next step
 
 1. User reviews Phase 4 on a real phone (`bac3d0d`, `73d2f01`, `bf9853f` are local only; Phase 3D is on

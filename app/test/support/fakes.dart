@@ -125,7 +125,13 @@ class FakeApi extends ApiClient {
   @override
   Future<RecipeAnalysis> analyzeText(String text) async => _next(analyses, 'analyzeText');
   @override
-  Future<RecipeAnalysis> analyzeUrl(String url) async => _next(analyses, 'analyzeUrl');
+  Future<RecipeAnalysis> analyzeUrl(String url) async {
+    lastUrl = url;
+    return _next(analyses, 'analyzeUrl');
+  }
+
+  /// The link the app sent for the last URL import.
+  String? lastUrl;
   @override
   Future<RecipeAnalysis> analyzeImage(Uint8List jpeg) async => _next(analyses, 'analyzeImage');
   @override

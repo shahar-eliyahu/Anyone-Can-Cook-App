@@ -2,9 +2,11 @@ import 'package:anyone_can_cook/core/api_client.dart';
 import 'package:anyone_can_cook/core/db/database.dart';
 import 'package:anyone_can_cook/data/recipe_repository.dart';
 import 'package:anyone_can_cook/data/settings_repository.dart';
+import 'package:anyone_can_cook/features/import/import_service.dart' show findLink;
 import 'package:anyone_can_cook/models/plan_response.dart';
 import 'package:anyone_can_cook/models/recipe_analysis.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
@@ -243,5 +245,81 @@ void main() {
     await tapText(tester, 'נסו שוב');
     await expectSeen(tester, find.text('מתחילים לבשל'));
     expect(h.api.calls, ['analyzeText', 'plan', 'plan']); // no second analysis
+  });
+
+  group("shared links that can't be read", () {
+    const resolved = 'https://chef-lavan.co.il/%D7%A2%D7%95%D7%92%D7%94/';
+    const blocked = ApiFailure('site_blocked', site: 'chef-lavan.co.il', resolvedUrl: resolved);
+
+    Future<void> openLinkTab(WidgetTester tester, AppHarness h) async {
+      await acceptPrivacy(h);
+      await tester.pumpWidget(h.build(initialLocation: '/import'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('קישור'));
+      await tester.pumpAndSettle();
+    }
+
+    testApp('a protected site: named, the full address can be copied, pasting the text is one tap away',
+        (tester, h) async {
+      final copied = <String>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+        if (call.method == 'Clipboard.setData') copied.add((call.arguments as Map)['text'] as String);
+        return null;
+      });
+      addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+      h.api.analyses.add(blocked);
+      await openLinkTab(tester, h);
+      await tester.enterText(find.byType(TextField), 'עוגת ביסקוויטים קרה https://share.google/8zYO39TZnZUazYh3t');
+      await tapText(tester, 'קריאת המתכון');
+
+      expect(h.api.lastUrl, 'https://share.google/8zYO39TZnZUazYh3t'); // the link out of the shared text
+      await expectSeen(tester, find.textContaining('האתר chef-lavan.co.il לא מאפשר לאפליקציות לקרוא'));
+      expect(find.text('הקישור מוביל אל chef-lavan.co.il.'), findsOneWidget);
+      expect(find.textContaining('share.google'), findsOneWidget); // the cook's link stays in its field
+      expect(await allRecipes(h), isEmpty);
+
+      await tapText(tester, 'העתקת הכתובת המלאה');
+      expect(copied, [resolved]);
+      expect(find.text('הכתובת הועתקה. אפשר לפתוח אותה בדפדפן.'), findsOneWidget);
+
+      await tapText(tester, 'להדביק את טקסט המתכון');
+      expect(find.text('הדביקו או הקלידו כאן את המתכון'), findsOneWidget); // the text tab, ready
+      await tester.tap(find.text('קישור'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('share.google/8zYO39TZnZUazYh3t'), findsOneWidget); // nothing lost
+    });
+
+    testApp('a short link that needs a browser explains what to do, and the link is kept for later', (tester, h) async {
+      h.api.analyses.add(const ApiFailure('link_unresolved', site: 'bit.ly'));
+      await openLinkTab(tester, h);
+      await tester.enterText(find.byType(TextField), 'https://bit.ly/abc');
+      await tapText(tester, 'קריאת המתכון');
+      await expectSeen(tester, find.textContaining('לא הצלחנו לפתוח את הקישור המשותף'));
+      expect(find.text('להדביק את טקסט המתכון'), findsOneWidget);
+      expect(find.text('העתקת הכתובת המלאה'), findsNothing); // nothing resolved to copy
+
+      // Leaving and coming back: the link is restored.
+      GoRouter.of(tester.element(find.byType(Scaffold).last)).pop();
+      await tester.pumpAndSettle();
+      await tapText(tester, 'מתכון חדש');
+      expect(find.text('https://bit.ly/abc'), findsOneWidget);
+      await expectSeen(tester, find.text('שחזרנו את מה שהזנתם בניסיון הקודם.'));
+    });
+
+    testApp('a protected site without details falls back to the general message', (tester, h) async {
+      h.api.analyses.add(const ApiFailure('site_blocked'));
+      await openLinkTab(tester, h);
+      await tester.enterText(find.byType(TextField), 'https://example.com/r');
+      await tapText(tester, 'קריאת המתכון');
+      await expectSeen(tester, find.textContaining('האתר לא מאפשר לקרוא את הדף'));
+      expect(find.textContaining('הקישור מוביל אל'), findsNothing);
+    });
+  });
+
+  test('the first web address is taken from shared text', () {
+    expect(findLink('עוגה https://share.google/abc.'), 'https://share.google/abc');
+    expect(findLink('(https://chef.example/r?id=1)'), 'https://chef.example/r?id=1');
+    expect(findLink('https://a.example/x‏'), 'https://a.example/x');
+    expect(findLink('אין כאן קישור'), isNull);
   });
 }

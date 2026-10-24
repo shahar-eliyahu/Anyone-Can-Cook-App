@@ -1243,7 +1243,7 @@ abstract class AppLocalizations {
   /// No description provided for @errNoRecipeFound.
   ///
   /// In he, this message translates to:
-  /// **'לא מצאנו מתכון בדף. נסו להדביק את טקסט המתכון במקום.'**
+  /// **'לא מצאנו מתכון בדף. אפשר להדביק את טקסט המתכון במקום.'**
   String get errNoRecipeFound;
 
   /// No description provided for @errUnsafeToPlan.
@@ -2385,6 +2385,42 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'אפשר גם לומר \"כן\" או \"לא\"'**
   String get remyAnswerHint;
+
+  /// No description provided for @errSiteBlockedNamed.
+  ///
+  /// In he, this message translates to:
+  /// **'האתר {site} לא מאפשר לאפליקציות לקרוא את המתכונים שלו. אפשר לפתוח את המתכון בדפדפן, להעתיק את הטקסט ולהדביק אותו כאן.'**
+  String errSiteBlockedNamed(Object site);
+
+  /// No description provided for @errLinkUnresolved.
+  ///
+  /// In he, this message translates to:
+  /// **'לא הצלחנו לפתוח את הקישור המשותף. אפשר לפתוח אותו בדפדפן ולהדביק כאן את הכתובת המלאה של המתכון, או להדביק את טקסט המתכון.'**
+  String get errLinkUnresolved;
+
+  /// No description provided for @importLinkLeadsTo.
+  ///
+  /// In he, this message translates to:
+  /// **'הקישור מוביל אל {site}.'**
+  String importLinkLeadsTo(Object site);
+
+  /// No description provided for @importPasteTextInstead.
+  ///
+  /// In he, this message translates to:
+  /// **'להדביק את טקסט המתכון'**
+  String get importPasteTextInstead;
+
+  /// No description provided for @importCopyFullUrl.
+  ///
+  /// In he, this message translates to:
+  /// **'העתקת הכתובת המלאה'**
+  String get importCopyFullUrl;
+
+  /// No description provided for @importUrlCopied.
+  ///
+  /// In he, this message translates to:
+  /// **'הכתובת הועתקה. אפשר לפתוח אותה בדפדפן.'**
+  String get importUrlCopied;
 }
 
 class _AppLocalizationsDelegate

@@ -1,4 +1,4 @@
-"""One error shape for the API: {"error_code": ..., "detail": ...}.
+"""One error shape for the API: {"error_code": ..., "detail": ..., optional facts such as "site"}.
 
 The app maps `error_code` to Hebrew text from its own strings; `detail` is for
 developers and never contains recipe content or secrets.
@@ -21,19 +21,22 @@ class ApiError(Exception):
         code: str,
         detail: str = "",
         headers: dict[str, str] | None = None,
+        extra: dict[str, str] | None = None,
     ) -> None:
         super().__init__(code)
         self.status = status
         self.code = code
         self.detail = detail
         self.headers = headers
+        # Facts the app can show the cook (e.g. which site a shared link led to); never secrets.
+        self.extra = extra or {}
 
 
 def install_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(ApiError)
     async def _api_error(_: Request, exc: ApiError) -> JSONResponse:
         return JSONResponse(
-            {"error_code": exc.code, "detail": exc.detail},
+            {"error_code": exc.code, "detail": exc.detail, **exc.extra},
             status_code=exc.status,
             headers=exc.headers,
         )

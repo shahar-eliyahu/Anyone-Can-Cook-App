@@ -332,3 +332,103 @@ def test_proxy_environment_variables_are_ignored(server, monkeypatch):
     with pytest.raises(ApiError):
         real_fetch("http://internal.test/cake", resolver("10.0.0.5"), server.port)
     assert server.requests == []
+
+
+# --- Shared links: redirects, wrappers, refresh pages, bot checks (docs/DECISIONS.md #76) ---
+
+RECIPE_HTML = JSONLD_PAGE.format(data=json.dumps(RECIPE_LD, ensure_ascii=False))
+CHEF_URL = "https://chef.example/%D7%A2%D7%95%D7%92%D7%94/"
+IMPERVA_PAGE = """<html><head><META NAME="robots" CONTENT="noindex,nofollow">
+<script src="/_Incapsula_Resource?SWJIYLWA=5074a744e2e3d891814e9a2dace20bd4"></script>
+<body></body></html>"""
+
+
+def fetch_error(url, routes, res=None) -> ApiError:
+    with pytest.raises(ApiError) as e:
+        fetch(url, routes, res)
+    return e.value
+
+
+def test_a_google_share_link_is_followed_to_the_recipe():
+    routes = {
+        "https://share.google/abc123": httpx.Response(302, headers={"location": "https://www.google.com/share.google?q=abc123"}),
+        "https://www.google.com/share.google?q=abc123": httpx.Response(301, headers={"location": CHEF_URL + "?shem=aimgspe,"}),
+        CHEF_URL + "?shem=aimgspe,": html(RECIPE_HTML),
+    }
+    page = fetch("https://share.google/abc123", routes)
+    assert page.title == "עוגת שוקולד" and page.final_url.startswith(CHEF_URL)
+
+
+def test_five_hops_are_followed_and_a_sixth_is_refused():
+    chain = {f"https://a.example/{i}": httpx.Response(302, headers={"location": f"/{i + 1}"}) for i in range(5)}
+    assert fetch("https://a.example/0", {**chain, "https://a.example/5": html(RECIPE_HTML)}).title == "עוגת שוקולד"
+    longer = {f"https://a.example/{i}": httpx.Response(302, headers={"location": f"/{i + 1}"}) for i in range(6)}
+    assert fetch_error("https://a.example/0", {**longer, "https://a.example/6": html(RECIPE_HTML)}).code == "fetch_failed"
+
+
+def test_a_bot_check_page_is_reported_as_blocked_with_where_the_link_led():
+    routes = {
+        "https://share.google/abc123": httpx.Response(302, headers={"location": CHEF_URL + "?shem=x&id=7"}),
+        CHEF_URL + "?shem=x&id=7": html(IMPERVA_PAGE),
+    }
+    e = fetch_error("https://share.google/abc123", routes)
+    assert e.code == "site_blocked" and "imperva" in e.detail
+    assert e.extra == {"site": "chef.example", "resolved_url": CHEF_URL + "?id=7"}  # tracking dropped
+
+
+@pytest.mark.parametrize("page,status", [
+    ("<html><head><title>Just a moment...</title></head><body><script>cf_chl_opt={}</script></body></html>", 200),
+    ("<html><body>blocked</body></html>", 403),
+    ('<html><body><script src="https://geo.captcha-delivery.com/c.js"></script></body></html>', 200),
+    ('<html><head><meta name="robots" content="noindex"></head><body><script src="/gate.js"></script></body></html>', 200),
+])
+def test_other_bot_checks_are_reported_as_blocked(page, status):
+    e = fetch_error("https://site.example/r", {"https://site.example/r": html(page, status=status)})
+    assert e.code == "site_blocked" and e.extra["site"] == "site.example"
+    assert "resolved_url" not in e.extra  # the cook's own link
+
+
+def test_a_real_recipe_page_with_protection_scripts_is_still_read():
+    page = RECIPE_HTML.replace("</head>", '<script src="/cdn-cgi/challenge-platform/scripts/x.js"></script>'
+                                          '<script>var incap_ses_1=1;</script></head>')
+    assert fetch("https://site.example/r", {"https://site.example/r": html(page)}).title == "עוגת שוקולד"
+
+
+def test_a_short_link_that_needs_a_browser_is_reported_as_unresolved():
+    page = "<html><body><script>location.href='https://real.example/r'</script></body></html>"
+    e = fetch_error("https://bit.ly/xyz", {"https://bit.ly/xyz": html(page)})
+    assert e.code == "link_unresolved" and e.extra["site"] == "bit.ly"
+    loop = {"https://share.google/x": httpx.Response(302, headers={"location": "https://share.google/x"})}
+    assert fetch_error("https://share.google/x", loop).code == "link_unresolved"
+
+
+def test_link_wrappers_are_unwrapped_without_a_request():
+    wrapped = "https://www.google.com/url?q=https%3A%2F%2Fchef.example%2Fcake&sa=D"
+    page = fetch(wrapped, {"https://chef.example/cake": html(RECIPE_HTML)})  # no route for google.com
+    assert page.final_url == "https://chef.example/cake"
+    fb = "https://l.facebook.com/l.php?u=https%3A%2F%2Fchef.example%2Fcake&h=AT0"
+    assert fetch(fb, {"https://chef.example/cake": html(RECIPE_HTML)}).title == "עוגת שוקולד"
+
+
+def test_unwrapped_and_refreshed_targets_keep_every_safety_check():
+    async def res(host):
+        return ["10.0.0.5"] if host == "internal.example" else ["93.184.216.34"]
+
+    wrapped = "https://www.google.com/url?q=http%3A%2F%2Finternal.example%2Fadmin"
+    assert fetch_error(wrapped, {}, res=res).code == "invalid_url"
+    assert fetch_error("https://www.google.com/url?q=file:///etc/passwd", {}).code == "fetch_failed"  # not unwrapped
+    refresh = '<html><head><meta http-equiv="refresh" content="0; url=http://internal.example/admin"></head></html>'
+    assert fetch_error("https://r.example/", {"https://r.example/": html(refresh)}, res=res).code == "invalid_url"
+
+
+def test_a_meta_refresh_redirect_page_is_followed_once_per_hop():
+    refresh = "<html><head><meta content=\"0;URL='https://chef.example/cake'\" http-equiv=\"refresh\"></head></html>"
+    page = fetch("https://r.example/", {"https://r.example/": html(refresh), "https://chef.example/cake": html(RECIPE_HTML)})
+    assert page.final_url == "https://chef.example/cake"
+    loop = '<html><head><meta http-equiv="refresh" content="0;url=/again"></head></html>'
+    assert fetch_error("https://r.example/again", {"https://r.example/again": html(loop)}).code == "fetch_failed"
+
+
+def test_a_big_page_with_an_auto_reload_is_not_treated_as_a_redirect():
+    page = RECIPE_HTML.replace("</head>", '<meta http-equiv="refresh" content="300;url=/other">' + "<!-- x -->" * 3000 + "</head>")
+    assert fetch("https://site.example/r", {"https://site.example/r": html(page)}).title == "עוגת שוקולד"

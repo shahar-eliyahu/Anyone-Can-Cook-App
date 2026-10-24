@@ -8,9 +8,15 @@ carrier-grade NAT, metadata and IPv4-mapped/NAT64 forms of those). The check hap
 where the connection is made: `_PinnedBackend` resolves the host once, connects to that
 checked IP itself (so a second, different DNS answer can't redirect the connection:
 DNS rebinding), and then verifies the socket's actual peer address. TLS still uses the
-hostname for SNI and certificate checks. Redirects are followed manually (max 3); each
+hostname for SNI and certificate checks. Redirects are followed manually (max 5); each
 hop is a new origin, re-checked and connected the same way. Environment proxies are
 ignored, and the body is capped in size and in total time.
+
+Shared links: HTTP redirects (share.google, bit.ly…), well-known link wrappers
+(google.com/url?q=, l.facebook.com/l.php?u=) unwrapped without a request, and a plain
+<meta refresh> page are each one hop under the same checks. Links that need a browser to
+resolve are reported as `link_unresolved`. Pages that answer with a bot check (Imperva,
+Cloudflare…) are reported as `site_blocked`; they are never worked around.
 """
 
 import asyncio
@@ -19,7 +25,7 @@ import json
 import re
 import socket
 from dataclasses import dataclass
-from urllib.parse import SplitResult, urljoin, urlsplit
+from urllib.parse import SplitResult, parse_qs, unquote, urljoin, urlsplit
 
 import httpcore
 import httpx
@@ -27,7 +33,9 @@ import httpx
 from app.config import Settings
 from app.errors import ApiError
 
-MAX_REDIRECTS = 3
+# Share links take two hops before the recipe site (share.google → google.com → site), and
+# sites often add their own (http → https, a trailing slash).
+MAX_REDIRECTS = 5
 MIN_TEXT_CHARS = 120
 _USER_AGENT = "Mozilla/5.0 (compatible; AnyoneCanCookRecipeImport/1.0)"
 
@@ -130,6 +138,97 @@ def _pinned_transport(resolver) -> httpx.AsyncHTTPTransport:
     return transport
 
 
+# Link shorteners and share services: a page served by one of these is not a recipe yet.
+_SHORTENERS = {
+    "share.google", "goo.gl", "g.co", "maps.app.goo.gl", "bit.ly", "tinyurl.com", "t.co", "pin.it",
+    "lnkd.in", "ow.ly", "buff.ly", "is.gd", "rb.gy", "cutt.ly", "shorturl.at", "t.ly", "tiny.cc",
+    "fb.me", "l.facebook.com", "lm.facebook.com", "l.instagram.com", "linktr.ee", "s.id",
+}
+
+
+def _host(url: str) -> str:
+    return (urlsplit(url).hostname or "").removeprefix("www.")
+
+
+def _unwrap(url: str) -> str | None:
+    """The destination of a well-known link wrapper, read from the URL itself (no request)."""
+    parts = urlsplit(url)
+    host = (parts.hostname or "").removeprefix("www.")
+    query = parse_qs(parts.query)
+
+    def first(*keys: str) -> str | None:
+        for key in keys:
+            if value := query.get(key, [None])[0]:
+                value = unquote(value) if "%" in value and "://" not in value else value
+                return value if value.startswith(("http://", "https://")) else None
+        return None
+
+    if (host.startswith("google.") or host == "google.com") and parts.path == "/url":
+        return first("q", "url")
+    if host in ("l.facebook.com", "lm.facebook.com") and parts.path == "/l.php":
+        return first("u")
+    if host == "l.instagram.com":
+        return first("u")
+    return None
+
+
+_META_REFRESH = re.compile(r"<meta\b[^>]*>", re.I)
+_REFRESH_URL = re.compile(r"""content=["']?\s*\d*\s*;?\s*url\s*=\s*['"]?([^"'>\s]+)""", re.I)
+
+
+def _meta_refresh(html: str) -> str | None:
+    """The target of a plain redirect page (<meta http-equiv="refresh" content="0;url=…">)."""
+    if len(html) > 20_000:  # real pages may carry a slow auto-reload; only tiny redirect pages count
+        return None
+    for tag in _META_REFRESH.findall(html):
+        if re.search(r"""http-equiv=["']?refresh""", tag, re.I) and (m := _REFRESH_URL.search(tag)):
+            return m.group(1).replace("&amp;", "&")
+    return None
+
+
+_CHALLENGES = (
+    ("imperva", ("_incapsula_resource", "incap_ses", "visid_incap")),
+    ("cloudflare", ("cf-browser-verification", "cf_chl_", "<title>just a moment", "cf-turnstile")),
+    ("datadome", ("captcha-delivery.com", "datadome")),
+    ("perimeterx", ("px-captcha", "perimeterx")),
+    ("akamai", ("bm-verify", "/_sec/cp_challenge")),
+    ("sucuri", ("sucuri_cloudproxy", "sucuri website firewall")),
+    ("aws-waf", ("awswaf", "aws-waf-token")),
+)
+
+
+def _bot_check(html: str) -> str | None:
+    """Which anti-bot service answered instead of the page (only asked when no recipe was
+    found: real pages may carry these scripts too)."""
+    low = html.lower()
+    for vendor, markers in _CHALLENGES:
+        if any(m in low for m in markers):
+            return vendor
+    # A tiny page that is only a script and "don't index me": a JavaScript gate.
+    text = re.sub(r"<script.*?</script>|<[^>]+>", " ", low, flags=re.S).strip()
+    if len(low) < 3000 and "<script" in low and not text:
+        return "javascript-gate"
+    return None
+
+
+_TRACKING = re.compile(r"^(utm_\w+|shem|fbclid|gclid|igshid|mc_cid|mc_eid)$")
+
+
+def _clean_url(url: str) -> str:
+    """The address without sharing/tracking parameters (what the cook would copy)."""
+    parts = urlsplit(url)
+    kept = [q for q in parts.query.split("&") if q and not _TRACKING.match(q.split("=", 1)[0])]
+    return parts._replace(query="&".join(kept), fragment="").geturl()
+
+
+def _facts(original: str, final: str) -> dict[str, str]:
+    """What the app may show: the site a link led to, and its full address when it differs."""
+    facts = {"site": _host(final)}
+    if final != original:
+        facts["resolved_url"] = _clean_url(final)
+    return facts
+
+
 async def fetch_recipe_page(
     url: str,
     *,
@@ -146,6 +245,7 @@ async def fetch_recipe_page(
 
 
 async def _fetch(current: str, settings: Settings, transport: httpx.AsyncBaseTransport, resolver) -> FetchedPage:
+    original = current
     async with httpx.AsyncClient(
         transport=transport,
         trust_env=False,
@@ -155,6 +255,9 @@ async def _fetch(current: str, settings: Settings, transport: httpx.AsyncBaseTra
     ) as client:
         for _ in range(MAX_REDIRECTS + 1):
             parts = _check_url(current)
+            if (inner := _unwrap(current)) is not None:
+                current = inner  # one hop, checked like any other on the next round
+                continue
             # Early, friendly rejection; the binding check is at connect time (_PinnedBackend).
             await _checked_addresses(parts.hostname, resolver)
             try:
@@ -166,12 +269,12 @@ async def _fetch(current: str, settings: Settings, transport: httpx.AsyncBaseTra
                         current = urljoin(current, location)
                         continue
                     if response.status_code in (401, 403, 429, 451, 503):
-                        raise ApiError(422, "site_blocked", f"http {response.status_code}")
+                        raise ApiError(422, "site_blocked", f"http {response.status_code}", extra=_facts(original, current))
                     if response.status_code >= 400:
-                        raise ApiError(422, "fetch_failed", f"http {response.status_code}")
+                        raise ApiError(422, "fetch_failed", f"http {response.status_code}", extra=_facts(original, current))
                     ctype = response.headers.get("content-type", "")
                     if "html" not in ctype:
-                        raise ApiError(422, "fetch_failed", "not an html page")
+                        raise ApiError(422, "fetch_failed", "not an html page", extra=_facts(original, current))
                     body = bytearray()
                     async for chunk in response.aiter_bytes():
                         body.extend(chunk)
@@ -181,8 +284,23 @@ async def _fetch(current: str, settings: Settings, transport: httpx.AsyncBaseTra
             except httpx.TimeoutException as e:
                 raise ApiError(504, "timeout", "page fetch timed out") from e
             except httpx.HTTPError as e:
-                raise ApiError(422, "fetch_failed", type(e).__name__) from e
-            return extract_recipe(html, current, max_chars=settings.max_text_chars)
+                raise ApiError(422, "fetch_failed", type(e).__name__, extra=_facts(original, current)) from e
+            if (target := _meta_refresh(html)) is not None:
+                current = urljoin(current, target)
+                continue
+            try:
+                return extract_recipe(html, current, max_chars=settings.max_text_chars)
+            except ApiError as e:
+                if e.code != "no_recipe_found":
+                    raise
+                if _host(current) in _SHORTENERS:
+                    raise ApiError(422, "link_unresolved", "short link needs a browser", extra=_facts(original, current)) from e
+                if (vendor := _bot_check(html)) is not None:
+                    raise ApiError(422, "site_blocked", f"bot check: {vendor}", extra=_facts(original, current)) from e
+                e.extra = _facts(original, current)
+                raise
+    if _host(original) in _SHORTENERS:
+        raise ApiError(422, "link_unresolved", "too many redirects", extra=_facts(original, current))
     raise ApiError(422, "fetch_failed", "too many redirects")
 
 
