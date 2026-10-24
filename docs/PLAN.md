@@ -619,7 +619,11 @@ wake phrase ("Hey Remy") stays later (always-on listening: battery and privacy).
 
 #### Phase 4 and Future
 
-- Phase 4: visual refinement, an original "Remy" (רמי) look, settings wording, release work.
+- Phase 4: visual identity from the final logo (`docs/branding/logo.png`, DECISIONS #64), navigation, the
+  beginner journey, an original "Remy" (רמי) look, motion and accessibility. **Phase 4A (UX/UI analysis and
+  design proposal) is in `docs/DESIGN.md`, awaiting the user's review.** Proposed subphases, each needing
+  approval: 4B foundation (theme, font, transitions, nested routes + menu, RTL fixes, copy without dashes),
+  4C screens, 4D Remy and feedback, 4E icon replacement and accessibility pass; release work separately.
 - Future: an optional "Hey Remy" wake phrase (always-on listening). Original character only.
 
 #### Gemini usage in Phase 3
@@ -713,7 +717,7 @@ Phase 4 — Settings wording (exact alarms, battery).
    - `backend/evals/run_agent_eval.py --base-url …` grades the results deterministically: the expected intent, the expected tool names, the exact redirect text for off-topic, no success claims, and a Hebrew reply.
 
 ### Phase 4 — Polish & release
-(Phase 3 direction: visual refinement and an original "Remy" look here; voice moved to Future.) Servings scaling, Hebrew text-to-speech and voice confirmations ("סיימתי"), local JSON backup export and import, App Check, a paid Gemini tier and privacy policy, iOS builds (Codemagic), store release.
+(Superseded in detail by `docs/DESIGN.md` (Phase 4A proposal). Voice was delivered in Phase 3D.) Servings scaling, Hebrew text-to-speech and voice confirmations ("סיימתי"), local JSON backup export and import, App Check, a paid Gemini tier and privacy policy, iOS builds (Codemagic), store release.
 
 ### Later (not planned yet): accounts and cloud sync
 Optional sign-in, then a sync service built on the existing UUIDs, `updated_at` and `deleted_at` tombstones, and `owner_id`, plus cloud image storage and sharing (§6.4). Nothing in Phases 0–4 depends on it.

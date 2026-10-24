@@ -408,9 +408,24 @@ Checked what existed, changed only what was missing.
 - The wake phrase ("Hey Remy") stays later. Local understanding is rule-based; unusual phrasings go to Gemini
   (online). The server interpretation is untested against real Gemini (needs approval).
 
+### Phase 4A — UX/UI analysis and design proposal, 2026-10-24 (docs only, not committed)
+
+- Inspected every screen, the theme, routes, icons, copy and loading states. Proposal in `docs/DESIGN.md`:
+  palette sampled from the final logo with contrast checked, Heebo typography, components, nested navigation with
+  an always-visible "תפריט", final home structure, the beginner journey, Remy placement (labelled bottom-bar
+  button in cooking, "שאלו את רמי" in preparation), motion patterns with reduced-motion fallbacks, friendly
+  Gemini loading, RTL fixes, a Hebrew copy rule (no dashes), subphases 4B–4E.
+- Bugs found (to fix in 4B, not yet changed): row chevrons point the wrong way in Hebrew (`chevron_left` mirrors);
+  `context.go()` to flat routes leaves a one-page stack (no back arrow; Android back exits) after saving from
+  advanced editing, on the finish screen and from history "continue"; 13 `.arb` strings plus some Dart and
+  backend strings use dashes as separators.
+- The logo is stored at `docs/branding/logo.png`; the app icon is unchanged.
+
 ## Next step
 
-1. User reviews 3D (`fee2df1` + the voice commit, local only) and tries voice on a real phone.
+0. User reviews the Phase 4A proposal (`docs/DESIGN.md`) and the open decisions in its section 10; 4B starts only
+   after approval.
+1. User reviews 3D (`fee2df1` + `9386cbb`, local only) and tries voice on a real phone.
 2. With approval: push; small live Gemini checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 /
    ≤ 10 calls; 3B/3D Remy ≈ 15 questions / ≤ 20 calls), then deploy.
-3. Phase 4 only after approval.
+3. Phase 4B only after approval of 4A.

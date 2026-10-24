@@ -1,7 +1,8 @@
 # CLAUDE.md — Anyone Can Cook ("לבשל כל אחד יכול")
 
 Permanent instructions and project map for Claude Code. **Current status lives in `docs/PROGRESS.md`**;
-the approved design lives in `docs/PLAN.md`; the reasons behind decisions live in `docs/DECISIONS.md`.
+the approved design lives in `docs/PLAN.md` (Phase 4 UX/UI in `docs/DESIGN.md`, brand reference
+`docs/branding/logo.png`); the reasons behind decisions live in `docs/DECISIONS.md`.
 Do not copy status or plan details into this file.
 
 ## Resuming work (read this first in a new session)
