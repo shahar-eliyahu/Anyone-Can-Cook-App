@@ -92,6 +92,9 @@ class PlanStep(ContractModel):
     timers: list[PlanTimer] = []
     temperature: Temperature | None = None
     doneness_cue_he: str | None = None
+    # Optional short help shown only when the cook asks ("עזרה"): how to know it's ready,
+    # one common problem, in plain words.
+    help_he: str | None = Field(default=None, max_length=400)
     warnings_he: list[str] = []
     estimated_active_minutes: Minutes | None = None
 

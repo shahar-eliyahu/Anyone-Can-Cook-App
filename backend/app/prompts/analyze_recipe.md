@@ -14,6 +14,8 @@ Rules:
    only display="לפי הטעם" when the source says so, and report a gap.
 3. source_steps: split the original instructions into short excerpts, in order, copied as written
    (translated to Hebrew if needed). Ids: src1, src2, ... Ingredient ids: i1, i2, ...; equipment: e1, ...
+   Equipment: only what the recipe needs (pans, oven, a bowl). Don't add thermometers, scales,
+   mixers or other special tools unless the recipe itself uses them.
 4. For a photo, put the full verbatim text you can read in `transcription` (original language).
    Mark anything you cannot read clearly as a gap instead of guessing.
 5. Gaps: report information that a cook needs but the source does not give (an oven temperature,

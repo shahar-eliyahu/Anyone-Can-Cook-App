@@ -227,3 +227,63 @@ def test_daily_cap_counts_every_attempt():
         run(analyze_source(SourceInput(type="text", text="x"), provider=provider, settings=settings, budget=budget))
     assert e.value.code == "daily_limit"
     assert budget.used == 1
+
+
+# ---- Phase 3C: practical guidance (decisions #37, #38) -------------------------------------
+
+
+def omelette_plan(safety_food="eggs_stovetop", cue="בדקו במדחום במרכז: לפחות 71°C.", warnings=None):
+    p = plan_out()
+    step = p["steps"][1]  # an ordinary one-action step of the sample plan
+    step["safety_food"] = safety_food
+    step["doneness_cue_he"] = cue
+    step["warnings_he"] = warnings if warnings is not None else ["השתמשו במדחום כדי לוודא 71°C."]
+    return p, step["id"]
+
+
+def test_stovetop_eggs_get_an_observable_cue_and_no_thermometer_or_forced_check():
+    out, sid = omelette_plan()
+    r = run(plan(FakeProvider({"LlmPlan": [out]}), sample_analysis()))
+    step = {s.id: s for s in r.plan.steps}[sid]
+    assert step.doneness_cue_he == "מבשלים עד שהביצה יציבה ואין חלקים נוזליים."
+    assert not any("מדחום" in w for w in step.warnings_he)
+    assert all(a.confirm_policy == "auto_ok" for a in step.actions)
+
+
+def test_baked_egg_dish_uses_a_practical_cue_without_requiring_a_thermometer():
+    out, sid = omelette_plan(safety_food="egg_dish", cue=None, warnings=[])
+    r = run(plan(FakeProvider({"LlmPlan": [out]}), sample_analysis()))
+    step = {s.id: s for s in r.plan.steps}[sid]
+    assert "סכין" in step.doneness_cue_he and "מדחום" not in step.doneness_cue_he
+    assert step.warnings_he == [] and all(a.confirm_policy == "auto_ok" for a in step.actions)
+
+
+def test_ordinary_steps_lose_thermometer_lines_the_recipe_does_not_mention():
+    out, sid = omelette_plan(safety_food="none", cue="בדקו במדחום שהגיע ל-60°C.", warnings=["צריך מדחום."])
+    r = run(plan(FakeProvider({"LlmPlan": [out]}), sample_analysis()))
+    step = {s.id: s for s in r.plan.steps}[sid]
+    assert step.doneness_cue_he is None and step.warnings_he == []
+
+
+def test_high_risk_poultry_keeps_one_short_check_and_the_cooks_confirmation():
+    r = run(plan(FakeProvider({"LlmPlan": [plan_out()]}), sample_analysis()))
+    bake = {s.id: s for s in r.plan.steps}["s3"]
+    from app.knowledge.food_safety import REFERENCES
+    cue = REFERENCES["poultry"].check_cue_he
+    assert bake.warnings_he.count(cue) == 1 and "74°C" in cue
+    assert bake.actions[-1].confirm_policy == "always_ask"
+
+
+def test_a_recipe_that_uses_a_thermometer_keeps_its_instructions():
+    analysis = sample_analysis()
+    analysis = analysis.model_copy(update={"source_text": analysis.source_text + "\nבדקו במדחום שהגיע ל-60°C."})
+    out, sid = omelette_plan(safety_food="none", cue="בדקו במדחום שהגיע ל-60°C.", warnings=[])
+    r = run(plan(FakeProvider({"LlmPlan": [out]}), analysis))
+    assert {s.id: s for s in r.plan.steps}[sid].doneness_cue_he == "בדקו במדחום שהגיע ל-60°C."
+
+
+def test_help_text_reaches_the_plan():
+    out = plan_out()
+    out["steps"][0]["help_he"] = "תפוחי האדמה מוכנים לתבנית כשהם מצופים בשמן."
+    r = run(plan(FakeProvider({"LlmPlan": [out]}), sample_analysis()))
+    assert r.plan.steps[0].help_he == "תפוחי האדמה מוכנים לתבנית כשהם מצופים בשמן."

@@ -15,6 +15,12 @@ String sessionStatusLabel(AppLocalizations l10n, String status) => switch (statu
       _ => l10n.statusInProgress,
     };
 
+/// "25 דק'", or "פחות מדקה" for very short sessions.
+String cookingDurationLabel(AppLocalizations l10n, DateTime start, DateTime end) {
+  final minutes = end.difference(start).inMinutes;
+  return minutes < 1 ? l10n.durationUnderMinute : l10n.minutesShort(minutes);
+}
+
 class HistoryScreen extends ConsumerWidget {
   const HistoryScreen({super.key});
 
@@ -37,7 +43,7 @@ class HistoryScreen extends ConsumerWidget {
                     title: Text(e.recipe.displayTitle),
                     subtitle: Text(
                       '${formatDateTime(e.session.startedAt)} · ${sessionStatusLabel(l10n, e.session.status)}'
-                      '${e.session.endedAt == null ? '' : ' · ${l10n.minutesShort(e.session.endedAt!.difference(e.session.startedAt).inMinutes)}'}',
+                      '${e.session.endedAt == null ? '' : ' · ${cookingDurationLabel(l10n, e.session.startedAt, e.session.endedAt!)}'}',
                     ),
                     trailing: const Icon(Icons.chevron_left),
                     onTap: () => context.push('/history/${e.session.id}'),

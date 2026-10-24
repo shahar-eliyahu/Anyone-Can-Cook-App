@@ -16,6 +16,7 @@ class KitchenScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    ref.watch(healthProvider); // wakes the server quietly; nothing is shown
 
     return AppScaffold(
       title: l10n.kitchenTitle,
@@ -44,8 +45,6 @@ class KitchenScreen extends ConsumerWidget {
                 onTap: () => context.push(path),
               ),
             ),
-          const SizedBox(height: 16),
-          const BackendStatusCard(),
         ],
       ),
     );
@@ -59,15 +58,22 @@ class _ContinueCookingCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final session = ref.watch(activeSessionProvider).value;
+    final active = ref.watch(activeSessionProvider);
+    final session = active.value;
     final recipe = session == null ? null : ref.watch(recipeProvider(session.recipeId)).value;
+    // While loading, say nothing rather than "no active session" (no flash on cold start).
+    final subtitle = switch (active) {
+      AsyncData(value: null) => l10n.noActiveSession,
+      AsyncData() => recipe?.displayTitle ?? l10n.loadingShort,
+      _ => l10n.loadingShort,
+    };
 
     return Card(
       color: theme.colorScheme.secondaryContainer,
       child: ListTile(
         leading: const Icon(Icons.local_fire_department_outlined),
         title: Text(l10n.continueCooking),
-        subtitle: Text(recipe?.displayTitle ?? l10n.noActiveSession),
+        subtitle: Text(subtitle),
         trailing: session == null ? null : const Icon(Icons.chevron_left),
         onTap: session == null ? null : () => context.push('/cook/${session.id}'),
       ),

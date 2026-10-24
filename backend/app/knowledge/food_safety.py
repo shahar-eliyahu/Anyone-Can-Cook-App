@@ -7,7 +7,12 @@ chart before release). The Israeli Ministry of Health's general guidance (cook t
 70 °C at the center, juices of meat and poultry run clear, use a thermometer) is
 cited as a general reference; where FSIS is more specific and higher, FSIS is used.
 
-Wording shown to users never claims a dish is guaranteed safe.
+Wording shown to users never claims a dish is guaranteed safe. Cues are short and
+practical (docs/DECISIONS.md #37): observable signs first; a thermometer is mentioned
+only for high-risk foods (poultry, ground meat), as the accurate check, and appearance is
+never presented as reliable where it isn't. Stovetop eggs (omelette, scrambled, fried)
+are cooked "until set" (FSIS: until yolk and white are firm); the 160 °F / 71 °C value is
+for baked egg dishes (casseroles, quiche).
 """
 
 from dataclasses import dataclass
@@ -15,7 +20,9 @@ from typing import Literal
 
 from app.schemas.analysis import ReferenceSource
 
-SafetyFood = Literal["poultry", "ground_meat", "whole_cut_meat", "fish", "egg_dish", "leftovers"]
+SafetyFood = Literal[
+    "poultry", "ground_meat", "whole_cut_meat", "fish", "egg_dish", "eggs_stovetop", "leftovers"
+]
 
 FSIS_SOURCE = ReferenceSource(
     id="ref_fsis_temps",
@@ -36,11 +43,13 @@ IL_MOH_SOURCE = ReferenceSource(
 class SafetyReference:
     food: SafetyFood
     label_he: str
-    min_internal_c: int
-    min_internal_f: int
+    min_internal_c: int | None  # None: no temperature check for this food (stovetop eggs)
+    min_internal_f: int | None
     rest_minutes: int
-    check_cue_he: str
+    check_cue_he: str  # one short, practical sentence shown to the cook
     source_ids: tuple[str, ...]
+    # High risk: the cue is shown as a short warning and the cook confirms doneness.
+    high_risk: bool = False
 
 
 REFERENCES: dict[SafetyFood, SafetyReference] = {
@@ -48,32 +57,39 @@ REFERENCES: dict[SafetyFood, SafetyReference] = {
     for r in (
         SafetyReference(
             "poultry", "עוף והודו (כולל טחון)", 74, 165, 0,
-            "בדקו במדחום בחלק העבה ביותר: לפחות 74°C. הנוזלים שקופים ולא ורודים.",
+            "חתכו בחלק העבה: אין ורוד והנוזלים שקופים. הבדיקה המדויקת: מדחום, לפחות 74°C.",
             (FSIS_SOURCE.id, IL_MOH_SOURCE.id),
+            high_risk=True,
         ),
         SafetyReference(
             "ground_meat", "בשר טחון (בקר, טלה, חזיר)", 71, 160, 0,
-            "בדקו במדחום במרכז: לפחות 71°C. הצבע לבדו אינו סימן אמין.",
+            "מבשלים עד שאין ורוד בפנים; הצבע לבדו לא תמיד אמין, ולכן הכי בטוח מדחום: לפחות 71°C במרכז.",
             (FSIS_SOURCE.id, IL_MOH_SOURCE.id),
+            high_risk=True,
         ),
         SafetyReference(
             "whole_cut_meat", "נתחים שלמים: סטייק, צלעות, צלי", 63, 145, 3,
-            "בדקו במדחום במרכז: לפחות 63°C, ואז מנוחה של 3 דקות לפחות.",
+            "לפני ההגשה נותנים לבשר לנוח כ-3 דקות.",
             (FSIS_SOURCE.id,),
         ),
         SafetyReference(
             "fish", "דגים", 63, 145, 0,
-            "בדקו במדחום: לפחות 63°C, או עד שהבשר אטום ומתפרק בקלות במזלג.",
+            "הדג מוכן כשהוא אטום ומתפרק בקלות במזלג.",
             (FSIS_SOURCE.id,),
         ),
         SafetyReference(
-            "egg_dish", "מאכלי ביצים (פריטטה, קיש)", 71, 160, 0,
-            "בדקו במדחום במרכז: לפחות 71°C. הביצים יציבות ולא נוזליות.",
+            "egg_dish", "מאכלי ביצים אפויים (קיש, פשטידה, פריטטה בתנור)", 71, 160, 0,
+            "המרכז יציב, וסכין שננעצת במרכז יוצאת נקייה.",
+            (FSIS_SOURCE.id,),
+        ),
+        SafetyReference(
+            "eggs_stovetop", "ביצים במחבת (חביתה, ביצה מקושקשת, ביצת עין)", None, None, 0,
+            "מבשלים עד שהביצה יציבה ואין חלקים נוזליים.",
             (FSIS_SOURCE.id,),
         ),
         SafetyReference(
             "leftovers", "שאריות ותבשילים מוכנים (חימום חוזר)", 74, 165, 0,
-            "חממו עד שהמרכז מגיע ל-74°C לפחות.",
+            "מחממים עד שהכול חם מאוד ומהביל, גם במרכז.",
             (FSIS_SOURCE.id,),
         ),
     )

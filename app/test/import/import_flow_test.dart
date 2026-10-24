@@ -22,18 +22,6 @@ RecipeAnalysis analysis({SourceType type = SourceType.text, List<Question> quest
 
 final planResponse = PlanResponse(plan: loadSampleBundle().plan, limitationsHe: const ['לא ידוע גודל התבנית']);
 
-Future<void> tapText(WidgetTester tester, String text) async {
-  await expectSeen(tester, find.text(text));
-  await tester.ensureVisible(find.text(text).first);
-  await tester.pumpAndSettle();
-  await tester.tap(find.text(text).first);
-  await tester.pumpAndSettle();
-}
-
-VoidCallback? onPressedOf(WidgetTester tester, String label) => tester
-    .widget<ButtonStyleButton>(find.ancestor(of: find.text(label), matching: find.bySubtype<ButtonStyleButton>()))
-    .onPressed;
-
 // Plain queries: drift watch streams never emit inside testWidgets' fake async zone.
 Future<List<RecipeRow>> allRecipes(AppHarness h) => h.db.select(h.db.recipes).get();
 

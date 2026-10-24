@@ -15,9 +15,9 @@ void main() {
     // Advance notice before starting.
     await expectSeen(tester, find.textContaining('כל התהליך לוקח כ-4 שעות'));
 
-    // Knead, then start the first proof (a 60–90 minute range).
+    // Knead (a timed step: explicit start), finish early, then start the first proof (60–90 minutes).
     await tapButton(tester, 'התחלתי ללוש');
-    await tapButton(tester, 'הבצק חלק');
+    await tapText(tester, 'כבר מוכן? לשלב הבא');
     await tapButton(tester, 'כיסיתי את הבצק');
 
     await expectSeen(tester, find.text('התפחה ראשונה'));
@@ -30,12 +30,12 @@ void main() {
     await expectSeen(tester, find.text('שמנו את התבנית')); // suggested during the wait
     expect(h.notifier.scheduled.keys, unorderedEquals(['${session.id}/t2', '${session.id}/t2#end']));
 
-    // Check time: the cue, the step's own action, and "check again".
+    // Check time: the cue, "ready — next step", and "needs more time" (the plan's 10 minutes).
     await h.advance(tester, const Duration(minutes: 60));
     await expectSeen(tester, find.text('זמן לבדוק!'));
     await expectSeen(tester, find.textContaining('👀 הבצק הכפיל את נפחו'));
-    await expectSeen(tester, find.widgetWithText(FilledButton, 'הבצק תפח'));
-    final recheck = find.text("עוד לא — לבדוק שוב בעוד 10 דק'");
+    await expectSeen(tester, find.widgetWithText(FilledButton, 'מוכן — לשלב הבא'));
+    final recheck = find.text("צריך עוד זמן (+10 דק')");
     await expectSeen(tester, recheck);
     await tester.ensureVisible(recheck);
     await tester.tap(recheck);

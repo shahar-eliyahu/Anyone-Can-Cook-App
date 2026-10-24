@@ -144,6 +144,19 @@
           ],
           "default": null
         },
+        "help_he": {
+          "anyOf": [
+            {
+              "maxLength": 400,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Help He"
+        },
         "id": {
           "title": "Id",
           "type": "string"

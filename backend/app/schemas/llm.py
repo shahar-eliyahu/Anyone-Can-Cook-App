@@ -12,7 +12,8 @@ from pydantic import BaseModel
 Category = Literal["safety", "outcome", "equipment", "preference", "minor"]
 Conf = Literal["high", "medium", "low"]
 SafetyFoodName = Literal[
-    "poultry", "ground_meat", "whole_cut_meat", "fish", "egg_dish", "leftovers", "home_preserving", "none"
+    "poultry", "ground_meat", "whole_cut_meat", "fish", "egg_dish", "eggs_stovetop", "leftovers",
+    "home_preserving", "none",
 ]
 
 
@@ -144,6 +145,7 @@ class LlmStep(BaseModel):
     timers: list[LlmTimer] = []
     temperature: LlmTemperature | None = None
     doneness_cue_he: str | None = None
+    help_he: str | None = None
     warnings_he: list[str] = []
     estimated_active_minutes: LlmMinutes | None = None
     safety_food: SafetyFoodName | None = None

@@ -462,7 +462,153 @@ safety-related value is an estimate.
   authentication. Per-IP limits and an app-wide daily cap (in memory: reset on restart, shared IPs share limits),
   request-size caps, SSRF protection, no recipe content in logs. A Hebrew privacy notice before the first import.
 
-### Phase 3 — Cooking AI Agent
+### Phase 3 — final product direction (approved 2026-10-24)
+
+Supersedes the older Phase 3 text below and §5 where they differ. Decisions: `docs/DECISIONS.md` #33–#43.
+
+**Goal.** A complete beginner imports a recipe, prepares everything needed, and cooks successfully with minimal
+confusion and minimal interaction. The app handles complexity behind the scenes; the user never has to
+understand, validate or edit a complicated plan.
+
+**Flow.** Import → Recipe overview → Check ingredients and equipment → Resolve missing items → "מתחילים לבשל"
+→ Simple steps → Finish. Advanced editing (the Phase 2 review/edit screen) stays available but secondary.
+
+**Principles (all of Phase 3)**
+- One clear primary action per screen; few buttons; no unnecessary dialogs or confirmations.
+- Short, beginner-friendly Hebrew; explanations only on request.
+- Practical cues first; no thermometers, special equipment, professional techniques or extra measurements unless
+  the recipe needs them or food safety genuinely requires it. High-risk safety guidance stays, said briefly;
+  appearance is never presented as reliable where it isn't.
+- No developer-facing text (server, backend, API, Gemini, Render, HTTP, JSON, database, versions); no technical
+  success messages; errors only when the user needs to know or act.
+- Deterministic local execution stays: CookingEngine, event replay, undo, session restore, parallel steps,
+  timers and notifications, offline cooking and saved recipes. No automatic Gemini calls; no new dependencies or
+  paid services without approval.
+
+#### Phase 3C — simple cooking, practical guidance, timer end (first)
+
+Status: implemented locally 2026-10-24 (not committed); see `docs/PROGRESS.md`.
+
+Checklist:
+1. **Food-safety reference (backend).** Split eggs: stovetop eggs (omelette, scrambled, fried) → observable cue
+   ("until the eggs are set, no runny egg"), no temperature, no forced confirmation; baked egg dishes (quiche,
+   frittata, casserole) keep 71°C as an optional precise check with an observable cue. Shorten every cue to one
+   sentence; poultry/ground meat: brief thermometer recommendation plus signs, without claiming colour alone is
+   reliable (open decision 4). Add the `egg_*` cases to tests.
+2. **Planning (backend).** Stop appending the full safety cue to `warnings_he` for every safety-tagged step: one
+   short line only for high-risk foods; `always_ask` only for high-risk foods (poultry, ground meat, …), not
+   stovetop eggs.
+3. **Plan prompt.** Ordinary step = one action that completes it ("סיימתי"); timed step = the start action
+   ("הכנסתי לתנור", `starts_timer`) + completion. Short beginner instructions; observable cues; no unneeded
+   equipment; equipment only if the recipe needs it; one optional `help_he` per step (how to know it's ready,
+   one common problem, plain words).
+4. **Contract.** `PlanStep.help_he` (optional; schema_version stays 1) → export schemas → Dart model; fixtures.
+5. **Engine.** `ActionDispatcher.completeStep(stepId)`: confirms the step's remaining actions in order as
+   `ActionConfirmed` events; stops at an action that starts a timer (that action becomes the primary button);
+   idempotent and serialized; completion with a running timer keeps today's behaviour (timers end). Derived
+   `primaryAction(step)` for the UI: start-timer action / waiting / "סיימתי — לשלב הבא".
+6. **Timer end (app).** Doneness cue + "מוכן — לשלב הבא" + "צריך עוד זמן (+N דק')" with N from
+   `recheck_seconds` (default 5 min) and ± 1 minute adjust; uses existing `TimerRechecked`/`TimerExtended`.
+7. **Cooking screen (app).** Current step big: title, one instruction, amounts used, primary button, small
+   "חזרה" (undo last). "איך יודעים?/עזרה" expands `help_he` and the doneness cue. Timers tray and "בינתיים
+   אפשר" stay, compact. Hidden from the main view: estimate badges, step status chips, technical timer labels;
+   "כל השלבים" behind a link. Remove per-action success snackbars (undo is on the screen). Safety check inline
+   ("בדקתי ש…" before the primary button) instead of a popup.
+8. **Developer-facing messages (app).** Remove the home status card text (server connected/offline/waking, AI
+   mode, database version); keep a silent warm-up health request. Friendly loading/error text (see the audit
+   below). Fix the cold-start "אין בישול פעיל" flash (neutral loading state).
+9. **Tests and checks.** Backend (fake provider): egg categories, high-risk only `always_ask`, prompt rules
+   reflected in validation. Flutter: `completeStep` (multi-action steps, stops at timer actions, undo, idempotent,
+   old event logs replay identically), timer-end extension, single-button cooking flow, inline safety check, no
+   developer text on home/import. Emulator: one full cook offline. Live check with approval (≤ 2 recipes,
+   ≤ 6 calls).
+
+Acceptance: an ordinary step takes one tap; a timed step two (start, done); no popups except destructive
+actions; omelette without a thermometer, chicken with a short doneness check; old saved recipes and active
+sessions keep working; timers and notifications unchanged offline; no developer terminology on screen.
+
+#### Phase 3A — recipe overview, checklist, missing items, substitutions
+
+- After import the app analyzes and plans automatically, then shows the **overview**: name, servings,
+  estimated duration (computed locally from steps and timers), short useful notes; a short "שימו לב" card only
+  for safety-relevant estimates or limitations. Questions only when needed for a reliable plan.
+- **Checklist** of all ingredients (with amounts) and equipment: have / missing, one tap each; free text such as
+  "אין לי שמנת, יש לי חלב", "אין לי מיקסר", "אין לי משקל", "אין לי מדחום".
+- **Resolution:** curated context-aware local table first (offline); otherwise one Gemini call
+  (`POST /v1/recipes/substitute`) with the whole recipe as context. Verdicts: works / changes the result (how) /
+  not recommended / essential, no reliable substitute. Adjusted quantity and instructions; never an invented
+  workaround.
+- **Applying:** a backend-validated patch (ingredient + affected step text; plan checks, number checks, safety
+  re-classification); if invalid, fallback to one `/plan` regeneration. Saved as a new plan version
+  (`based_on_plan_id`), original kept; undo before cooking. Resolved equipment isn't asked again while cooking.
+- Primary action "מתחילים לבשל"; the Phase 2 review/edit screen becomes "עריכה מתקדמת".
+- Acceptance: everything needed is visible before cooking; common swaps offline; essential items never faked;
+  recipe and plan consistent after a swap; active sessions untouched; reopening makes zero calls.
+- Tests: fake-provider verdicts, patch validation, safety re-classification (e.g. chicken → fish), fallback,
+  limits/quota; app checklist, local table, apply/undo, plan versions, no stale text. Live check with approval
+  (≈ 5 substitutions, ≤ 10 calls).
+
+#### Phase 3B — context-aware text assistant, validated mid-cooking adjustments
+
+- `POST /v1/assistant/turn`: recipe + accepted substitutions + current/completed steps + active timers
+  (`engine.snapshot()`) + safety constraints + last few turns. One Gemini call per user question, never automatic.
+- Local first: step chips ("מה זה אומר?", "איך יודעים שמוכן?") answer from `help_he`, the doneness cue and a
+  local Hebrew technique glossary — zero calls.
+- Proposals only, each approved by the user, executed by the engine: extend a timer; substitute in a step not
+  yet started (`PlanPatchApplied`, replayed as plan + patches; never touches started steps or running timers).
+- Cooking-only scope and guardrails from §5.4 (redirect, false-success rewrite, length cap, injection stance).
+  Own per-device limit inside the shared daily cap.
+- Voice-ready: a UI-independent `AssistantService.ask(text) → reply + proposals`.
+- Tests: guardrails with a fake provider; proposal validation against live engine state; `PlanPatchApplied`
+  replay (old sessions unchanged); approval cards. Live evaluation with approval (≈ 15 questions, ≤ 20 calls).
+
+#### Phase 4 and Future
+
+- Phase 4: visual refinement, an original "Remy" (רמי) look, settings wording, release work.
+- Future: microphone, speech-to-text and text-to-speech, hands-free commands answered locally ("הבא", "כמה זמן
+  נשאר?"), then an optional "Hey Remy" wake phrase. No voice packages, continuous listening or wake word now;
+  original character only.
+
+#### Gemini usage in Phase 3
+
+| Moment | Gemini calls |
+|---|---|
+| Import (analyze + plan) | 2 (3 with a repair) |
+| Reopening or cooking a saved recipe; timer end; doneness check; extension | 0 |
+| Step help, glossary, common substitutions | 0 (prepared in the plan or local) |
+| Recipe-specific substitution | 1 |
+| Free-text assistant question | 1, only when asked |
+
+Protections: app-wide daily cap (300, under Gemini's 500 RPD), per-device limits, quota pause, short context.
+
+#### Developer-facing message audit (2026-10-24)
+
+Remove or reword in 3C:
+- Home status card: "מתחבר לשרת…", "השרת מתעורר…", "השרת מחובר ✓", "מצב הדגמה / בינה מלאכותית מחוברת / לא
+  ידוע", "אין חיבור לשרת", "מסד הנתונים מוכן (גרסה N)" → removed (silent warm-up request kept).
+- Import loading: "קוראים את המתכון…" → "בודקים את המצרכים וההוראות…"; "בונים תוכנית בישול…" → "מסדרים לך את
+  שלבי הבישול…"; "זה לוקח קצת זמן — ייתכן שהשרת מתעורר." → "זה לוקח קצת יותר זמן מהרגיל…".
+- Errors: "השרת לא הגיב בזמן" → "זה לקח יותר מדי זמן. נסו שוב בעוד רגע."; "השרת עדיין לא מוגדר לייבוא
+  מתכונים." → "ייבוא מתכונים לא זמין כרגע. נסו שוב מאוחר יותר."; quota/busy/unavailable texts drop "שירות
+  הבינה המלאכותית" for "הכנת מתכונים חדשים לא זמינה כרגע…".
+- Cooking: per-action success snackbars ("✓ סומן…") removed; technical timer/estimate labels hidden.
+Keep: the debug-only server address in Settings (not in release builds); the Settings notification test,
+reworded as "בדיקת התראות".
+Later: 3A — review terms ("מה הוערך", provenance badges, "תוכנית", "מקורות") move into advanced editing;
+Phase 4 — Settings wording (exact alarms, battery).
+
+#### Phase 3 — open decisions (resolved 2026-10-24: 1–4 adopted as recommended, `docs/DECISIONS.md` #44–#47; 5 still needs approval)
+
+1. The one-time privacy notice: keep naming Google as the recipient of recipe text/photos (without "Gemini")?
+2. Estimate badges ("הערכה") leave the cooking screen; transparency moves to the overview's "שימו לב" card and
+   advanced editing. This changes the CLAUDE.md invariant "AI estimates show הערכה".
+3. Existing saved recipes (e.g. the test omelette) keep their old plan text (including the thermometer line);
+   offer an optional "rebuild the plan" (one call) rather than editing saved text automatically?
+4. Poultry and ground meat: a one-line thermometer recommendation plus observable signs, honestly worded, never a
+   mandatory checkbox; if the user marks "no thermometer" in 3A, signs only with the caveat.
+5. Live check at the end of 3C (≤ 2 recipes, ≤ 6 calls).
+
+### Phase 3 — Cooking AI Agent (original plan; superseded where it differs from the section above)
 1. **Backend:**
    - `POST /v1/agent/turn`, the `AgentTurn` schema, the agent system prompt in `backend/app/prompts/agent.md`
    - the tool registry and validators in `backend/app/services/agent/`
@@ -514,7 +660,7 @@ safety-related value is an estimate.
    - `backend/evals/run_agent_eval.py --base-url …` grades the results deterministically: the expected intent, the expected tool names, the exact redirect text for off-topic, no success claims, and a Hebrew reply.
 
 ### Phase 4 — Polish & release
-Servings scaling, Hebrew text-to-speech and voice confirmations ("סיימתי"), local JSON backup export and import, App Check, a paid Gemini tier and privacy policy, iOS builds (Codemagic), store release.
+(Phase 3 direction: visual refinement and an original "Remy" look here; voice moved to Future.) Servings scaling, Hebrew text-to-speech and voice confirmations ("סיימתי"), local JSON backup export and import, App Check, a paid Gemini tier and privacy policy, iOS builds (Codemagic), store release.
 
 ### Later (not planned yet): accounts and cloud sync
 Optional sign-in, then a sync service built on the existing UUIDs, `updated_at` and `deleted_at` tombstones, and `owner_id`, plus cloud image storage and sharing (§6.4). Nothing in Phases 0–4 depends on it.

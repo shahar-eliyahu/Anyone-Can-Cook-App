@@ -29,3 +29,20 @@ Future<void> expectSeen(WidgetTester tester, Finder finder) async {
   }
   expect(finder, findsWidgets);
 }
+
+/// Taps the widget showing exactly [text] (scrolling to it first).
+Future<void> tapText(WidgetTester tester, String text) async {
+  await expectSeen(tester, find.text(text));
+  await tester.ensureVisible(find.text(text).first);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(text).first);
+  await tester.pumpAndSettle();
+}
+
+/// The `onPressed` of the button showing [label] (null when disabled).
+VoidCallback? onPressedOf(WidgetTester tester, String label) => tester
+    .widget<ButtonStyleButton>(find.ancestor(of: find.text(label), matching: find.bySubtype<ButtonStyleButton>()).first)
+    .onPressed;
+
+/// Words that belong in development logs, never on screen (docs/DECISIONS.md #39).
+const developerWords = ['שרת', 'מסד הנתונים', 'גרסה', 'בינה מלאכותית', 'Gemini', 'gemini', 'API', 'backend'];

@@ -3,7 +3,7 @@
 Frequently changing status. Permanent rules are in `CLAUDE.md`; the approved design is `docs/PLAN.md`.
 Update this file at the end of every work step.
 
-_Last updated: 2026-10-24 (Phase 2 security hardening)_
+_Last updated: 2026-10-24 (Phase 3C implemented locally, not committed)_
 
 ## Phase status
 
@@ -11,8 +11,8 @@ _Last updated: 2026-10-24 (Phase 2 security hardening)_
 |---|---|
 | 0 — Local foundations | ✅ Complete, committed and pushed (`1196478`). Render verified: `/health` 200, `/internal/ai-check` 404. |
 | 1 — Deterministic cooking core (no AI) | ✅ Implemented, verified (automated + emulator), approved by the user, committed and pushed to `main` (see `git log`). |
-| 2 — AI recipe analysis & planning | 🔄 Implemented with mock/fake providers and verified on the emulator against a local mock backend. Not committed. Live Gemini evaluation not run (needs approval). |
-| 3 — Cooking AI Agent | ⏸ Not started. |
+| 2 — AI recipe analysis & planning | ✅ Complete, committed and pushed (`a6bd1f3` Phase 2, `a372736` app icon, `fa87e71` quota handling). Deployed on Render; live Gemini recipe test by the user passed (details below). |
+| 3 — Beginner cooking experience + assistant | 🔄 3C implemented and verified locally (tests + emulator), not committed or deployed. 3A and 3B not started. |
 | 4 — Polish & release | ⏸ Not started. |
 
 ## Phase 1 — what exists
@@ -71,8 +71,8 @@ Emulator `emulator-5554` (Android 15), app built in debug, **network disabled** 
 - The "הערכה" badge explanation is on long-press only (not discoverable); revisit in Phase 4.
 - Screen-on during cooking (wakelock) not implemented; avoided an extra package. Revisit if users need it.
 - Cold start: the home screen's "המשך בישול" card briefly shows "אין בישול פעיל כרגע" before the active
-  session loads (the card treats "still loading" as "no session"). Fix later with the UI/UX improvements
-  (Phase 4): show a neutral loading state instead. Seen on the emulator 2026-10-24.
+  session loads (the card treats "still loading" as "no session"). Show a neutral loading state instead.
+  Seen on the emulator 2026-10-24. Planned in Phase 3C (home screen cleanup), not Phase 4.
 
 ## Phase 2 progress
 
@@ -128,7 +128,7 @@ Emulator `emulator-5554` (Android 15), app built in debug, **network disabled** 
   step used the corrected 50:00 timer with the 74°C food-safety check; one exact alarm (window 0).
   Found and fixed: an edited timer kept the AI's "estimated" note.
 
-## AI quota and rate-limit handling (2026-10-24, not committed)
+## AI quota and rate-limit handling (2026-10-24, committed `fa87e71`, deployed)
 
 Checked what existed, changed only what was missing.
 - Already in place: 429 never retried (backend or app); typed text and links stay in the field; drafts and
@@ -154,7 +154,7 @@ Checked what existed, changed only what was missing.
 - Needs the live run: confirm the real Gemini 429 body uses these `quotaId` names. If it doesn't, the
   app shows the general "temporary limit" message (safe fallback, no time promised).
 
-## App icon (2026-10-24, not committed)
+## App icon (2026-10-24, committed `a372736`, deployed)
 
 - Official logo (user-supplied, 2048×2048) as the app icon: source `app/assets/icon/app_icon.png` (lossless copy;
   not bundled into the app), monochrome silhouette `app_icon_monochrome.png` for Android 13+ themed icons.
@@ -170,10 +170,22 @@ Checked what existed, changed only what was missing.
 - Observed (pre-existing, not icon related): on a cold start the "המשך בישול" card briefly shows
   "אין בישול פעיל כרגע" while the database stream loads.
 
-## Phase 2 — needs live testing (after deploy, with approval)
+## Phase 2 — deployment and live test (2026-10-24)
 
-- Gemini accepts our structured-output schemas, `PLAN_MODEL`/`AI_MODEL` and the optional thinking level
-  (unverified until a live call). First evaluation: ≤ 5 recipes, ≤ 15 calls, stop on quota or rate-limit errors.
+- Deployed: `main` = `origin/main` = `fa87e71`; Render redeployed from it. `APP_CLIENT_TOKEN` set on Render by
+  the user; the app is built with `--dart-define-from-file` pointing at a file outside the repository.
+- Verified by Claude (read-only, no Gemini calls): `/health` → `ok`, `ai_provider: gemini`; the deployed API
+  lists `/v1/recipes/analyze`, `/analyze-image`, `/plan`; `POST /v1/recipes/analyze` without a token → 401.
+- Live test by the user (Android app → Render → Gemini, `gemini-3.5-flash-lite`, free tier: 15 RPM,
+  250,000 TPM, 500 RPD): a real recipe (omelette) was analyzed, cooking steps ran, timers worked.
+- Findings that shaped Phase 3: too many confirmations while cooking ("התחלתי"/"סיימתי" for nearly every
+  action); the omelette got a 71°C thermometer check — caused by the backend's food-safety layer (step tagged
+  `egg_dish`, a value meant for baked egg dishes), not by Gemini.
+
+## Phase 2 — still to check live (as it comes up; each live run needs approval)
+
+- Structured output and the model setting work (confirmed by the live recipe test). A broader evaluation
+  (≤ 5 recipes, ≤ 15 calls) is still open.
 - Plan quality on real Hebrew and English recipes: step grouping, labeled estimates, questions only when needed,
   food-safety warnings.
 - URL import against real sites, over HTTPS through the pinned connection (TLS SNI/certificate with an IP
@@ -199,10 +211,64 @@ Checked what existed, changed only what was missing.
 - Page text extraction runs on the request thread (CPU for up to 2 MB of HTML); fine at the current limits.
 - iOS not built or tested.
 
+## Phase 3 — status
+
+- Product direction approved 2026-10-24 (`docs/PLAN.md` "Phase 3 — final product direction"; decisions #33–#47).
+- Order: **3C** → **3A** (overview, checklist, substitutions) → **3B** (assistant) → Phase 4 → Future (voice).
+
+### Phase 3C — implemented 2026-10-24 (local, not committed)
+
+- **Food safety (backend):** stovetop eggs (`eggs_stovetop`: omelette, scrambled, fried) → "cook until set, no runny
+  egg", no temperature, no forced confirmation; baked egg dishes keep 71°C as reference value with an observable cue
+  (knife comes out clean); all cues one practical sentence. Only poultry and ground meat are high-risk: one short
+  warning line, the doneness cue and `always_ask`. Thermometer lines the model adds to non-high-risk steps are
+  dropped unless the recipe itself mentions a thermometer. Fixes the omelette 71°C bug.
+- **Prompts:** plan — ordinary step = one action "סיימתי"; timed step = explicit start action (starts the timer) +
+  completion; short beginner instructions; observable cues; no unneeded equipment; optional `help_he`. Analyze —
+  equipment only what the recipe needs.
+- **Contract:** `PlanStep.help_he` (optional; schema_version stays 1); schemas re-exported; Dart model; sample fixture
+  has help texts (asset copy identical); mock AI data regenerated.
+- **Engine:** `ActionDispatcher.completeStep` (remaining actions as ordinary `ActionConfirmed` events from one tap;
+  stops before a timer-start action) and `undoLast` ("חזרה": undoes the whole last tap or a prep task);
+  `CookingState.primaryFor` (start timer / waiting / check due / next, with the safety-check flag) and a tap log
+  rebuilt by replay. No new event types: old sessions replay identically.
+- **Cooking screen:** current step big; one main button in a fixed bottom bar above the system navigation bar
+  ("סיימתי — לשלב הבא", the start action with "כשתלחצו, יתחיל טיימר של …", "מוכן — לשלב הבא" + "צריך עוד זמן (+N דק')"
+  from the plan's re-check time, "כבר מוכן? לשלב הבא" while waiting) and "חזרה"; inline safety check instead of a
+  popup; help only on request; timer controls in a small menu; no estimate badges, status chips or per-action
+  snackbars; "כל השלבים" collapsed with per-step undo.
+- **History:** the detail is a friendly summary (date, status, duration or "פחות מדקה", steps with ✓, notes); the raw
+  action log and the empty "approved changes" placeholder are gone. The finish screen uses the same duration label.
+- **No developer-facing text:** home status card removed (server/AI mode/database version); a silent health request
+  still wakes the server; import loading and error texts reworded (no server/AI-service wording); privacy notice
+  names Google without "Gemini"; Settings test notification renamed "בדיקת התראות". Unused strings removed.
+- **Cold start:** the continue-cooking card shows "…" while loading instead of "אין בישול פעיל כרגע".
+- **Tests (all with fakes, zero Gemini calls):** backend 141/141 (new: stovetop/baked eggs, thermometer stripping,
+  recipe that uses a thermometer, high-risk confirmation, help text); Flutter 123/123, analyzer clean (new:
+  `complete_step_test.dart` 14 tests incl. replay of old sessions; developer-terminology test for import texts).
+  **Intentionally changed tests:** `cooking_flow_test` (one tap per step, explicit timer start, inline safety
+  check, "צריך עוד זמן", history summary), `wait_guidance_ui_test` (new button labels), `widget_test` (home has no
+  server/database/AI text, still pings health once), helpers moved to `test/support/ui_helpers.dart`.
+- **Emulator (Android 15), 2026-10-24:** new build installed over the existing app with data kept; home has no
+  technical text; the Phase 2 session (old per-action events) resumed in the new layout at its oven check, with the
+  inline safety check gating "מוכן — לשלב הבא"; airplane mode on: finished the oven step, started rice (one exact
+  alarm added), "חזרה" cancelled it (alarm removed), finished rest and serving offline; history showed the new
+  summary. Airplane mode turned off again afterwards.
+
+### Phase 3C — limitations and follow-ups
+
+- No live Gemini check of the new prompt rules yet (needs approval, ≤ 2 recipes / ≤ 6 calls). Until then, new plans
+  from Gemini may still contain 2–3 actions per step; the one-button flow handles that.
+- Saved recipes keep their old plan text (e.g. the earlier omelette's thermometer line); "rebuild the plan" is 3A.
+- The review/advanced editing screen still uses technical terms ("מה הוערך", provenance badges): planned for 3A.
+- The cold-start loading state is reviewed in code; no automated test (drift streams can't be held "loading"
+  inside widget tests).
+- The "cooking history changes" and "Android layout fixes" in the 3C approval had no written spec in this project;
+  implemented as: beginner-friendly history summary, and a fixed bottom action bar inside the safe area (Android
+  15 edge-to-edge) with wrapping rows. Adjust if something else was meant.
+
 ## Next step
 
-1. User review of the hardening; approval to commit locally (no push, no deploy yet).
-2. Before any Render deploy, the user (not Claude): set `APP_CLIENT_TOKEN` and check the variables listed in
-   the hand-over; the app is then built with the same `--dart-define=APP_CLIENT_TOKEN=…`.
-3. With approval: first live evaluation (≤ 5 recipes, ≤ 15 Gemini calls, stop on quota errors), after
-   checking the model's limits and remaining usage with the user.
+1. User reviews 3C (phone test list in the final report); approval to commit locally.
+2. With approval: small live check of the new plan rules (≤ 2 recipes, ≤ 6 Gemini calls), then deploy.
+3. Then Phase 3A (only after approval).

@@ -84,6 +84,13 @@ class CookingController extends AsyncNotifier<CookingView> {
   Future<DispatchResult> confirmAction(String stepId, String actionId) =>
       _run((d) => d.confirmAction(stepId, actionId, source: ActionSource.ui));
 
+  /// "סיימתי — לשלב הבא" / "מוכן — לשלב הבא".
+  Future<DispatchResult> completeStep(String stepId) =>
+      _run((d) => d.completeStep(stepId, source: ActionSource.ui));
+
+  /// "חזרה": undo the last tap.
+  Future<DispatchResult> undoLast() => _run((d) => d.undoLast());
+
   Future<DispatchResult> completePrepTask(String id) =>
       _run((d) => d.completePrepTask(id, source: ActionSource.ui));
 

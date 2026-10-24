@@ -43,8 +43,11 @@ Key invariants:
 - Gemini plans; the app executes. Gemini is never in the loop for step progression or timers.
 - Every session change goes through `ActionDispatcher` → append-only `session_events` → `CookingEngine.reduce`.
   State = replay of events. Duplicate actions are no-ops. Timer durations come only from the approved plan.
-- Values carry provenance (`original` / `inferred` / `answered` / `user`); AI estimates show "הערכה" and are
-  never presented as recipe facts.
+- Values carry provenance (`original` / `inferred` / `answered` / `user` / `reference`); AI estimates are never
+  presented as recipe facts. They are labelled "הערכה" where values are reviewed (review, advanced editing, plan
+  view); the cooking screen stays free of technical badges (DECISIONS #45).
+- Beginner UX: one main action per step ("סיימתי — לשלב הבא"), timers start only from an explicit tap, no
+  developer-facing text (server, API, Gemini, database…) anywhere in the UI (DECISIONS #35, #39).
 - Phase 1 works fully offline; the backend is optional for cooking.
 - Local data uses sync-ready columns (UUID ids, `created_at`/`updated_at`, `deleted_at`, nullable `owner_id`).
   No accounts or cloud sync until approved.

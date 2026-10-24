@@ -9,6 +9,7 @@ import '../../data/recipe_repository.dart';
 import '../../data/session_repository.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/cooking_plan.dart';
+import '../cooking/engine/cooking_engine.dart';
 import '../cooking/engine/events.dart';
 import '../cooking/start_cooking.dart';
 import 'history_screen.dart';
@@ -61,49 +62,35 @@ class _DetailView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
     final session = detail.entry.session;
     final recipe = detail.entry.recipe;
-    final plan = detail.plan;
-
-    String? describe(CookingEvent e) => switch (e) {
-          ActionConfirmed(:final stepId, :final actionId) => () {
-              final step = plan.stepById(stepId);
-              final action = step?.actionById(actionId);
-              return step == null || action == null ? null : '${step.title}: ${action.labelHe}';
-            }(),
-          PrepTaskDone(:final prepTaskId) => plan.prepTaskById(prepTaskId)?.textHe,
-          _ => null,
-        };
-
-    final log = [
-      for (final e in detail.events)
-        if (describe(e) case final text?) (e.at, text),
-    ];
+    // A friendly summary rebuilt from the session's events: which steps were done.
+    final state = CookingEngine.replay(detail.plan, detail.events);
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Text(recipe.displayTitle, style: Theme.of(context).textTheme.headlineSmall),
+        Text(recipe.displayTitle, style: theme.textTheme.headlineSmall),
         const SizedBox(height: 4),
-        Text(sessionStatusLabel(l10n, session.status)),
-        Text(l10n.startedAt(formatDateTime(session.startedAt))),
-        if (session.endedAt != null) ...[
-          Text(l10n.endedAt(formatDateTime(session.endedAt!))),
-          Text(l10n.cookingTime(l10n.minutesShort(session.endedAt!.difference(session.startedAt).inMinutes))),
-        ],
+        Text('${formatDateTime(session.startedAt)} · ${sessionStatusLabel(l10n, session.status)}'),
+        if (session.endedAt != null)
+          Text(l10n.cookingTime(cookingDurationLabel(l10n, session.startedAt, session.endedAt!))),
         if (session.notes != null) ...[
           SectionTitle(l10n.notes),
           Text(session.notes!),
         ],
-        SectionTitle(l10n.approvedChanges),
-        Text(l10n.noApprovedChanges),
-        SectionTitle(l10n.actionsLog),
-        for (final (at, text) in log)
+        SectionTitle(l10n.stepsCompletedTitle),
+        for (final step in detail.plan.steps)
           ListTile(
             dense: true,
             contentPadding: EdgeInsets.zero,
-            leading: Text(formatTime(at), textDirection: TextDirection.ltr),
-            title: Text(text),
+            leading: Icon(
+              state.isStepDone(step) ? Icons.check_circle : Icons.radio_button_unchecked,
+              color: state.isStepDone(step) ? theme.colorScheme.primary : theme.disabledColor,
+            ),
+            title: Text(step.title),
+            subtitle: state.isStepDone(step) ? null : Text(l10n.stepNotDone),
           ),
         const SizedBox(height: 16),
         if (session.status == SessionStatus.inProgress)

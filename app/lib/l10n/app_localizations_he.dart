@@ -37,36 +37,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get noActiveSession => 'אין בישול פעיל כרגע';
 
   @override
-  String get backendConnecting => 'מתחבר לשרת…';
-
-  @override
-  String get backendWakingUp => 'השרת מתעורר… זה יכול לקחת עד דקה';
-
-  @override
-  String get backendOk => 'השרת מחובר ✓';
-
-  @override
-  String get aiModeDemo => 'מצב הדגמה (ללא בינה מלאכותית)';
-
-  @override
-  String get aiModeLive => 'בינה מלאכותית מחוברת';
-
-  @override
-  String get aiModeUnknown => 'מצב בינה מלאכותית לא ידוע';
-
-  @override
-  String get backendOffline => 'אין חיבור לשרת';
-
-  @override
-  String get offlineCookingNote => 'אפשר לבשל גם בלי חיבור';
-
-  @override
   String get retry => 'נסו שוב';
-
-  @override
-  String databaseReady(int version) {
-    return 'מסד הנתונים מוכן (גרסה $version)';
-  }
 
   @override
   String get errorGeneric => 'משהו השתבש. נסו שוב.';
@@ -186,9 +157,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get noPlan => 'אין תוכנית בישול למתכון הזה';
 
   @override
-  String get planActions => 'תאשרו בזמן הבישול:';
-
-  @override
   String get activeSessionTitle => 'כבר יש בישול פעיל';
 
   @override
@@ -221,19 +189,6 @@ class AppLocalizationsHe extends AppLocalizations {
   }
 
   @override
-  String get nowLabel => 'עכשיו';
-
-  @override
-  String waitingForTimer(String label) {
-    return 'ממתינים לטיימר: $label';
-  }
-
-  @override
-  String startsTimer(String label, String duration) {
-    return 'יפעיל טיימר: $label ($duration)';
-  }
-
-  @override
   String get meanwhileTitle => 'בינתיים אפשר';
 
   @override
@@ -243,38 +198,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get allSteps => 'כל השלבים';
 
   @override
-  String get stepLocked => 'ממתין לשלבים קודמים';
-
-  @override
-  String get stepReady => 'מוכן להתחלה';
-
-  @override
-  String get stepInProgress => 'בתהליך';
-
-  @override
-  String get stepWaiting => 'ממתין לטיימר';
-
-  @override
-  String get stepDone => 'הושלם';
-
-  @override
   String get undoLastAction => 'ביטול הפעולה האחרונה';
-
-  @override
-  String actionDone(String label) {
-    return '✓ $label';
-  }
-
-  @override
-  String actionDoneWithTimer(String label, String timer, String duration) {
-    return '✓ $label · טיימר $timer הופעל ($duration)';
-  }
-
-  @override
-  String get actionAlreadyDone => 'זה כבר סומן כבוצע';
-
-  @override
-  String get actionNotAvailable => 'אי אפשר לבצע את זה עכשיו';
 
   @override
   String get undoNotAllowed => 'אי אפשר לבטל — כבר התחלתם שלב שתלוי בזה';
@@ -293,11 +217,6 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String rangeUntil(String time) {
     return 'טווח הזמן: עד $time';
-  }
-
-  @override
-  String recheckIn(int minutes) {
-    return 'עוד לא — לבדוק שוב בעוד $minutes דק\'';
   }
 
   @override
@@ -384,22 +303,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get dismissTimer => 'סגירת הטיימר';
 
   @override
-  String confirmActionTitle(String label) {
-    return '$label?';
-  }
-
-  @override
-  String get confirmCheck => 'לפני שממשיכים, בדקו:';
-
-  @override
-  String confirmYes(String label) {
-    return 'כן, $label';
-  }
-
-  @override
-  String get confirmNotYet => 'עוד לא';
-
-  @override
   String get allStepsDone => 'כל השלבים הושלמו! 🎉';
 
   @override
@@ -467,15 +370,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get notes => 'הערות';
 
   @override
-  String get actionsLog => 'מה עשיתם';
-
-  @override
-  String get approvedChanges => 'שינויים שאושרו בתוכנית';
-
-  @override
-  String get noApprovedChanges => 'לא בוצעו שינויים בתוכנית';
-
-  @override
   String get cookAgain => 'לבשל שוב';
 
   @override
@@ -518,10 +412,10 @@ class AppLocalizationsHe extends AppLocalizations {
       'בטלפונים של שיאומי, סמסונג, וואווי ו-וואן פלוס יש לפעמים הגבלות נוספות. אם טיימר לא התריע, ודאו בהגדרות הסוללה של הטלפון שהאפליקציה מורשית לפעול ברקע.';
 
   @override
-  String get testNotification => 'שליחת התראת בדיקה (בעוד 10 שניות)';
+  String get testNotification => 'בדיקת התראות (תגיע בעוד 10 שניות)';
 
   @override
-  String get testNotificationScheduled => 'התראת בדיקה תגיע בעוד 10 שניות';
+  String get testNotificationScheduled => 'התראת הבדיקה תגיע בעוד 10 שניות';
 
   @override
   String serverAddress(String url) {
@@ -569,13 +463,13 @@ class AppLocalizationsHe extends AppLocalizations {
   String get importAnalyze => 'ניתוח המתכון';
 
   @override
-  String get importStageReading => 'קוראים את המתכון…';
+  String get importStageReading => 'בודקים את המצרכים וההוראות…';
 
   @override
-  String get importStagePlanning => 'בונים תוכנית בישול…';
+  String get importStagePlanning => 'מסדרים לך את שלבי הבישול…';
 
   @override
-  String get importStageSlow => 'זה לוקח קצת זמן — ייתכן שהשרת מתעורר.';
+  String get importStageSlow => 'זה לוקח קצת יותר זמן מהרגיל…';
 
   @override
   String get importDuplicateTitle => 'המתכון כבר יובא';
@@ -599,16 +493,13 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get privacyBody =>
-      'כדי לנתח את המתכון, הטקסט, הקישור או התמונה נשלחים לשירות בינה מלאכותית (Gemini של Google). בגרסה החינמית של השירות Google עשויה להשתמש במידע לשיפור המוצרים שלה. אל תשלחו מידע אישי. התמונה נשמרת במכשיר רק עד שתאשרו את התוכנית.';
+      'כדי להכין את המתכון, הטקסט, הקישור או התמונה נשלחים לשירות בינה מלאכותית של Google. בשירות החינמי Google עשויה להשתמש במידע לשיפור המוצרים שלה. אל תשלחו מידע אישי. התמונה נשמרת במכשיר רק עד שתאשרו את התוכנית.';
 
   @override
   String get privacyAccept => 'הבנתי, להמשיך';
 
   @override
   String get draftsTitle => 'ייבואים שלא הושלמו';
-
-  @override
-  String get draftResume => 'להמשיך';
 
   @override
   String get draftDiscard => 'מחיקה';
@@ -679,9 +570,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get reviewCancelImport => 'ביטול הייבוא';
 
   @override
-  String get reviewSave => 'שמירת השינויים';
-
-  @override
   String get reviewOutdatedTitle => 'התוכנית לא מעודכנת לשינויים במתכון';
 
   @override
@@ -693,9 +581,6 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get reviewStillCorrect => 'בדקתי — התוכנית נכונה';
-
-  @override
-  String get provenanceInferred => 'הערכה';
 
   @override
   String get provenanceAnswered => 'לפי תשובתך';
@@ -738,28 +623,18 @@ class AppLocalizationsHe extends AppLocalizations {
       'התוכנית לא מעודכנת לשינויים במתכון. ערכו אותה או צרו אותה מחדש לפני הבישול.';
 
   @override
-  String rangeMinutes(int from, int to) {
-    return '$from–$to דק\'';
-  }
-
-  @override
-  String minutesValue(int minutes) {
-    return '$minutes דק\'';
-  }
-
-  @override
   String get errOffline =>
       'אין חיבור לאינטרנט. ייבוא מתכון חדש דורש חיבור; בישול של מתכון שמור עובד גם בלי.';
 
   @override
-  String get errTimeout => 'השרת לא הגיב בזמן. נסו שוב בעוד רגע.';
+  String get errTimeout => 'זה לקח יותר מדי זמן. נסו שוב בעוד רגע.';
 
   @override
   String get errRateLimited => 'הגעתם למגבלת הייבוא לשעה. נסו שוב מאוחר יותר.';
 
   @override
   String get errAiBusy =>
-      'ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
+      'הכנת מתכונים חדשים לא זמינה כרגע בגלל עומס זמני. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
 
   @override
   String get errDailyLimit =>
@@ -797,23 +672,24 @@ class AppLocalizationsHe extends AppLocalizations {
       'לא הצלחנו לבנות תוכנית אמינה מהמתכון הזה. נסו שוב, או נסחו את המתכון בבירור.';
 
   @override
-  String get errNotConfigured => 'השרת עדיין לא מוגדר לייבוא מתכונים.';
+  String get errNotConfigured =>
+      'ייבוא מתכונים לא זמין כרגע. נסו שוב מאוחר יותר.';
 
   @override
   String get errGeneric => 'משהו השתבש בייבוא. נסו שוב.';
 
   @override
   String errAiBusyRetryIn(int minutes) {
-    return 'ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. אפשר לנסות שוב בעוד כ-$minutes דק\'. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
+    return 'הכנת מתכונים חדשים לא זמינה כרגע בגלל עומס זמני. אפשר לנסות שוב בעוד כ-$minutes דק\'. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
   }
 
   @override
   String get errAiQuota =>
-      'מכסת השימוש היומית בשירות הבינה המלאכותית נוצלה, ולכן ייבוא מתכונים חדשים לא זמין כרגע. נסו שוב מאוחר יותר. מה שהזנתם נשמר, והמתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
+      'הכנת מתכונים חדשים לא זמינה כרגע, כי הגענו למכסת השימוש היומית. נסו שוב מאוחר יותר. מה שהזנתם נשמר, והמתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
 
   @override
   String get errAiUnavailable =>
-      'שירות הבינה המלאכותית לא זמין כרגע. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
+      'הכנת מתכונים חדשים לא זמינה כרגע. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
 
   @override
   String get importRetry => 'נסו שוב';
@@ -824,4 +700,61 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get importPlanFailedNote =>
       'המתכון נקרא ונשמר. אפשר לנסות שוב לבנות את התוכנית בלי לקרוא אותו מחדש.';
+
+  @override
+  String get stepPrimaryNext => 'סיימתי — לשלב הבא';
+
+  @override
+  String get stepPrimaryLast => 'סיימתי';
+
+  @override
+  String get stepPrimaryReady => 'מוכן — לשלב הבא';
+
+  @override
+  String get stepPrimaryReadyLast => 'מוכן';
+
+  @override
+  String stepNeedMoreTime(int minutes) {
+    return 'צריך עוד זמן (+$minutes דק\')';
+  }
+
+  @override
+  String get stepReadyEarly => 'כבר מוכן? לשלב הבא';
+
+  @override
+  String stepStartsTimer(String duration) {
+    return 'כשתלחצו, יתחיל טיימר של $duration';
+  }
+
+  @override
+  String get stepHelp => 'עזרה בשלב הזה';
+
+  @override
+  String get stepHideHelp => 'הסתרת העזרה';
+
+  @override
+  String safetyCheckLabel(String cue) {
+    return 'בדקתי: $cue';
+  }
+
+  @override
+  String get safetyCheckGeneric => 'בדקתי שהמנה מוכנה';
+
+  @override
+  String get backButton => 'חזרה';
+
+  @override
+  String get timerOptions => 'אפשרויות טיימר';
+
+  @override
+  String get stepsCompletedTitle => 'השלבים';
+
+  @override
+  String get stepNotDone => 'לא הושלם';
+
+  @override
+  String get durationUnderMinute => 'פחות מדקה';
+
+  @override
+  String get loadingShort => '…';
 }

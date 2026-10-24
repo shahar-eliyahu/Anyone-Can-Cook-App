@@ -85,13 +85,55 @@ async def plan_recipe(
     raise ApiError(502, "invalid_ai_output", f"plan failed validation ({len(problems)} problems)")
 
 
+def _mentions_thermometer(text: str | None) -> bool:
+    low = (text or "").lower()
+    return "מדחום" in low or "thermometer" in low
+
+
+def _apply_safety(step: dict, ref, source_mentions_thermometer: bool) -> None:
+    """Practical guidance (docs/DECISIONS.md #37, #38).
+
+    High-risk foods (poultry, ground meat): one short warning line, the doneness cue,
+    and the cook confirms doneness (`always_ask`). Other safety-tagged foods: an
+    observable cue only, no warning and no forced confirmation. Steps that are not
+    high-risk never get a thermometer requirement the recipe itself doesn't mention:
+    such lines added by the model are dropped, and a cue that relies on one is replaced
+    by the reference's observable cue.
+    """
+    high_risk = ref is not None and ref.high_risk
+    if not high_risk and not source_mentions_thermometer:
+        step["warnings_he"] = [w for w in step.get("warnings_he", []) if not _mentions_thermometer(w)]
+        cue = step.get("doneness_cue_he")
+        if cue and _mentions_thermometer(cue):
+            if ref is not None:
+                step["doneness_cue_he"] = ref.check_cue_he
+            else:
+                step.pop("doneness_cue_he")
+    if ref is None:
+        return
+    if high_risk:
+        step["warnings_he"] = list(dict.fromkeys([*step.get("warnings_he", []), ref.check_cue_he]))
+        step.setdefault("doneness_cue_he", ref.check_cue_he)
+        for a in step["actions"]:
+            if a.get("completes_step"):
+                a["confirm_policy"] = "always_ask"
+    else:
+        step.setdefault("doneness_cue_he", ref.check_cue_he)
+
+
 def _prompt_data(analysis: RecipeAnalysis, facts: list[gap_resolution.Fact]) -> str:
     recipe = json.dumps(analysis.recipe.model_dump(mode="json"), ensure_ascii=False)
     fact_list = [
         {"field": f.field, "status": f.status, "value_he": f.value_he, "note_he": f.note_he} for f in facts
     ]
     refs = [
-        {"food": r.food, "min_internal_c": r.min_internal_c, "rest_minutes": r.rest_minutes, "check_cue_he": r.check_cue_he}
+        {
+            "food": r.food,
+            "min_internal_c": r.min_internal_c,
+            "rest_minutes": r.rest_minutes,
+            "check_cue_he": r.check_cue_he,
+            "high_risk": r.high_risk,
+        }
         for r in REFERENCES.values()
     ]
     return (
@@ -149,6 +191,7 @@ def _plan_from(llm: LlmPlan, analysis: RecipeAnalysis) -> tuple[CookingPlan, lis
         ]
         return d
 
+    source_mentions_thermometer = _mentions_thermometer(source)
     steps: list[dict] = []
     for s in llm.steps:
         d = s.model_dump(exclude_none=True, exclude={"safety_food"})
@@ -169,7 +212,7 @@ def _plan_from(llm: LlmPlan, analysis: RecipeAnalysis) -> tuple[CookingPlan, lis
             temp = d["temperature"]
             prov = s.temperature.provenance
             if prov == "reference":
-                valid = {r.min_internal_c for r in REFERENCES.values()}
+                valid = {r.min_internal_c for r in REFERENCES.values() if r.min_internal_c is not None}
                 temp["provenance"] = "reference" if s.temperature.value in valid else "inferred"
             else:
                 temp["provenance"] = check_prov(
@@ -178,14 +221,7 @@ def _plan_from(llm: LlmPlan, analysis: RecipeAnalysis) -> tuple[CookingPlan, lis
         for key in ("estimated_active_minutes",):
             if key in d and d[key]["provenance"] == "original" and not states_duration(source, d[key]["value"] * 60):
                 d[key]["provenance"] = "inferred"
-        ref = reference_for(s.safety_food)
-        if ref is not None:
-            # Safety steps: a thermometer/doneness check, and the cook always confirms.
-            d["warnings_he"] = list(dict.fromkeys([*d.get("warnings_he", []), ref.check_cue_he]))
-            d.setdefault("doneness_cue_he", ref.check_cue_he)
-            for a in d["actions"]:
-                if a.get("completes_step"):
-                    a["confirm_policy"] = "always_ask"
+        _apply_safety(d, reference_for(s.safety_food), source_mentions_thermometer)
         steps.append(d)
 
     prep_tasks = []

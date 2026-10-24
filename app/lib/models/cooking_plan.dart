@@ -132,6 +132,9 @@ abstract class PlanStep with _$PlanStep {
     @Default([]) List<PlanTimer> timers,
     Temperature? temperature,
     String? donenessCueHe,
+
+    /// Short help shown only on request ("עזרה").
+    String? helpHe,
     @Default([]) List<String> warningsHe,
     Minutes? estimatedActiveMinutes,
   }) = _PlanStep;

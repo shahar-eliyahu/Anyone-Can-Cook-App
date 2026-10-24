@@ -138,6 +138,47 @@ class PrepTaskView {
 
 enum NotificationKind { check, rangeEnd, prepReminder }
 
+/// One thing the cook did, in order: an action of a step or a finished prep
+/// task. Actions confirmed by one tap share the same [at]; "חזרה" undoes a tap.
+class TapEntry {
+  const TapEntry({required this.at, this.stepId, this.actionId, this.prepTaskId});
+  final DateTime at;
+  final String? stepId;
+  final String? actionId;
+  final String? prepTaskId;
+}
+
+enum PrimaryKind {
+  /// The next action starts a timer: the cook taps it when the real-world wait
+  /// begins ("הכנסתי לתנור").
+  startTimer,
+
+  /// Waiting for the step's timer.
+  waiting,
+
+  /// The step's timer reached its check time: "מוכן — לשלב הבא" or more time.
+  checkDue,
+
+  /// An ordinary step: "סיימתי — לשלב הבא".
+  next,
+}
+
+/// The single main thing the cook can do for a step right now.
+class StepPrimary {
+  const StepPrimary(this.kind, {this.action, this.timer, this.needsSafetyCheck = false});
+  final PrimaryKind kind;
+
+  /// For [PrimaryKind.startTimer]: the action that starts the timer.
+  final AvailableAction? action;
+
+  /// For [PrimaryKind.waiting] and [PrimaryKind.checkDue].
+  final TimerState? timer;
+
+  /// Finishing the step confirms an action that needs the cook's explicit
+  /// check (`confirm_policy: always_ask`, high-risk food).
+  final bool needsSafetyCheck;
+}
+
 /// A notification that should be scheduled for the current state.
 class PlannedNotification {
   const PlannedNotification({
@@ -207,6 +248,7 @@ class CookingState {
     this.prepDone = const {},
     this.timers = const {},
     this.proposalIds = const {},
+    this.log = const [],
   });
 
   final CookingPlan plan;
@@ -220,12 +262,16 @@ class CookingState {
   /// Agent proposal ids already applied (duplicate protection).
   final Set<String> proposalIds;
 
+  /// What the cook did, in order (rebuilt by replay; nothing new is stored).
+  final List<TapEntry> log;
+
   CookingState copyWith({
     DateTime? startedAt,
     Map<String, List<String>>? confirmed,
     Set<String>? prepDone,
     Map<String, TimerState>? timers,
     Set<String>? proposalIds,
+    List<TapEntry>? log,
   }) =>
       CookingState(
         plan: plan,
@@ -234,6 +280,7 @@ class CookingState {
         prepDone: prepDone ?? this.prepDone,
         timers: timers ?? this.timers,
         proposalIds: proposalIds ?? this.proposalIds,
+        log: log ?? this.log,
       );
 
   // ---- Derived views -------------------------------------------------------
@@ -277,6 +324,57 @@ class CookingState {
     final timer =
         action.startsTimer == null ? null : plan.timersById[action.startsTimer];
     return AvailableAction(step, action, timer);
+  }
+
+  /// The actions "סיימתי — לשלב הבא" would confirm for [step]: the remaining
+  /// ones, stopping before an action that starts a timer not yet running (timers
+  /// start only when the cook says the real-world wait began).
+  List<StepAction> actionsToFinish(PlanStep step) {
+    final result = <StepAction>[];
+    for (final a in step.actions.skip(confirmedIn(step.id).length)) {
+      if (a.startsTimer != null && !timers.containsKey(a.startsTimer)) break;
+      result.add(a);
+      if (a.completesStep) break;
+    }
+    return result;
+  }
+
+  /// The single main action for [step] now, or null when it is locked or done.
+  StepPrimary? primaryFor(PlanStep step, DateTime now) {
+    final status = statusOf(step, now);
+    if (status == StepStatus.locked || status == StepStatus.done) return null;
+    final stepTimers = [
+      for (final t in timers.values)
+        if (t.stepId == step.id && t.isActive) t,
+    ];
+    final pending = stepTimers.where((t) => t.isPending(now)).toList()
+      ..sort((a, b) => a.remaining(now).compareTo(b.remaining(now)));
+    final safety = actionsToFinish(step).any((a) => a.confirmPolicy == ConfirmPolicy.alwaysAsk);
+    if (pending.isNotEmpty) {
+      return StepPrimary(PrimaryKind.waiting, timer: pending.first, needsSafetyCheck: safety);
+    }
+    final next = availableActionFor(step.id, now);
+    if (next == null) return null;
+    final startsTimer = next.action.startsTimer;
+    if (startsTimer != null && !timers.containsKey(startsTimer)) {
+      return StepPrimary(PrimaryKind.startTimer, action: next);
+    }
+    final due = stepTimers.where((t) => t.isFinished(now)).toList();
+    if (due.isNotEmpty) {
+      return StepPrimary(PrimaryKind.checkDue, timer: due.first, needsSafetyCheck: safety);
+    }
+    return StepPrimary(PrimaryKind.next, needsSafetyCheck: safety);
+  }
+
+  /// The actions of the cook's last tap (same moment, same step), or the last
+  /// finished prep task: what "חזרה" undoes.
+  List<TapEntry> lastTap() {
+    if (log.isEmpty) return const [];
+    final last = log.last;
+    if (last.prepTaskId != null) return [last];
+    return [
+      for (final e in log.reversed.takeWhile((e) => e.stepId == last.stepId && e.at == last.at)) e,
+    ];
   }
 
   /// Every action that can be confirmed right now, in plan order.
@@ -570,6 +668,7 @@ abstract final class CookingEngine {
             confirmed: {...s.confirmed, stepId: [...s.confirmedIn(stepId), actionId]},
             timers: timers,
             proposalIds: _withProposal(s.proposalIds, event.proposalId),
+            log: [...s.log, TapEntry(at: at, stepId: stepId, actionId: actionId)],
           ),
           effects,
         );
@@ -589,6 +688,7 @@ abstract final class CookingEngine {
             prepDone: {...s.prepDone, prepTaskId},
             timers: timers,
             proposalIds: _withProposal(s.proposalIds, event.proposalId),
+            log: [...s.log, TapEntry(at: at, prepTaskId: prepTaskId)],
           ),
           effects,
         );
@@ -602,7 +702,11 @@ abstract final class CookingEngine {
           effects.add(CancelTimerNotification(task.timer!.id));
         }
         return ReduceResult(
-          s.copyWith(prepDone: {...s.prepDone}..remove(prepTaskId), timers: timers),
+          s.copyWith(
+            prepDone: {...s.prepDone}..remove(prepTaskId),
+            timers: timers,
+            log: [for (final e in s.log) if (e.prepTaskId != prepTaskId) e],
+          ),
           effects,
         );
 
@@ -617,10 +721,12 @@ abstract final class CookingEngine {
         if (timerId != null && timers.remove(timerId) != null) {
           effects.add(CancelTimerNotification(timerId));
         }
+        final undone = s.log.lastIndexWhere((e) => e.stepId == stepId && e.actionId == done.last);
         return ReduceResult(
           s.copyWith(
             confirmed: {...s.confirmed, stepId: done.sublist(0, done.length - 1)},
             timers: timers,
+            log: undone < 0 ? s.log : ([...s.log]..removeAt(undone)),
           ),
           effects,
         );

@@ -148,65 +148,11 @@ abstract class AppLocalizations {
   /// **'אין בישול פעיל כרגע'**
   String get noActiveSession;
 
-  /// No description provided for @backendConnecting.
-  ///
-  /// In he, this message translates to:
-  /// **'מתחבר לשרת…'**
-  String get backendConnecting;
-
-  /// No description provided for @backendWakingUp.
-  ///
-  /// In he, this message translates to:
-  /// **'השרת מתעורר… זה יכול לקחת עד דקה'**
-  String get backendWakingUp;
-
-  /// No description provided for @backendOk.
-  ///
-  /// In he, this message translates to:
-  /// **'השרת מחובר ✓'**
-  String get backendOk;
-
-  /// No description provided for @aiModeDemo.
-  ///
-  /// In he, this message translates to:
-  /// **'מצב הדגמה (ללא בינה מלאכותית)'**
-  String get aiModeDemo;
-
-  /// No description provided for @aiModeLive.
-  ///
-  /// In he, this message translates to:
-  /// **'בינה מלאכותית מחוברת'**
-  String get aiModeLive;
-
-  /// No description provided for @aiModeUnknown.
-  ///
-  /// In he, this message translates to:
-  /// **'מצב בינה מלאכותית לא ידוע'**
-  String get aiModeUnknown;
-
-  /// No description provided for @backendOffline.
-  ///
-  /// In he, this message translates to:
-  /// **'אין חיבור לשרת'**
-  String get backendOffline;
-
-  /// No description provided for @offlineCookingNote.
-  ///
-  /// In he, this message translates to:
-  /// **'אפשר לבשל גם בלי חיבור'**
-  String get offlineCookingNote;
-
   /// No description provided for @retry.
   ///
   /// In he, this message translates to:
   /// **'נסו שוב'**
   String get retry;
-
-  /// No description provided for @databaseReady.
-  ///
-  /// In he, this message translates to:
-  /// **'מסד הנתונים מוכן (גרסה {version})'**
-  String databaseReady(int version);
 
   /// No description provided for @errorGeneric.
   ///
@@ -418,12 +364,6 @@ abstract class AppLocalizations {
   /// **'אין תוכנית בישול למתכון הזה'**
   String get noPlan;
 
-  /// No description provided for @planActions.
-  ///
-  /// In he, this message translates to:
-  /// **'תאשרו בזמן הבישול:'**
-  String get planActions;
-
   /// No description provided for @activeSessionTitle.
   ///
   /// In he, this message translates to:
@@ -478,24 +418,6 @@ abstract class AppLocalizations {
   /// **'{done} מתוך {total} שלבים הושלמו'**
   String cookingProgress(int done, int total);
 
-  /// No description provided for @nowLabel.
-  ///
-  /// In he, this message translates to:
-  /// **'עכשיו'**
-  String get nowLabel;
-
-  /// No description provided for @waitingForTimer.
-  ///
-  /// In he, this message translates to:
-  /// **'ממתינים לטיימר: {label}'**
-  String waitingForTimer(String label);
-
-  /// No description provided for @startsTimer.
-  ///
-  /// In he, this message translates to:
-  /// **'יפעיל טיימר: {label} ({duration})'**
-  String startsTimer(String label, String duration);
-
   /// No description provided for @meanwhileTitle.
   ///
   /// In he, this message translates to:
@@ -514,65 +436,11 @@ abstract class AppLocalizations {
   /// **'כל השלבים'**
   String get allSteps;
 
-  /// No description provided for @stepLocked.
-  ///
-  /// In he, this message translates to:
-  /// **'ממתין לשלבים קודמים'**
-  String get stepLocked;
-
-  /// No description provided for @stepReady.
-  ///
-  /// In he, this message translates to:
-  /// **'מוכן להתחלה'**
-  String get stepReady;
-
-  /// No description provided for @stepInProgress.
-  ///
-  /// In he, this message translates to:
-  /// **'בתהליך'**
-  String get stepInProgress;
-
-  /// No description provided for @stepWaiting.
-  ///
-  /// In he, this message translates to:
-  /// **'ממתין לטיימר'**
-  String get stepWaiting;
-
-  /// No description provided for @stepDone.
-  ///
-  /// In he, this message translates to:
-  /// **'הושלם'**
-  String get stepDone;
-
   /// No description provided for @undoLastAction.
   ///
   /// In he, this message translates to:
   /// **'ביטול הפעולה האחרונה'**
   String get undoLastAction;
-
-  /// No description provided for @actionDone.
-  ///
-  /// In he, this message translates to:
-  /// **'✓ {label}'**
-  String actionDone(String label);
-
-  /// No description provided for @actionDoneWithTimer.
-  ///
-  /// In he, this message translates to:
-  /// **'✓ {label} · טיימר {timer} הופעל ({duration})'**
-  String actionDoneWithTimer(String label, String timer, String duration);
-
-  /// No description provided for @actionAlreadyDone.
-  ///
-  /// In he, this message translates to:
-  /// **'זה כבר סומן כבוצע'**
-  String get actionAlreadyDone;
-
-  /// No description provided for @actionNotAvailable.
-  ///
-  /// In he, this message translates to:
-  /// **'אי אפשר לבצע את זה עכשיו'**
-  String get actionNotAvailable;
 
   /// No description provided for @undoNotAllowed.
   ///
@@ -603,12 +471,6 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'טווח הזמן: עד {time}'**
   String rangeUntil(String time);
-
-  /// No description provided for @recheckIn.
-  ///
-  /// In he, this message translates to:
-  /// **'עוד לא — לבדוק שוב בעוד {minutes} דק\''**
-  String recheckIn(int minutes);
 
   /// No description provided for @removeMinute.
   ///
@@ -742,30 +604,6 @@ abstract class AppLocalizations {
   /// **'סגירת הטיימר'**
   String get dismissTimer;
 
-  /// No description provided for @confirmActionTitle.
-  ///
-  /// In he, this message translates to:
-  /// **'{label}?'**
-  String confirmActionTitle(String label);
-
-  /// No description provided for @confirmCheck.
-  ///
-  /// In he, this message translates to:
-  /// **'לפני שממשיכים, בדקו:'**
-  String get confirmCheck;
-
-  /// No description provided for @confirmYes.
-  ///
-  /// In he, this message translates to:
-  /// **'כן, {label}'**
-  String confirmYes(String label);
-
-  /// No description provided for @confirmNotYet.
-  ///
-  /// In he, this message translates to:
-  /// **'עוד לא'**
-  String get confirmNotYet;
-
   /// No description provided for @allStepsDone.
   ///
   /// In he, this message translates to:
@@ -880,24 +718,6 @@ abstract class AppLocalizations {
   /// **'הערות'**
   String get notes;
 
-  /// No description provided for @actionsLog.
-  ///
-  /// In he, this message translates to:
-  /// **'מה עשיתם'**
-  String get actionsLog;
-
-  /// No description provided for @approvedChanges.
-  ///
-  /// In he, this message translates to:
-  /// **'שינויים שאושרו בתוכנית'**
-  String get approvedChanges;
-
-  /// No description provided for @noApprovedChanges.
-  ///
-  /// In he, this message translates to:
-  /// **'לא בוצעו שינויים בתוכנית'**
-  String get noApprovedChanges;
-
   /// No description provided for @cookAgain.
   ///
   /// In he, this message translates to:
@@ -979,13 +799,13 @@ abstract class AppLocalizations {
   /// No description provided for @testNotification.
   ///
   /// In he, this message translates to:
-  /// **'שליחת התראת בדיקה (בעוד 10 שניות)'**
+  /// **'בדיקת התראות (תגיע בעוד 10 שניות)'**
   String get testNotification;
 
   /// No description provided for @testNotificationScheduled.
   ///
   /// In he, this message translates to:
-  /// **'התראת בדיקה תגיע בעוד 10 שניות'**
+  /// **'התראת הבדיקה תגיע בעוד 10 שניות'**
   String get testNotificationScheduled;
 
   /// No description provided for @serverAddress.
@@ -1075,19 +895,19 @@ abstract class AppLocalizations {
   /// No description provided for @importStageReading.
   ///
   /// In he, this message translates to:
-  /// **'קוראים את המתכון…'**
+  /// **'בודקים את המצרכים וההוראות…'**
   String get importStageReading;
 
   /// No description provided for @importStagePlanning.
   ///
   /// In he, this message translates to:
-  /// **'בונים תוכנית בישול…'**
+  /// **'מסדרים לך את שלבי הבישול…'**
   String get importStagePlanning;
 
   /// No description provided for @importStageSlow.
   ///
   /// In he, this message translates to:
-  /// **'זה לוקח קצת זמן — ייתכן שהשרת מתעורר.'**
+  /// **'זה לוקח קצת יותר זמן מהרגיל…'**
   String get importStageSlow;
 
   /// No description provided for @importDuplicateTitle.
@@ -1129,7 +949,7 @@ abstract class AppLocalizations {
   /// No description provided for @privacyBody.
   ///
   /// In he, this message translates to:
-  /// **'כדי לנתח את המתכון, הטקסט, הקישור או התמונה נשלחים לשירות בינה מלאכותית (Gemini של Google). בגרסה החינמית של השירות Google עשויה להשתמש במידע לשיפור המוצרים שלה. אל תשלחו מידע אישי. התמונה נשמרת במכשיר רק עד שתאשרו את התוכנית.'**
+  /// **'כדי להכין את המתכון, הטקסט, הקישור או התמונה נשלחים לשירות בינה מלאכותית של Google. בשירות החינמי Google עשויה להשתמש במידע לשיפור המוצרים שלה. אל תשלחו מידע אישי. התמונה נשמרת במכשיר רק עד שתאשרו את התוכנית.'**
   String get privacyBody;
 
   /// No description provided for @privacyAccept.
@@ -1143,12 +963,6 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'ייבואים שלא הושלמו'**
   String get draftsTitle;
-
-  /// No description provided for @draftResume.
-  ///
-  /// In he, this message translates to:
-  /// **'להמשיך'**
-  String get draftResume;
 
   /// No description provided for @draftDiscard.
   ///
@@ -1276,12 +1090,6 @@ abstract class AppLocalizations {
   /// **'ביטול הייבוא'**
   String get reviewCancelImport;
 
-  /// No description provided for @reviewSave.
-  ///
-  /// In he, this message translates to:
-  /// **'שמירת השינויים'**
-  String get reviewSave;
-
   /// No description provided for @reviewOutdatedTitle.
   ///
   /// In he, this message translates to:
@@ -1305,12 +1113,6 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'בדקתי — התוכנית נכונה'**
   String get reviewStillCorrect;
-
-  /// No description provided for @provenanceInferred.
-  ///
-  /// In he, this message translates to:
-  /// **'הערכה'**
-  String get provenanceInferred;
 
   /// No description provided for @provenanceAnswered.
   ///
@@ -1390,18 +1192,6 @@ abstract class AppLocalizations {
   /// **'התוכנית לא מעודכנת לשינויים במתכון. ערכו אותה או צרו אותה מחדש לפני הבישול.'**
   String get recipeOutdatedBanner;
 
-  /// No description provided for @rangeMinutes.
-  ///
-  /// In he, this message translates to:
-  /// **'{from}–{to} דק\''**
-  String rangeMinutes(int from, int to);
-
-  /// No description provided for @minutesValue.
-  ///
-  /// In he, this message translates to:
-  /// **'{minutes} דק\''**
-  String minutesValue(int minutes);
-
   /// No description provided for @errOffline.
   ///
   /// In he, this message translates to:
@@ -1411,7 +1201,7 @@ abstract class AppLocalizations {
   /// No description provided for @errTimeout.
   ///
   /// In he, this message translates to:
-  /// **'השרת לא הגיב בזמן. נסו שוב בעוד רגע.'**
+  /// **'זה לקח יותר מדי זמן. נסו שוב בעוד רגע.'**
   String get errTimeout;
 
   /// No description provided for @errRateLimited.
@@ -1423,7 +1213,7 @@ abstract class AppLocalizations {
   /// No description provided for @errAiBusy.
   ///
   /// In he, this message translates to:
-  /// **'ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
+  /// **'הכנת מתכונים חדשים לא זמינה כרגע בגלל עומס זמני. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
   String get errAiBusy;
 
   /// No description provided for @errDailyLimit.
@@ -1483,7 +1273,7 @@ abstract class AppLocalizations {
   /// No description provided for @errNotConfigured.
   ///
   /// In he, this message translates to:
-  /// **'השרת עדיין לא מוגדר לייבוא מתכונים.'**
+  /// **'ייבוא מתכונים לא זמין כרגע. נסו שוב מאוחר יותר.'**
   String get errNotConfigured;
 
   /// No description provided for @errGeneric.
@@ -1495,19 +1285,19 @@ abstract class AppLocalizations {
   /// No description provided for @errAiBusyRetryIn.
   ///
   /// In he, this message translates to:
-  /// **'ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. אפשר לנסות שוב בעוד כ-{minutes} דק\'. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
+  /// **'הכנת מתכונים חדשים לא זמינה כרגע בגלל עומס זמני. אפשר לנסות שוב בעוד כ-{minutes} דק\'. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
   String errAiBusyRetryIn(int minutes);
 
   /// No description provided for @errAiQuota.
   ///
   /// In he, this message translates to:
-  /// **'מכסת השימוש היומית בשירות הבינה המלאכותית נוצלה, ולכן ייבוא מתכונים חדשים לא זמין כרגע. נסו שוב מאוחר יותר. מה שהזנתם נשמר, והמתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
+  /// **'הכנת מתכונים חדשים לא זמינה כרגע, כי הגענו למכסת השימוש היומית. נסו שוב מאוחר יותר. מה שהזנתם נשמר, והמתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
   String get errAiQuota;
 
   /// No description provided for @errAiUnavailable.
   ///
   /// In he, this message translates to:
-  /// **'שירות הבינה המלאכותית לא זמין כרגע. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
+  /// **'הכנת מתכונים חדשים לא זמינה כרגע. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
   String get errAiUnavailable;
 
   /// No description provided for @importRetry.
@@ -1527,6 +1317,108 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'המתכון נקרא ונשמר. אפשר לנסות שוב לבנות את התוכנית בלי לקרוא אותו מחדש.'**
   String get importPlanFailedNote;
+
+  /// No description provided for @stepPrimaryNext.
+  ///
+  /// In he, this message translates to:
+  /// **'סיימתי — לשלב הבא'**
+  String get stepPrimaryNext;
+
+  /// No description provided for @stepPrimaryLast.
+  ///
+  /// In he, this message translates to:
+  /// **'סיימתי'**
+  String get stepPrimaryLast;
+
+  /// No description provided for @stepPrimaryReady.
+  ///
+  /// In he, this message translates to:
+  /// **'מוכן — לשלב הבא'**
+  String get stepPrimaryReady;
+
+  /// No description provided for @stepPrimaryReadyLast.
+  ///
+  /// In he, this message translates to:
+  /// **'מוכן'**
+  String get stepPrimaryReadyLast;
+
+  /// No description provided for @stepNeedMoreTime.
+  ///
+  /// In he, this message translates to:
+  /// **'צריך עוד זמן (+{minutes} דק\')'**
+  String stepNeedMoreTime(int minutes);
+
+  /// No description provided for @stepReadyEarly.
+  ///
+  /// In he, this message translates to:
+  /// **'כבר מוכן? לשלב הבא'**
+  String get stepReadyEarly;
+
+  /// No description provided for @stepStartsTimer.
+  ///
+  /// In he, this message translates to:
+  /// **'כשתלחצו, יתחיל טיימר של {duration}'**
+  String stepStartsTimer(String duration);
+
+  /// No description provided for @stepHelp.
+  ///
+  /// In he, this message translates to:
+  /// **'עזרה בשלב הזה'**
+  String get stepHelp;
+
+  /// No description provided for @stepHideHelp.
+  ///
+  /// In he, this message translates to:
+  /// **'הסתרת העזרה'**
+  String get stepHideHelp;
+
+  /// No description provided for @safetyCheckLabel.
+  ///
+  /// In he, this message translates to:
+  /// **'בדקתי: {cue}'**
+  String safetyCheckLabel(String cue);
+
+  /// No description provided for @safetyCheckGeneric.
+  ///
+  /// In he, this message translates to:
+  /// **'בדקתי שהמנה מוכנה'**
+  String get safetyCheckGeneric;
+
+  /// No description provided for @backButton.
+  ///
+  /// In he, this message translates to:
+  /// **'חזרה'**
+  String get backButton;
+
+  /// No description provided for @timerOptions.
+  ///
+  /// In he, this message translates to:
+  /// **'אפשרויות טיימר'**
+  String get timerOptions;
+
+  /// No description provided for @stepsCompletedTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'השלבים'**
+  String get stepsCompletedTitle;
+
+  /// No description provided for @stepNotDone.
+  ///
+  /// In he, this message translates to:
+  /// **'לא הושלם'**
+  String get stepNotDone;
+
+  /// No description provided for @durationUnderMinute.
+  ///
+  /// In he, this message translates to:
+  /// **'פחות מדקה'**
+  String get durationUnderMinute;
+
+  /// No description provided for @loadingShort.
+  ///
+  /// In he, this message translates to:
+  /// **'…'**
+  String get loadingShort;
 }
 
 class _AppLocalizationsDelegate

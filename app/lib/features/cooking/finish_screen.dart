@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/clock.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../l10n/app_localizations.dart';
+import '../history/history_screen.dart';
 import 'cooking_controller.dart';
 
 class FinishScreen extends ConsumerStatefulWidget {
@@ -43,7 +44,7 @@ class _FinishScreenState extends ConsumerState<FinishScreen> {
     if (view == null) {
       return AppScaffold(title: l10n.finishTitle, body: const Center(child: CircularProgressIndicator()));
     }
-    final minutes = ref.read(clockProvider)().difference(view.session.startedAt).inMinutes;
+    final ended = ref.read(clockProvider)();
 
     return AppScaffold(
       title: l10n.finishTitle,
@@ -55,7 +56,7 @@ class _FinishScreenState extends ConsumerState<FinishScreen> {
             style: Theme.of(context).textTheme.headlineSmall,
           ),
           const SizedBox(height: 8),
-          Text(l10n.cookingTime(l10n.minutesShort(minutes))),
+          Text(l10n.cookingTime(cookingDurationLabel(l10n, view.session.startedAt, ended))),
           Text(l10n.cookingProgress(view.state.doneStepCount, view.state.plan.steps.length)),
           const SizedBox(height: 16),
           TextField(

@@ -9,19 +9,8 @@
   "settings": "הגדרות",
   "newRecipe": "מתכון חדש",
   "noActiveSession": "אין בישול פעיל כרגע",
-  "backendConnecting": "מתחבר לשרת…",
-  "backendWakingUp": "השרת מתעורר… זה יכול לקחת עד דקה",
-  "backendOk": "השרת מחובר ✓",
-  "aiModeDemo": "מצב הדגמה (ללא בינה מלאכותית)",
-  "aiModeLive": "בינה מלאכותית מחוברת",
-  "aiModeUnknown": "מצב בינה מלאכותית לא ידוע",
-  "backendOffline": "אין חיבור לשרת",
-  "offlineCookingNote": "אפשר לבשל גם בלי חיבור",
   "retry": "נסו שוב",
-  "databaseReady": "מסד הנתונים מוכן (גרסה {version})",
-  "@databaseReady": { "placeholders": { "version": { "type": "int" } } },
   "errorGeneric": "משהו השתבש. נסו שוב.",
-
   "allRecipes": "הכל",
   "searchRecipes": "חיפוש מתכון",
   "noRecipes": "אין מתכונים עדיין",
@@ -47,84 +36,173 @@
   "cannotDeleteActive": "אי אפשר למחוק מתכון בזמן בישול. סיימו או הפסיקו את הבישול קודם.",
   "estimate": "הערכה",
   "estimateHint": "ערך משוער — המתכון המקורי לא ציין אותו",
-
   "prepTasks": "הכנות מראש",
   "steps": "שלבים",
   "stepNumber": "שלב {number}",
-  "@stepNumber": { "placeholders": { "number": { "type": "int" } } },
+  "@stepNumber": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
   "afterSteps": "אחרי: {steps}",
-  "@afterSteps": { "placeholders": { "steps": { "type": "String" } } },
+  "@afterSteps": {
+    "placeholders": {
+      "steps": {
+        "type": "String"
+      }
+    }
+  },
   "canRunInParallel": "אפשר במקביל לשלבים אחרים",
   "timerLabel": "טיימר: {label} ({duration})",
-  "@timerLabel": { "placeholders": { "label": { "type": "String" }, "duration": { "type": "String" } } },
+  "@timerLabel": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "temperatureLabel": "טמפרטורה: {value}°",
-  "@temperatureLabel": { "placeholders": { "value": { "type": "int" } } },
+  "@temperatureLabel": {
+    "placeholders": {
+      "value": {
+        "type": "int"
+      }
+    }
+  },
   "leadTime": "כ-{minutes} דקות לפני שצריך",
-  "@leadTime": { "placeholders": { "minutes": { "type": "int" } } },
+  "@leadTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "noPlan": "אין תוכנית בישול למתכון הזה",
-  "planActions": "תאשרו בזמן הבישול:",
-
   "activeSessionTitle": "כבר יש בישול פעיל",
   "activeSessionBody": "כרגע מתבשל: {title}. אפשר להמשיך אותו, או להפסיק אותו ולהתחיל מחדש.",
-  "@activeSessionBody": { "placeholders": { "title": { "type": "String" } } },
+  "@activeSessionBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "goToActive": "המשך לבישול הפעיל",
   "exactAlarmPromptTitle": "טיימרים שמתריעים בזמן",
   "exactAlarmPromptBody": "כדי שהטיימרים יתריעו בדיוק בזמן, צריך לאשר לאפליקציה \"התראות ותזכורות\" בהגדרות הטלפון. בלי האישור, התראה עלולה להתעכב בכמה דקות.",
   "allowInSettings": "אישור בהגדרות",
   "continueWithout": "להמשיך בלי",
   "abandonAndStart": "הפסק והתחל חדש",
-
   "cookingProgress": "{done} מתוך {total} שלבים הושלמו",
-  "@cookingProgress": { "placeholders": { "done": { "type": "int" }, "total": { "type": "int" } } },
-  "nowLabel": "עכשיו",
-  "waitingForTimer": "ממתינים לטיימר: {label}",
-  "@waitingForTimer": { "placeholders": { "label": { "type": "String" } } },
-  "startsTimer": "יפעיל טיימר: {label} ({duration})",
-  "@startsTimer": { "placeholders": { "label": { "type": "String" }, "duration": { "type": "String" } } },
+  "@cookingProgress": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "meanwhileTitle": "בינתיים אפשר",
   "prepNeededNow": "נדרש עכשיו",
   "allSteps": "כל השלבים",
-  "stepLocked": "ממתין לשלבים קודמים",
-  "stepReady": "מוכן להתחלה",
-  "stepInProgress": "בתהליך",
-  "stepWaiting": "ממתין לטיימר",
-  "stepDone": "הושלם",
   "undoLastAction": "ביטול הפעולה האחרונה",
-  "actionDone": "✓ {label}",
-  "@actionDone": { "placeholders": { "label": { "type": "String" } } },
-  "actionDoneWithTimer": "✓ {label} · טיימר {timer} הופעל ({duration})",
-  "@actionDoneWithTimer": { "placeholders": { "label": { "type": "String" }, "timer": { "type": "String" }, "duration": { "type": "String" } } },
-  "actionAlreadyDone": "זה כבר סומן כבוצע",
-  "actionNotAvailable": "אי אפשר לבצע את זה עכשיו",
   "undoNotAllowed": "אי אפשר לבטל — כבר התחלתם שלב שתלוי בזה",
   "timersTitle": "טיימרים",
   "timerCheckDue": "זמן לבדוק!",
   "checkAtLabel": "לבדוק בערך ב-{time}",
-  "@checkAtLabel": { "placeholders": { "time": { "type": "String" } } },
+  "@checkAtLabel": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "rangeUntil": "טווח הזמן: עד {time}",
-  "@rangeUntil": { "placeholders": { "time": { "type": "String" } } },
-  "recheckIn": "עוד לא — לבדוק שוב בעוד {minutes} דק'",
-  "@recheckIn": { "placeholders": { "minutes": { "type": "int" } } },
+  "@rangeUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "removeMinute": "− דקה",
   "nextStepPreview": "אחרי זה: {title}",
-  "@nextStepPreview": { "placeholders": { "title": { "type": "String" } } },
+  "@nextStepPreview": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "tomorrowAt": "מחר ב-{time}",
-  "@tomorrowAt": { "placeholders": { "time": { "type": "String" } } },
+  "@tomorrowAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "dateAt": "{date} ב-{time}",
-  "@dateAt": { "placeholders": { "date": { "type": "String" }, "time": { "type": "String" } } },
+  "@dateAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "notifCheckTitle": "⏰ {label}: זמן לבדוק",
-  "@notifCheckTitle": { "placeholders": { "label": { "type": "String" } } },
+  "@notifCheckTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "notifCheckBody": "בדקו: {cue}",
-  "@notifCheckBody": { "placeholders": { "cue": { "type": "String" } } },
+  "@notifCheckBody": {
+    "placeholders": {
+      "cue": {
+        "type": "String"
+      }
+    }
+  },
   "notifCheckBodyDefault": "לבשל כל אחד יכול · לחצו כדי לחזור לבישול",
   "notifPreheatBody": "בדקו שהתנור הגיע לחום",
   "notifRangeEndTitle": "⏰ {label}: סוף טווח הזמן",
-  "@notifRangeEndTitle": { "placeholders": { "label": { "type": "String" } } },
+  "@notifRangeEndTitle": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
   "notifRangeEndBodyDefault": "זה הזמן לבדוק שוב",
   "notifPrepTitle": "⏳ {task}",
-  "@notifPrepTitle": { "placeholders": { "task": { "type": "String" } } },
+  "@notifPrepTitle": {
+    "placeholders": {
+      "task": {
+        "type": "String"
+      }
+    }
+  },
   "notifPrepBody": "בעוד כ-{minutes} דקות תצטרכו את זה",
-  "@notifPrepBody": { "placeholders": { "minutes": { "type": "int" } } },
+  "@notifPrepBody": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "notifTestTitle": "⏰ התראת בדיקה",
   "notifTestBody": "לבשל כל אחד יכול · ההתראות של הטיימרים עובדות",
   "channelTimersName": "טיימרים לבישול",
@@ -135,43 +213,61 @@
   "resume": "המשך",
   "addMinute": "+ דקה",
   "dismissTimer": "סגירת הטיימר",
-  "confirmActionTitle": "{label}?",
-  "@confirmActionTitle": { "placeholders": { "label": { "type": "String" } } },
-  "confirmCheck": "לפני שממשיכים, בדקו:",
-  "confirmYes": "כן, {label}",
-  "@confirmYes": { "placeholders": { "label": { "type": "String" } } },
-  "confirmNotYet": "עוד לא",
   "allStepsDone": "כל השלבים הושלמו! 🎉",
   "goToFinish": "לסיום הבישול",
   "abandonCooking": "הפסקת הבישול",
   "abandonConfirm": "להפסיק את הבישול? מה שעשיתם יישמר בהיסטוריה.",
   "abandonAction": "הפסקה",
   "sessionEnded": "הבישול הזה הסתיים",
-
   "finishTitle": "סיום הבישול",
   "finishSummary": "סיימתם לבשל: {title}",
-  "@finishSummary": { "placeholders": { "title": { "type": "String" } } },
+  "@finishSummary": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "cookingTime": "זמן בישול: {duration}",
-  "@cookingTime": { "placeholders": { "duration": { "type": "String" } } },
+  "@cookingTime": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
   "minutesShort": "{minutes} דק'",
-  "@minutesShort": { "placeholders": { "minutes": { "type": "int" } } },
+  "@minutesShort": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
   "notesLabel": "הערות לפעם הבאה (לא חובה)",
   "saveAndFinish": "שמירה וסיום",
-
   "historyEmpty": "עוד לא בישלתם. בחרו מתכון מהרשימה והתחילו.",
   "statusCompleted": "הושלם",
   "statusAbandoned": "הופסק",
   "statusInProgress": "בתהליך",
   "startedAt": "התחיל: {time}",
-  "@startedAt": { "placeholders": { "time": { "type": "String" } } },
+  "@startedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "endedAt": "הסתיים: {time}",
-  "@endedAt": { "placeholders": { "time": { "type": "String" } } },
+  "@endedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "notes": "הערות",
-  "actionsLog": "מה עשיתם",
-  "approvedChanges": "שינויים שאושרו בתוכנית",
-  "noApprovedChanges": "לא בוצעו שינויים בתוכנית",
   "cookAgain": "לבשל שוב",
-
   "settingsNotifications": "התראות טיימר",
   "notificationsOn": "ההתראות מאופשרות",
   "notificationsOff": "ההתראות חסומות — טיימרים לא יתריעו",
@@ -184,10 +280,16 @@
   "batteryOk": "חיסכון בסוללה לא מגביל את האפליקציה",
   "openBatterySettings": "פתיחת הגדרות הסוללה",
   "batteryVendorHint": "בטלפונים של שיאומי, סמסונג, וואווי ו-וואן פלוס יש לפעמים הגבלות נוספות. אם טיימר לא התריע, ודאו בהגדרות הסוללה של הטלפון שהאפליקציה מורשית לפעול ברקע.",
-  "testNotification": "שליחת התראת בדיקה (בעוד 10 שניות)",
-  "testNotificationScheduled": "התראת בדיקה תגיע בעוד 10 שניות",
+  "testNotification": "בדיקת התראות (תגיע בעוד 10 שניות)",
+  "testNotificationScheduled": "התראת הבדיקה תגיע בעוד 10 שניות",
   "serverAddress": "כתובת השרת (מצב פיתוח): {url}",
-  "@serverAddress": { "placeholders": { "url": { "type": "String" } } },
+  "@serverAddress": {
+    "placeholders": {
+      "url": {
+        "type": "String"
+      }
+    }
+  },
   "aboutTitle": "אודות",
   "aboutBody": "בזמן הבישול האפליקציה עובדת גם בלי אינטרנט: השלבים, הטיימרים וההתקדמות נשמרים במכשיר.",
   "refresh": "רענון",
@@ -201,20 +303,25 @@
   "importPickPhoto": "מהגלריה",
   "importPhotoNote": "התמונה נשמרת רק עד שתאשרו את התוכנית.",
   "importAnalyze": "ניתוח המתכון",
-  "importStageReading": "קוראים את המתכון…",
-  "importStagePlanning": "בונים תוכנית בישול…",
-  "importStageSlow": "זה לוקח קצת זמן — ייתכן שהשרת מתעורר.",
+  "importStageReading": "בודקים את המצרכים וההוראות…",
+  "importStagePlanning": "מסדרים לך את שלבי הבישול…",
+  "importStageSlow": "זה לוקח קצת יותר זמן מהרגיל…",
   "importDuplicateTitle": "המתכון כבר יובא",
   "importDuplicateBody": "כבר ייבאתם את המתכון הזה: {title}. לפתוח אותו במקום לייבא שוב?",
-  "@importDuplicateBody": {"placeholders": {"title": {"type": "String"}}},
+  "@importDuplicateBody": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
   "importOpenExisting": "פתיחת הקיים",
   "importAgain": "ייבוא מחדש",
   "importNotRecipe": "לא זיהינו כאן מתכון.",
   "privacyTitle": "לפני הייבוא הראשון",
-  "privacyBody": "כדי לנתח את המתכון, הטקסט, הקישור או התמונה נשלחים לשירות בינה מלאכותית (Gemini של Google). בגרסה החינמית של השירות Google עשויה להשתמש במידע לשיפור המוצרים שלה. אל תשלחו מידע אישי. התמונה נשמרת במכשיר רק עד שתאשרו את התוכנית.",
+  "privacyBody": "כדי להכין את המתכון, הטקסט, הקישור או התמונה נשלחים לשירות בינה מלאכותית של Google. בשירות החינמי Google עשויה להשתמש במידע לשיפור המוצרים שלה. אל תשלחו מידע אישי. התמונה נשמרת במכשיר רק עד שתאשרו את התוכנית.",
   "privacyAccept": "הבנתי, להמשיך",
   "draftsTitle": "ייבואים שלא הושלמו",
-  "draftResume": "להמשיך",
   "draftDiscard": "מחיקה",
   "clarifyTitle": "כמה שאלות קצרות",
   "clarifyIntro": "חסר במתכון מידע שחשוב לתוכנית. ענו על מה שאתם יודעים.",
@@ -232,17 +339,21 @@
   "reviewSources": "מקורות",
   "reviewOriginalSource": "המתכון המקורי",
   "reviewFromSource": "מהמתכון המקורי: {text}",
-  "@reviewFromSource": {"placeholders": {"text": {"type": "String"}}},
+  "@reviewFromSource": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
   "reviewPhotoCheck": "התוכנית נבנתה מתמונה — בדקו שהכמויות והזמנים נקראו נכון.",
   "reviewSafetyCheckbox": "בדקתי את הערכים המסומנים",
   "reviewApprove": "אישור התוכנית",
   "reviewCancelImport": "ביטול הייבוא",
-  "reviewSave": "שמירת השינויים",
   "reviewOutdatedTitle": "התוכנית לא מעודכנת לשינויים במתכון",
   "reviewOutdatedBody": "שיניתם מצרכים או הוראות. צרו את התוכנית מחדש, או אשרו שבדקתם שהיא עדיין נכונה.",
   "reviewRegenerate": "יצירת התוכנית מחדש",
   "reviewStillCorrect": "בדקתי — התוכנית נכונה",
-  "provenanceInferred": "הערכה",
   "provenanceAnswered": "לפי תשובתך",
   "provenanceReference": "לפי מקור בטיחות מזון",
   "provenanceUser": "ערך שלך",
@@ -256,14 +367,10 @@
   "editTemperature": "עריכת טמפרטורה (°C)",
   "editRecipe": "עריכת המתכון והתוכנית",
   "recipeOutdatedBanner": "התוכנית לא מעודכנת לשינויים במתכון. ערכו אותה או צרו אותה מחדש לפני הבישול.",
-  "rangeMinutes": "{from}–{to} דק'",
-  "@rangeMinutes": {"placeholders": {"from": {"type": "int"}, "to": {"type": "int"}}},
-  "minutesValue": "{minutes} דק'",
-  "@minutesValue": {"placeholders": {"minutes": {"type": "int"}}},
   "errOffline": "אין חיבור לאינטרנט. ייבוא מתכון חדש דורש חיבור; בישול של מתכון שמור עובד גם בלי.",
-  "errTimeout": "השרת לא הגיב בזמן. נסו שוב בעוד רגע.",
+  "errTimeout": "זה לקח יותר מדי זמן. נסו שוב בעוד רגע.",
   "errRateLimited": "הגעתם למגבלת הייבוא לשעה. נסו שוב מאוחר יותר.",
-  "errAiBusy": "ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.",
+  "errAiBusy": "הכנת מתכונים חדשים לא זמינה כרגע בגלל עומס זמני. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.",
   "errDailyLimit": "הגענו למגבלת הייבוא היומית של האפליקציה. נסו שוב מחר. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.",
   "errTooLarge": "התוכן גדול מדי. נסו מתכון קצר יותר או תמונה קטנה יותר.",
   "errUnsupportedImage": "סוג התמונה לא נתמך. נסו תמונת JPEG או PNG.",
@@ -273,13 +380,57 @@
   "errNoRecipeFound": "לא מצאנו מתכון בדף. נסו להדביק את טקסט המתכון במקום.",
   "errUnsafeToPlan": "המתכון כולל שימורים ביתיים, שדורשים מתכון בדוק ומאומת. לא נבנה עבורם תוכנית על סמך הערכה.",
   "errInvalidAiOutput": "לא הצלחנו לבנות תוכנית אמינה מהמתכון הזה. נסו שוב, או נסחו את המתכון בבירור.",
-  "errNotConfigured": "השרת עדיין לא מוגדר לייבוא מתכונים.",
+  "errNotConfigured": "ייבוא מתכונים לא זמין כרגע. נסו שוב מאוחר יותר.",
   "errGeneric": "משהו השתבש בייבוא. נסו שוב.",
-  "errAiBusyRetryIn": "ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. אפשר לנסות שוב בעוד כ-{minutes} דק'. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.",
-  "@errAiBusyRetryIn": {"placeholders": {"minutes": {"type": "int"}}},
-  "errAiQuota": "מכסת השימוש היומית בשירות הבינה המלאכותית נוצלה, ולכן ייבוא מתכונים חדשים לא זמין כרגע. נסו שוב מאוחר יותר. מה שהזנתם נשמר, והמתכונים השמורים והבישול ממשיכים לעבוד כרגיל.",
-  "errAiUnavailable": "שירות הבינה המלאכותית לא זמין כרגע. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.",
+  "errAiBusyRetryIn": "הכנת מתכונים חדשים לא זמינה כרגע בגלל עומס זמני. אפשר לנסות שוב בעוד כ-{minutes} דק'. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.",
+  "@errAiBusyRetryIn": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "errAiQuota": "הכנת מתכונים חדשים לא זמינה כרגע, כי הגענו למכסת השימוש היומית. נסו שוב מאוחר יותר. מה שהזנתם נשמר, והמתכונים השמורים והבישול ממשיכים לעבוד כרגיל.",
+  "errAiUnavailable": "הכנת מתכונים חדשים לא זמינה כרגע. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.",
   "importRetry": "נסו שוב",
   "importRestored": "שחזרנו את מה שהזנתם בניסיון הקודם.",
-  "importPlanFailedNote": "המתכון נקרא ונשמר. אפשר לנסות שוב לבנות את התוכנית בלי לקרוא אותו מחדש."
+  "importPlanFailedNote": "המתכון נקרא ונשמר. אפשר לנסות שוב לבנות את התוכנית בלי לקרוא אותו מחדש.",
+  "stepPrimaryNext": "סיימתי — לשלב הבא",
+  "stepPrimaryLast": "סיימתי",
+  "stepPrimaryReady": "מוכן — לשלב הבא",
+  "stepPrimaryReadyLast": "מוכן",
+  "stepNeedMoreTime": "צריך עוד זמן (+{minutes} דק')",
+  "@stepNeedMoreTime": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "stepReadyEarly": "כבר מוכן? לשלב הבא",
+  "stepStartsTimer": "כשתלחצו, יתחיל טיימר של {duration}",
+  "@stepStartsTimer": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "stepHelp": "עזרה בשלב הזה",
+  "stepHideHelp": "הסתרת העזרה",
+  "safetyCheckLabel": "בדקתי: {cue}",
+  "@safetyCheckLabel": {
+    "placeholders": {
+      "cue": {
+        "type": "String"
+      }
+    }
+  },
+  "safetyCheckGeneric": "בדקתי שהמנה מוכנה",
+  "backButton": "חזרה",
+  "timerOptions": "אפשרויות טיימר",
+  "stepsCompletedTitle": "השלבים",
+  "stepNotDone": "לא הושלם",
+  "durationUnderMinute": "פחות מדקה",
+  "loadingShort": "…"
 }

@@ -9,7 +9,7 @@ import 'support/app_harness.dart';
 import 'support/ui_helpers.dart';
 
 void main() {
-  testApp('complete cooking flow on the sample recipe, fully offline', (tester, h) async {
+  testApp('complete cooking flow: one tap per ordinary step, explicit timer starts, fully offline', (tester, h) async {
     final recipeId = await h.seedSample();
     await tester.pumpWidget(h.build(initialLocation: '/recipes/$recipeId'));
     await tester.pumpAndSettle();
@@ -19,6 +19,7 @@ void main() {
     final session = (await h.sessions.activeSession())!;
     await expectSeen(tester, find.text('0 מתוך 5 שלבים הושלמו'));
     await expectSeen(tester, find.text('הכנת תפוחי האדמה'));
+    expect(find.text('הערכה'), findsNothing); // no technical badges while cooking
 
     // Preheat (prep task) starts its plan timer.
     await tester.tap(find.text('הדליקו את התנור על 200 מעלות'));
@@ -26,17 +27,22 @@ void main() {
     expect(h.notifier.scheduled.keys, ['${session.id}/tp1']);
     await expectSeen(tester, find.text('חימום תנור'));
 
-    // Prepare potatoes, season the chicken.
-    await tapButton(tester, 'התחלתי');
-    await tapButton(tester, 'סיימתי');
-    await tapButton(tester, 'סיימתי');
+    // One tap finishes a step (even one planned with "התחלתי" + "סיימתי").
+    await tapButton(tester, 'סיימתי — לשלב הבא');
+    await expectSeen(tester, find.text('1 מתוך 5 שלבים הושלמו'));
+    expect(find.byType(SnackBar), findsNothing);
+    // "חזרה" undoes the last tap; then continue.
+    await tapText(tester, 'חזרה');
+    await expectSeen(tester, find.text('0 מתוך 5 שלבים הושלמו'));
+    await tapButton(tester, 'סיימתי — לשלב הבא');
+    await tapButton(tester, 'סיימתי — לשלב הבא');
     await expectSeen(tester, find.text('2 מתוך 5 שלבים הושלמו'));
-    await expectSeen(tester, find.text('נדרש עכשיו'));
 
-    // Into the oven: the plan's 45-minute timer starts and is scheduled.
+    // A timed step: the start is an explicit tap, and only then the 45-minute timer runs.
+    await expectSeen(tester, find.text('כשתלחצו, יתחיל טיימר של 45:00'));
+    expect(h.notifier.scheduled.containsKey('${session.id}/t1'), isFalse);
     await tapButton(tester, 'הכנסתי לתנור');
     expect(h.notifier.scheduled['${session.id}/t1'], h.clock.now.add(const Duration(seconds: 2700)));
-    await expectSeen(tester, find.text('עוף בתנור'));
     await expectSeen(tester, find.text('45:00'));
 
     // Meanwhile: rice, a second timer at the same time.
@@ -48,44 +54,46 @@ void main() {
     // Rice reaches its check time first ("time to check", never "ready").
     await h.advance(tester, const Duration(minutes: 18));
     await expectSeen(tester, find.text('זמן לבדוק!'));
-    await expectSeen(tester, find.text('27:00'));
-    await tapButton(tester, 'האורז מוכן');
+    await expectSeen(tester, find.text('👀 המים נספגו והאורז רך.'));
+    await expectSeen(tester, find.text("צריך עוד זמן (+3 דק')")); // the plan's suggestion for rice
+    await tapButton(tester, 'מוכן');
     expect(h.notifier.scheduled.containsKey('${session.id}/t2'), isFalse);
 
-    // Taking poultry out always asks first; "not yet" changes nothing.
+    // Poultry: at check time the cook ticks the short doneness check — inline, no popup.
     await h.advance(tester, const Duration(minutes: 27));
-    await tapButton(tester, 'הוצאתי מהתנור');
-    expect(find.text('הוצאתי מהתנור?'), findsOneWidget);
-    expect(find.textContaining('ודאו שהעוף עשוי היטב'), findsWidgets);
-    await tester.tap(find.text('עוד לא'));
-    await tester.pumpAndSettle();
-    await expectSeen(tester, find.text('3 מתוך 5 שלבים הושלמו'));
-
-    await tapButton(tester, 'הוצאתי מהתנור');
-    await tester.tap(find.text('כן, הוצאתי מהתנור'));
-    await tester.pumpAndSettle();
+    await expectSeen(tester, find.text('מוכן — לשלב הבא'));
+    expect(onPressedOf(tester, 'מוכן — לשלב הבא'), isNull);
+    expect(find.byType(AlertDialog), findsNothing);
+    await tapText(tester, 'בדקתי: העוף שחום, ובחיתוך ליד העצם הנוזלים שקופים ולא ורודים.');
+    await tapButton(tester, 'מוכן — לשלב הבא');
     await expectSeen(tester, find.text('4 מתוך 5 שלבים הושלמו'));
     expect(h.notifier.scheduled.containsKey('${session.id}/t1'), isFalse);
 
-    // Rest and serve.
+    // Rest: "needs more time" once, then ready.
     await tapButton(tester, 'התחלתי מנוחה');
     expect(h.notifier.scheduled.containsKey('${session.id}/t3'), isTrue);
-    await tapButton(tester, 'הגשתי');
+    await h.advance(tester, const Duration(minutes: 5));
+    await tapText(tester, "צריך עוד זמן (+5 דק')");
+    expect(h.notifier.scheduled['${session.id}/t3'], h.clock.now.add(const Duration(minutes: 5)));
+    await h.advance(tester, const Duration(minutes: 5));
+    await tapButton(tester, 'מוכן');
     await expectSeen(tester, find.text('כל השלבים הושלמו! 🎉'));
 
     await tapButton(tester, 'לסיום הבישול');
     await tester.enterText(find.byType(TextField), 'בפעם הבאה פחות מלח');
     await tapButton(tester, 'שמירה וסיום');
 
-    // Saved to history; no notifications left behind.
+    // Saved to history as a friendly summary; no notifications left behind.
     final done = (await h.sessions.getSession(session.id))!;
     expect(done.status, SessionStatus.completed);
     expect(done.notes, 'בפעם הבאה פחות מלח');
     expect(await h.sessions.activeSession(), isNull);
     expect(h.notifier.scheduled, isEmpty);
-    await expectSeen(tester, find.text('הושלם'));
+    await expectSeen(tester, find.textContaining('הושלם'));
     await expectSeen(tester, find.text('בפעם הבאה פחות מלח'));
-    await expectSeen(tester, find.text('אפיית העוף ותפוחי האדמה: הכנסתי לתנור'));
+    await expectSeen(tester, find.text('מנוחה והגשה'));
+    expect(find.text('לא הושלם'), findsNothing);
+    expect(find.textContaining('הכנסתי לתנור'), findsNothing); // no raw action log
   });
 
   testApp('an interrupted session resumes with progress and timers restored', (tester, h) async {

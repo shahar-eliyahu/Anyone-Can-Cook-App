@@ -92,6 +92,49 @@ class ActionDispatcher {
         );
       });
 
+  /// "סיימתי — לשלב הבא" / "מוכן — לשלב הבא": confirms the step's remaining
+  /// actions in order, as ordinary [ActionConfirmed] events from one tap (same
+  /// time), and stops before an action that starts a timer: timers start only
+  /// from the explicit tap that marks the real-world start.
+  Future<DispatchResult> completeStep(
+    String stepId, {
+    ActionSource source = ActionSource.ui,
+  }) =>
+      _serialized(() {
+        final step = _state.plan.stepById(stepId);
+        if (step == null) return const DispatchResult.invalid('unknown_step');
+        final at = now();
+        switch (_state.statusOf(step, at)) {
+          case StepStatus.done:
+            return const DispatchResult.alreadyDone();
+          case StepStatus.locked:
+            return const DispatchResult.invalid('step_locked');
+          default:
+        }
+        final events = [
+          for (final a in _state.actionsToFinish(step))
+            ActionConfirmed(at: at, stepId: stepId, actionId: a.id, source: source),
+        ];
+        if (events.isEmpty) return const DispatchResult.invalid('needs_timer_start');
+        return events;
+      });
+
+  /// "חזרה": undoes the cook's last tap — every action it confirmed (cancelling
+  /// a timer it started) or a finished prep task — unless a later step that
+  /// depends on it already has progress.
+  Future<DispatchResult> undoLast() => _serialized(() {
+        final tap = _state.lastTap();
+        if (tap.isEmpty) return const DispatchResult.invalid('nothing_to_undo');
+        final at = now();
+        if (tap.first.prepTaskId case final prep?) return PrepTaskUndone(at: at, prepTaskId: prep);
+        final stepId = tap.first.stepId!;
+        final dependentStarted = _state.plan.steps.any(
+          (s) => s.dependsOn.contains(stepId) && _state.confirmedIn(s.id).isNotEmpty,
+        );
+        if (dependentStarted) return const DispatchResult.invalid('dependent_started');
+        return [for (final _ in tap) StepUndone(at: at, stepId: stepId)];
+      });
+
   Future<DispatchResult> completePrepTask(
     String prepTaskId, {
     ActionSource source = ActionSource.ui,
@@ -190,7 +233,8 @@ class ActionDispatcher {
       });
 
   /// Runs [decide] after all earlier calls finish. [decide] returns either a
-  /// final [DispatchResult] (nothing to do) or the event to apply.
+  /// final [DispatchResult] (nothing to do), the event to apply, or several
+  /// events from one tap (applied in order; effects handled once at the end).
   Future<DispatchResult> _serialized(Object Function() decide) {
     final completer = Completer<DispatchResult>();
     _queue = _queue.then((_) async {
@@ -200,14 +244,18 @@ class ActionDispatcher {
           completer.complete(decision);
           return;
         }
-        final event = decision as CookingEvent;
-        await _store.append(event);
+        final events = decision is List<CookingEvent> ? decision : [decision as CookingEvent];
         final before = _state.timers;
-        final result = CookingEngine.reduce(_state, event);
-        _state = result.state;
-        await _onEffects(result.effects);
+        final effects = <EngineEffect>[];
+        for (final event in events) {
+          await _store.append(event);
+          final result = CookingEngine.reduce(_state, event);
+          _state = result.state;
+          effects.addAll(result.effects);
+        }
+        await _onEffects(effects);
         TimerState? started;
-        for (final e in result.effects) {
+        for (final e in effects) {
           if (e is ScheduleTimerNotification && !before.containsKey(e.timerId)) {
             started = _state.timers[e.timerId];
           }

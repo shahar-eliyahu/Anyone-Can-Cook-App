@@ -10,12 +10,17 @@ class AppScaffold extends StatelessWidget {
     required this.body,
     this.actions,
     this.floatingActionButton,
+    this.bottomBar,
   });
 
   final String title;
   final Widget body;
   final List<Widget>? actions;
   final Widget? floatingActionButton;
+
+  /// Fixed at the bottom, above the system navigation bar (e.g. the cooking
+  /// screen's main button, so it never scrolls away).
+  final Widget? bottomBar;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +37,17 @@ class AppScaffold extends StatelessWidget {
         actions: actions,
       ),
       floatingActionButton: floatingActionButton,
-      body: SafeArea(child: body),
+      bottomNavigationBar: bottomBar == null
+          ? null
+          : Material(
+              elevation: 8,
+              color: theme.colorScheme.surfaceContainer,
+              child: SafeArea(
+                top: false,
+                child: Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 8), child: bottomBar),
+              ),
+            ),
+      body: SafeArea(bottom: bottomBar == null, child: body),
     );
   }
 }

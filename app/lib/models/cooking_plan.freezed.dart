@@ -1504,7 +1504,8 @@ $QuantityCopyWith<$Res>? get quantity {
 /// @nodoc
 mixin _$PlanStep {
 
- String get id; String get title; String get instructionHe; List<String> get sourceRefs; List<String> get ingredientIds; List<IngredientUse> get ingredientUses; List<String> get equipmentIds; List<String> get dependsOn; StepKind get kind; bool get parallelOk; List<StepAction> get actions; List<PlanTimer> get timers; Temperature? get temperature; String? get donenessCueHe; List<String> get warningsHe; Minutes? get estimatedActiveMinutes;
+ String get id; String get title; String get instructionHe; List<String> get sourceRefs; List<String> get ingredientIds; List<IngredientUse> get ingredientUses; List<String> get equipmentIds; List<String> get dependsOn; StepKind get kind; bool get parallelOk; List<StepAction> get actions; List<PlanTimer> get timers; Temperature? get temperature; String? get donenessCueHe;/// Short help shown only on request ("עזרה").
+ String? get helpHe; List<String> get warningsHe; Minutes? get estimatedActiveMinutes;
 /// Create a copy of PlanStep
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1518,20 +1519,20 @@ $PlanStepCopyWith<PlanStep> get copyWith => _$PlanStepCopyWithImpl<PlanStep>(thi
 @override
 bool operator ==(Object other) {
   final _this = this as PlanStep;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlanStep&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.instructionHe, _this.instructionHe) || other.instructionHe == _this.instructionHe)&&const DeepCollectionEquality().equals(other.sourceRefs, _this.sourceRefs)&&const DeepCollectionEquality().equals(other.ingredientIds, _this.ingredientIds)&&const DeepCollectionEquality().equals(other.ingredientUses, _this.ingredientUses)&&const DeepCollectionEquality().equals(other.equipmentIds, _this.equipmentIds)&&const DeepCollectionEquality().equals(other.dependsOn, _this.dependsOn)&&(identical(other.kind, _this.kind) || other.kind == _this.kind)&&(identical(other.parallelOk, _this.parallelOk) || other.parallelOk == _this.parallelOk)&&const DeepCollectionEquality().equals(other.actions, _this.actions)&&const DeepCollectionEquality().equals(other.timers, _this.timers)&&(identical(other.temperature, _this.temperature) || other.temperature == _this.temperature)&&(identical(other.donenessCueHe, _this.donenessCueHe) || other.donenessCueHe == _this.donenessCueHe)&&const DeepCollectionEquality().equals(other.warningsHe, _this.warningsHe)&&(identical(other.estimatedActiveMinutes, _this.estimatedActiveMinutes) || other.estimatedActiveMinutes == _this.estimatedActiveMinutes));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PlanStep&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.instructionHe, _this.instructionHe) || other.instructionHe == _this.instructionHe)&&const DeepCollectionEquality().equals(other.sourceRefs, _this.sourceRefs)&&const DeepCollectionEquality().equals(other.ingredientIds, _this.ingredientIds)&&const DeepCollectionEquality().equals(other.ingredientUses, _this.ingredientUses)&&const DeepCollectionEquality().equals(other.equipmentIds, _this.equipmentIds)&&const DeepCollectionEquality().equals(other.dependsOn, _this.dependsOn)&&(identical(other.kind, _this.kind) || other.kind == _this.kind)&&(identical(other.parallelOk, _this.parallelOk) || other.parallelOk == _this.parallelOk)&&const DeepCollectionEquality().equals(other.actions, _this.actions)&&const DeepCollectionEquality().equals(other.timers, _this.timers)&&(identical(other.temperature, _this.temperature) || other.temperature == _this.temperature)&&(identical(other.donenessCueHe, _this.donenessCueHe) || other.donenessCueHe == _this.donenessCueHe)&&(identical(other.helpHe, _this.helpHe) || other.helpHe == _this.helpHe)&&const DeepCollectionEquality().equals(other.warningsHe, _this.warningsHe)&&(identical(other.estimatedActiveMinutes, _this.estimatedActiveMinutes) || other.estimatedActiveMinutes == _this.estimatedActiveMinutes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as PlanStep;
-  return Object.hash(runtimeType,_this.id,_this.title,_this.instructionHe,const DeepCollectionEquality().hash(_this.sourceRefs),const DeepCollectionEquality().hash(_this.ingredientIds),const DeepCollectionEquality().hash(_this.ingredientUses),const DeepCollectionEquality().hash(_this.equipmentIds),const DeepCollectionEquality().hash(_this.dependsOn),_this.kind,_this.parallelOk,const DeepCollectionEquality().hash(_this.actions),const DeepCollectionEquality().hash(_this.timers),_this.temperature,_this.donenessCueHe,const DeepCollectionEquality().hash(_this.warningsHe),_this.estimatedActiveMinutes);
+  return Object.hash(runtimeType,_this.id,_this.title,_this.instructionHe,const DeepCollectionEquality().hash(_this.sourceRefs),const DeepCollectionEquality().hash(_this.ingredientIds),const DeepCollectionEquality().hash(_this.ingredientUses),const DeepCollectionEquality().hash(_this.equipmentIds),const DeepCollectionEquality().hash(_this.dependsOn),_this.kind,_this.parallelOk,const DeepCollectionEquality().hash(_this.actions),const DeepCollectionEquality().hash(_this.timers),_this.temperature,_this.donenessCueHe,_this.helpHe,const DeepCollectionEquality().hash(_this.warningsHe),_this.estimatedActiveMinutes);
 }
 
 @override
 String toString() {
   final _this = this as PlanStep;
-  return 'PlanStep(id: ${_this.id}, title: ${_this.title}, instructionHe: ${_this.instructionHe}, sourceRefs: ${_this.sourceRefs}, ingredientIds: ${_this.ingredientIds}, ingredientUses: ${_this.ingredientUses}, equipmentIds: ${_this.equipmentIds}, dependsOn: ${_this.dependsOn}, kind: ${_this.kind}, parallelOk: ${_this.parallelOk}, actions: ${_this.actions}, timers: ${_this.timers}, temperature: ${_this.temperature}, donenessCueHe: ${_this.donenessCueHe}, warningsHe: ${_this.warningsHe}, estimatedActiveMinutes: ${_this.estimatedActiveMinutes})';
+  return 'PlanStep(id: ${_this.id}, title: ${_this.title}, instructionHe: ${_this.instructionHe}, sourceRefs: ${_this.sourceRefs}, ingredientIds: ${_this.ingredientIds}, ingredientUses: ${_this.ingredientUses}, equipmentIds: ${_this.equipmentIds}, dependsOn: ${_this.dependsOn}, kind: ${_this.kind}, parallelOk: ${_this.parallelOk}, actions: ${_this.actions}, timers: ${_this.timers}, temperature: ${_this.temperature}, donenessCueHe: ${_this.donenessCueHe}, helpHe: ${_this.helpHe}, warningsHe: ${_this.warningsHe}, estimatedActiveMinutes: ${_this.estimatedActiveMinutes})';
 }
 
 
@@ -1542,7 +1543,7 @@ abstract mixin class $PlanStepCopyWith<$Res>  {
   factory $PlanStepCopyWith(PlanStep value, $Res Function(PlanStep) _then) = _$PlanStepCopyWithImpl;
 @useResult
 $Res call({
- String id, String title, String instructionHe, List<String> sourceRefs, List<String> ingredientIds, List<IngredientUse> ingredientUses, List<String> equipmentIds, List<String> dependsOn, StepKind kind, bool parallelOk, List<StepAction> actions, List<PlanTimer> timers, Temperature? temperature, String? donenessCueHe, List<String> warningsHe, Minutes? estimatedActiveMinutes
+ String id, String title, String instructionHe, List<String> sourceRefs, List<String> ingredientIds, List<IngredientUse> ingredientUses, List<String> equipmentIds, List<String> dependsOn, StepKind kind, bool parallelOk, List<StepAction> actions, List<PlanTimer> timers, Temperature? temperature, String? donenessCueHe, String? helpHe, List<String> warningsHe, Minutes? estimatedActiveMinutes
 });
 
 
@@ -1559,7 +1560,7 @@ class _$PlanStepCopyWithImpl<$Res>
 
 /// Create a copy of PlanStep
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? instructionHe = null,Object? sourceRefs = null,Object? ingredientIds = null,Object? ingredientUses = null,Object? equipmentIds = null,Object? dependsOn = null,Object? kind = null,Object? parallelOk = null,Object? actions = null,Object? timers = null,Object? temperature = freezed,Object? donenessCueHe = freezed,Object? warningsHe = null,Object? estimatedActiveMinutes = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? instructionHe = null,Object? sourceRefs = null,Object? ingredientIds = null,Object? ingredientUses = null,Object? equipmentIds = null,Object? dependsOn = null,Object? kind = null,Object? parallelOk = null,Object? actions = null,Object? timers = null,Object? temperature = freezed,Object? donenessCueHe = freezed,Object? helpHe = freezed,Object? warningsHe = null,Object? estimatedActiveMinutes = freezed,}) {
   return _then(PlanStep(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -1575,6 +1576,7 @@ as bool,actions: null == actions ? _self.actions : actions // ignore: cast_nulla
 as List<StepAction>,timers: null == timers ? _self.timers : timers // ignore: cast_nullable_to_non_nullable
 as List<PlanTimer>,temperature: freezed == temperature ? _self.temperature : temperature // ignore: cast_nullable_to_non_nullable
 as Temperature?,donenessCueHe: freezed == donenessCueHe ? _self.donenessCueHe : donenessCueHe // ignore: cast_nullable_to_non_nullable
+as String?,helpHe: freezed == helpHe ? _self.helpHe : helpHe // ignore: cast_nullable_to_non_nullable
 as String?,warningsHe: null == warningsHe ? _self.warningsHe : warningsHe // ignore: cast_nullable_to_non_nullable
 as List<String>,estimatedActiveMinutes: freezed == estimatedActiveMinutes ? _self.estimatedActiveMinutes : estimatedActiveMinutes // ignore: cast_nullable_to_non_nullable
 as Minutes?,
@@ -1686,10 +1688,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String instructionHe,  List<String> sourceRefs,  List<String> ingredientIds,  List<IngredientUse> ingredientUses,  List<String> equipmentIds,  List<String> dependsOn,  StepKind kind,  bool parallelOk,  List<StepAction> actions,  List<PlanTimer> timers,  Temperature? temperature,  String? donenessCueHe,  List<String> warningsHe,  Minutes? estimatedActiveMinutes)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String instructionHe,  List<String> sourceRefs,  List<String> ingredientIds,  List<IngredientUse> ingredientUses,  List<String> equipmentIds,  List<String> dependsOn,  StepKind kind,  bool parallelOk,  List<StepAction> actions,  List<PlanTimer> timers,  Temperature? temperature,  String? donenessCueHe,  String? helpHe,  List<String> warningsHe,  Minutes? estimatedActiveMinutes)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PlanStep() when $default != null:
-return $default(_that.id,_that.title,_that.instructionHe,_that.sourceRefs,_that.ingredientIds,_that.ingredientUses,_that.equipmentIds,_that.dependsOn,_that.kind,_that.parallelOk,_that.actions,_that.timers,_that.temperature,_that.donenessCueHe,_that.warningsHe,_that.estimatedActiveMinutes);case _:
+return $default(_that.id,_that.title,_that.instructionHe,_that.sourceRefs,_that.ingredientIds,_that.ingredientUses,_that.equipmentIds,_that.dependsOn,_that.kind,_that.parallelOk,_that.actions,_that.timers,_that.temperature,_that.donenessCueHe,_that.helpHe,_that.warningsHe,_that.estimatedActiveMinutes);case _:
   return orElse();
 
 }
@@ -1707,10 +1709,10 @@ return $default(_that.id,_that.title,_that.instructionHe,_that.sourceRefs,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String instructionHe,  List<String> sourceRefs,  List<String> ingredientIds,  List<IngredientUse> ingredientUses,  List<String> equipmentIds,  List<String> dependsOn,  StepKind kind,  bool parallelOk,  List<StepAction> actions,  List<PlanTimer> timers,  Temperature? temperature,  String? donenessCueHe,  List<String> warningsHe,  Minutes? estimatedActiveMinutes)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String instructionHe,  List<String> sourceRefs,  List<String> ingredientIds,  List<IngredientUse> ingredientUses,  List<String> equipmentIds,  List<String> dependsOn,  StepKind kind,  bool parallelOk,  List<StepAction> actions,  List<PlanTimer> timers,  Temperature? temperature,  String? donenessCueHe,  String? helpHe,  List<String> warningsHe,  Minutes? estimatedActiveMinutes)  $default,) {final _that = this;
 switch (_that) {
 case _PlanStep():
-return $default(_that.id,_that.title,_that.instructionHe,_that.sourceRefs,_that.ingredientIds,_that.ingredientUses,_that.equipmentIds,_that.dependsOn,_that.kind,_that.parallelOk,_that.actions,_that.timers,_that.temperature,_that.donenessCueHe,_that.warningsHe,_that.estimatedActiveMinutes);case _:
+return $default(_that.id,_that.title,_that.instructionHe,_that.sourceRefs,_that.ingredientIds,_that.ingredientUses,_that.equipmentIds,_that.dependsOn,_that.kind,_that.parallelOk,_that.actions,_that.timers,_that.temperature,_that.donenessCueHe,_that.helpHe,_that.warningsHe,_that.estimatedActiveMinutes);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1727,10 +1729,10 @@ return $default(_that.id,_that.title,_that.instructionHe,_that.sourceRefs,_that.
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String instructionHe,  List<String> sourceRefs,  List<String> ingredientIds,  List<IngredientUse> ingredientUses,  List<String> equipmentIds,  List<String> dependsOn,  StepKind kind,  bool parallelOk,  List<StepAction> actions,  List<PlanTimer> timers,  Temperature? temperature,  String? donenessCueHe,  List<String> warningsHe,  Minutes? estimatedActiveMinutes)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String instructionHe,  List<String> sourceRefs,  List<String> ingredientIds,  List<IngredientUse> ingredientUses,  List<String> equipmentIds,  List<String> dependsOn,  StepKind kind,  bool parallelOk,  List<StepAction> actions,  List<PlanTimer> timers,  Temperature? temperature,  String? donenessCueHe,  String? helpHe,  List<String> warningsHe,  Minutes? estimatedActiveMinutes)?  $default,) {final _that = this;
 switch (_that) {
 case _PlanStep() when $default != null:
-return $default(_that.id,_that.title,_that.instructionHe,_that.sourceRefs,_that.ingredientIds,_that.ingredientUses,_that.equipmentIds,_that.dependsOn,_that.kind,_that.parallelOk,_that.actions,_that.timers,_that.temperature,_that.donenessCueHe,_that.warningsHe,_that.estimatedActiveMinutes);case _:
+return $default(_that.id,_that.title,_that.instructionHe,_that.sourceRefs,_that.ingredientIds,_that.ingredientUses,_that.equipmentIds,_that.dependsOn,_that.kind,_that.parallelOk,_that.actions,_that.timers,_that.temperature,_that.donenessCueHe,_that.helpHe,_that.warningsHe,_that.estimatedActiveMinutes);case _:
   return null;
 
 }
@@ -1742,7 +1744,7 @@ return $default(_that.id,_that.title,_that.instructionHe,_that.sourceRefs,_that.
 @JsonSerializable()
 
 class _PlanStep extends PlanStep {
-  const _PlanStep({required this.id, required this.title, required this.instructionHe,  List<String> sourceRefs = const [],  List<String> ingredientIds = const [],  List<IngredientUse> ingredientUses = const [],  List<String> equipmentIds = const [],  List<String> dependsOn = const [], this.kind = StepKind.active, this.parallelOk = false, required  List<StepAction> actions,  List<PlanTimer> timers = const [], this.temperature, this.donenessCueHe,  List<String> warningsHe = const [], this.estimatedActiveMinutes}): _sourceRefs = sourceRefs,_ingredientIds = ingredientIds,_ingredientUses = ingredientUses,_equipmentIds = equipmentIds,_dependsOn = dependsOn,_actions = actions,_timers = timers,_warningsHe = warningsHe,super._();
+  const _PlanStep({required this.id, required this.title, required this.instructionHe,  List<String> sourceRefs = const [],  List<String> ingredientIds = const [],  List<IngredientUse> ingredientUses = const [],  List<String> equipmentIds = const [],  List<String> dependsOn = const [], this.kind = StepKind.active, this.parallelOk = false, required  List<StepAction> actions,  List<PlanTimer> timers = const [], this.temperature, this.donenessCueHe, this.helpHe,  List<String> warningsHe = const [], this.estimatedActiveMinutes}): _sourceRefs = sourceRefs,_ingredientIds = ingredientIds,_ingredientUses = ingredientUses,_equipmentIds = equipmentIds,_dependsOn = dependsOn,_actions = actions,_timers = timers,_warningsHe = warningsHe,super._();
   factory _PlanStep.fromJson(Map<String, dynamic> json) => _$PlanStepFromJson(json);
 
 @override final  String id;
@@ -1801,6 +1803,8 @@ class _PlanStep extends PlanStep {
 
 @override final  Temperature? temperature;
 @override final  String? donenessCueHe;
+/// Short help shown only on request ("עזרה").
+@override final  String? helpHe;
  final  List<String> _warningsHe;
 @override@JsonKey() List<String> get warningsHe {
   if (_warningsHe is EqualUnmodifiableListView) return _warningsHe;
@@ -1823,18 +1827,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PlanStep&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.instructionHe, instructionHe) || other.instructionHe == instructionHe)&&const DeepCollectionEquality().equals(other.sourceRefs, _sourceRefs)&&const DeepCollectionEquality().equals(other.ingredientIds, _ingredientIds)&&const DeepCollectionEquality().equals(other.ingredientUses, _ingredientUses)&&const DeepCollectionEquality().equals(other.equipmentIds, _equipmentIds)&&const DeepCollectionEquality().equals(other.dependsOn, _dependsOn)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.parallelOk, parallelOk) || other.parallelOk == parallelOk)&&const DeepCollectionEquality().equals(other.actions, _actions)&&const DeepCollectionEquality().equals(other.timers, _timers)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.donenessCueHe, donenessCueHe) || other.donenessCueHe == donenessCueHe)&&const DeepCollectionEquality().equals(other.warningsHe, _warningsHe)&&(identical(other.estimatedActiveMinutes, estimatedActiveMinutes) || other.estimatedActiveMinutes == estimatedActiveMinutes));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PlanStep&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.instructionHe, instructionHe) || other.instructionHe == instructionHe)&&const DeepCollectionEquality().equals(other.sourceRefs, _sourceRefs)&&const DeepCollectionEquality().equals(other.ingredientIds, _ingredientIds)&&const DeepCollectionEquality().equals(other.ingredientUses, _ingredientUses)&&const DeepCollectionEquality().equals(other.equipmentIds, _equipmentIds)&&const DeepCollectionEquality().equals(other.dependsOn, _dependsOn)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.parallelOk, parallelOk) || other.parallelOk == parallelOk)&&const DeepCollectionEquality().equals(other.actions, _actions)&&const DeepCollectionEquality().equals(other.timers, _timers)&&(identical(other.temperature, temperature) || other.temperature == temperature)&&(identical(other.donenessCueHe, donenessCueHe) || other.donenessCueHe == donenessCueHe)&&(identical(other.helpHe, helpHe) || other.helpHe == helpHe)&&const DeepCollectionEquality().equals(other.warningsHe, _warningsHe)&&(identical(other.estimatedActiveMinutes, estimatedActiveMinutes) || other.estimatedActiveMinutes == estimatedActiveMinutes));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,title,instructionHe,const DeepCollectionEquality().hash(_sourceRefs),const DeepCollectionEquality().hash(_ingredientIds),const DeepCollectionEquality().hash(_ingredientUses),const DeepCollectionEquality().hash(_equipmentIds),const DeepCollectionEquality().hash(_dependsOn),kind,parallelOk,const DeepCollectionEquality().hash(_actions),const DeepCollectionEquality().hash(_timers),temperature,donenessCueHe,const DeepCollectionEquality().hash(_warningsHe),estimatedActiveMinutes);
+    return Object.hash(runtimeType,id,title,instructionHe,const DeepCollectionEquality().hash(_sourceRefs),const DeepCollectionEquality().hash(_ingredientIds),const DeepCollectionEquality().hash(_ingredientUses),const DeepCollectionEquality().hash(_equipmentIds),const DeepCollectionEquality().hash(_dependsOn),kind,parallelOk,const DeepCollectionEquality().hash(_actions),const DeepCollectionEquality().hash(_timers),temperature,donenessCueHe,helpHe,const DeepCollectionEquality().hash(_warningsHe),estimatedActiveMinutes);
 }
 
 @override
 String toString() {
-    return 'PlanStep(id: $id, title: $title, instructionHe: $instructionHe, sourceRefs: $sourceRefs, ingredientIds: $ingredientIds, ingredientUses: $ingredientUses, equipmentIds: $equipmentIds, dependsOn: $dependsOn, kind: $kind, parallelOk: $parallelOk, actions: $actions, timers: $timers, temperature: $temperature, donenessCueHe: $donenessCueHe, warningsHe: $warningsHe, estimatedActiveMinutes: $estimatedActiveMinutes)';
+    return 'PlanStep(id: $id, title: $title, instructionHe: $instructionHe, sourceRefs: $sourceRefs, ingredientIds: $ingredientIds, ingredientUses: $ingredientUses, equipmentIds: $equipmentIds, dependsOn: $dependsOn, kind: $kind, parallelOk: $parallelOk, actions: $actions, timers: $timers, temperature: $temperature, donenessCueHe: $donenessCueHe, helpHe: $helpHe, warningsHe: $warningsHe, estimatedActiveMinutes: $estimatedActiveMinutes)';
 }
 
 
@@ -1845,7 +1849,7 @@ abstract mixin class _$PlanStepCopyWith<$Res> implements $PlanStepCopyWith<$Res>
   factory _$PlanStepCopyWith(_PlanStep value, $Res Function(_PlanStep) _then) = __$PlanStepCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String title, String instructionHe, List<String> sourceRefs, List<String> ingredientIds, List<IngredientUse> ingredientUses, List<String> equipmentIds, List<String> dependsOn, StepKind kind, bool parallelOk, List<StepAction> actions, List<PlanTimer> timers, Temperature? temperature, String? donenessCueHe, List<String> warningsHe, Minutes? estimatedActiveMinutes
+ String id, String title, String instructionHe, List<String> sourceRefs, List<String> ingredientIds, List<IngredientUse> ingredientUses, List<String> equipmentIds, List<String> dependsOn, StepKind kind, bool parallelOk, List<StepAction> actions, List<PlanTimer> timers, Temperature? temperature, String? donenessCueHe, String? helpHe, List<String> warningsHe, Minutes? estimatedActiveMinutes
 });
 
 
@@ -1862,7 +1866,7 @@ class __$PlanStepCopyWithImpl<$Res>
 
 /// Create a copy of PlanStep
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? instructionHe = null,Object? sourceRefs = null,Object? ingredientIds = null,Object? ingredientUses = null,Object? equipmentIds = null,Object? dependsOn = null,Object? kind = null,Object? parallelOk = null,Object? actions = null,Object? timers = null,Object? temperature = freezed,Object? donenessCueHe = freezed,Object? warningsHe = null,Object? estimatedActiveMinutes = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? instructionHe = null,Object? sourceRefs = null,Object? ingredientIds = null,Object? ingredientUses = null,Object? equipmentIds = null,Object? dependsOn = null,Object? kind = null,Object? parallelOk = null,Object? actions = null,Object? timers = null,Object? temperature = freezed,Object? donenessCueHe = freezed,Object? helpHe = freezed,Object? warningsHe = null,Object? estimatedActiveMinutes = freezed,}) {
   return _then(_PlanStep(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
@@ -1878,6 +1882,7 @@ as bool,actions: null == actions ? _self._actions : actions // ignore: cast_null
 as List<StepAction>,timers: null == timers ? _self._timers : timers // ignore: cast_nullable_to_non_nullable
 as List<PlanTimer>,temperature: freezed == temperature ? _self.temperature : temperature // ignore: cast_nullable_to_non_nullable
 as Temperature?,donenessCueHe: freezed == donenessCueHe ? _self.donenessCueHe : donenessCueHe // ignore: cast_nullable_to_non_nullable
+as String?,helpHe: freezed == helpHe ? _self.helpHe : helpHe // ignore: cast_nullable_to_non_nullable
 as String?,warningsHe: null == warningsHe ? _self._warningsHe : warningsHe // ignore: cast_nullable_to_non_nullable
 as List<String>,estimatedActiveMinutes: freezed == estimatedActiveMinutes ? _self.estimatedActiveMinutes : estimatedActiveMinutes // ignore: cast_nullable_to_non_nullable
 as Minutes?,
