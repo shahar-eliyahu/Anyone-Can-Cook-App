@@ -37,7 +37,7 @@ GoRouter createRouter({String initialLocation = '/'}) => GoRouter(
         GoRoute(path: '/import', builder: (context, state) => const ImportScreen()),
         GoRoute(
           path: '/drafts/:id/clarify',
-          builder: (context, state) => ClarifyScreen(draftId: state.pathParameters['id']!),
+          builder: (context, state) => ClarifyScreen(draftId: state.pathParameters['id']!, planError: state.extra),
         ),
         GoRoute(
           path: '/drafts/:id/review',

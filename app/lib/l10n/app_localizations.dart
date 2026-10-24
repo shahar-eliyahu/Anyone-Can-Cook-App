@@ -1423,13 +1423,13 @@ abstract class AppLocalizations {
   /// No description provided for @errAiBusy.
   ///
   /// In he, this message translates to:
-  /// **'שירות הבינה המלאכותית עמוס כרגע. נסו שוב בעוד דקה.'**
+  /// **'ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
   String get errAiBusy;
 
   /// No description provided for @errDailyLimit.
   ///
   /// In he, this message translates to:
-  /// **'הגענו למגבלת הייבוא היומית. נסו שוב מחר.'**
+  /// **'הגענו למגבלת הייבוא היומית של האפליקציה. נסו שוב מחר. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
   String get errDailyLimit;
 
   /// No description provided for @errTooLarge.
@@ -1491,6 +1491,42 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'משהו השתבש בייבוא. נסו שוב.'**
   String get errGeneric;
+
+  /// No description provided for @errAiBusyRetryIn.
+  ///
+  /// In he, this message translates to:
+  /// **'ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. אפשר לנסות שוב בעוד כ-{minutes} דק\'. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
+  String errAiBusyRetryIn(int minutes);
+
+  /// No description provided for @errAiQuota.
+  ///
+  /// In he, this message translates to:
+  /// **'מכסת השימוש היומית בשירות הבינה המלאכותית נוצלה, ולכן ייבוא מתכונים חדשים לא זמין כרגע. נסו שוב מאוחר יותר. מה שהזנתם נשמר, והמתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
+  String get errAiQuota;
+
+  /// No description provided for @errAiUnavailable.
+  ///
+  /// In he, this message translates to:
+  /// **'שירות הבינה המלאכותית לא זמין כרגע. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.'**
+  String get errAiUnavailable;
+
+  /// No description provided for @importRetry.
+  ///
+  /// In he, this message translates to:
+  /// **'נסו שוב'**
+  String get importRetry;
+
+  /// No description provided for @importRestored.
+  ///
+  /// In he, this message translates to:
+  /// **'שחזרנו את מה שהזנתם בניסיון הקודם.'**
+  String get importRestored;
+
+  /// No description provided for @importPlanFailedNote.
+  ///
+  /// In he, this message translates to:
+  /// **'המתכון נקרא ונשמר. אפשר לנסות שוב לבנות את התוכנית בלי לקרוא אותו מחדש.'**
+  String get importPlanFailedNote;
 }
 
 class _AppLocalizationsDelegate

@@ -128,6 +128,32 @@ Emulator `emulator-5554` (Android 15), app built in debug, **network disabled** 
   step used the corrected 50:00 timer with the 74°C food-safety check; one exact alarm (window 0).
   Found and fixed: an edited timer kept the AI's "estimated" note.
 
+## AI quota and rate-limit handling (2026-10-24, not committed)
+
+Checked what existed, changed only what was missing.
+- Already in place: 429 never retried (backend or app); typed text and links stay in the field; drafts and
+  clarification answers saved before the plan call; saved recipes, cooking, timers and notifications work
+  with no backend (tests: offline cooking flow, reopen-and-cook with the fake API failing on any call).
+- Added, backend: Gemini 429 bodies are classified from `QuotaFailure.quotaId` (`…PerDay…` → daily quota,
+  `…PerMinute…` → short limit) and `RetryInfo.retryDelay`. Daily quota → `ai_quota_exhausted`, no
+  `Retry-After` (reset time not promised; Gemini's `retryDelay` is ignored for daily quotas). Short limit →
+  `ai_rate_limited` with `Retry-After` only when Gemini stated a delay (the old fixed "60" was removed).
+  After a quota error the server stops calling Gemini for 1 hour (30 s, or the stated delay, for short
+  limits) and answers the same error without a provider call; then it tries again.
+- Added, app: separate Hebrew messages for daily quota, temporary limit (a wait time only if the server
+  stated one) and service outage, each saying saved recipes and cooking keep working (the old "נסו שוב בעוד
+  דקה" promise is gone). The unsent input (text, link or photo) is saved and restored when the import
+  screen reopens; a failed photo import no longer deletes the photo. A plan-step failure right after
+  analysis opens the saved draft with "נסו שוב", which retries only the plan (no second analysis call).
+  Retry is always a user tap ("נסו שוב"), never automatic.
+- Tests (all mocked, zero real Gemini calls): backend 135/135 (Python 3.14 and 3.12): 429 body parsing
+  (daily, per-minute, unclear and malformed bodies), SDK `ClientError` mapping, daily quota pause with no
+  further provider calls, stated vs unstated delays, quota during planning not repaired or retried. Flutter
+  110/110: quota message and retry, input restored after leaving, wait time only when stated, plan-only retry,
+  pending photo kept by cleanup.
+- Needs the live run: confirm the real Gemini 429 body uses these `quotaId` names. If it doesn't, the
+  app shows the general "temporary limit" message (safe fallback, no time promised).
+
 ## App icon (2026-10-24, not committed)
 
 - Official logo (user-supplied, 2048×2048) as the app icon: source `app/assets/icon/app_icon.png` (lossless copy;

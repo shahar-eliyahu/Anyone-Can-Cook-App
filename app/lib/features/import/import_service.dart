@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +8,7 @@ import '../../core/content_hash.dart';
 import '../../core/db/database.dart';
 import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
+import '../../data/settings_repository.dart';
 import '../../models/cooking_plan.dart';
 import '../../models/recipe_analysis.dart';
 import '../cooking/engine/plan_validator.dart';
@@ -35,6 +37,31 @@ class ImportPlanReady extends ImportOutcome {
   final String draftId;
 }
 
+/// The recipe was read and saved as a draft, but generating the plan failed (e.g. the
+/// AI quota ran out in between). Retrying needs only the plan call, not a new analysis.
+class ImportPlanFailed extends ImportOutcome {
+  const ImportPlanFailed(this.draftId, this.error);
+  final String draftId;
+  final Object error;
+}
+
+/// The input of an import that hasn't gone through yet (offline, AI quota used up…),
+/// kept so nothing typed, pasted or photographed is lost. Cleared once a draft exists.
+class PendingImport {
+  const PendingImport({this.text, this.url, this.imagePath});
+
+  factory PendingImport.of(ImportSource s) => PendingImport(text: s.text, url: s.url, imagePath: s.imagePath);
+
+  factory PendingImport.fromJson(Map<String, dynamic> j) =>
+      PendingImport(text: j['text'] as String?, url: j['url'] as String?, imagePath: j['image_path'] as String?);
+
+  final String? text;
+  final String? url;
+  final String? imagePath;
+
+  Map<String, dynamic> toJson() => {'text': text, 'url': url, 'image_path': imagePath};
+}
+
 /// What the user wants to import. Built by the import screen (or, later, by
 /// recipe discovery: a chosen search result is just a [ImportSource.url]).
 class ImportSource {
@@ -59,32 +86,40 @@ class ImportSource {
 }
 
 class ImportService {
-  ImportService({required this.api, required this.recipes, required this.images});
+  ImportService({required this.api, required this.recipes, required this.images, required this.settings});
 
   final ApiClient api;
   final RecipeRepository recipes;
   final ImageStore images;
+  final SettingsRepository settings;
+
+  Future<PendingImport?> pendingInput() async {
+    final raw = await settings.get(SettingKeys.pendingImport);
+    return raw == null || raw.isEmpty ? null : PendingImport.fromJson(jsonDecode(raw) as Map<String, dynamic>);
+  }
+
+  Future<void> savePending(PendingImport input) => settings.set(SettingKeys.pendingImport, jsonEncode(input.toJson()));
+
+  Future<void> clearPending() => settings.set(SettingKeys.pendingImport, '');
 
   /// A recipe or draft already imported from the same source.
   Future<RecipeRow?> findDuplicate(ImportSource source) => recipes.findByContentHash(source.hash);
 
   /// Analyze → save draft → (questions ? stop : generate the plan).
+  ///
+  /// The input is kept as pending until a draft exists, so a failure (offline, AI quota
+  /// used up…) loses nothing; the photo stays for a retry. Nothing is retried automatically.
   Future<ImportOutcome> analyze(ImportSource source, {void Function(ImportStage)? onStage}) async {
     onStage?.call(ImportStage.reading);
-    final RecipeAnalysis analysis;
-    try {
-      analysis = switch (source.type) {
-        SourceType.text => await api.analyzeText(source.text!),
-        SourceType.url => await api.analyzeUrl(source.url!),
-        _ => await api.analyzeImage(source.imageBytes!),
-      };
-    } catch (_) {
-      // A failed photo import keeps nothing.
-      await images.delete(source.imagePath);
-      rethrow;
-    }
+    await savePending(PendingImport.of(source));
+    final analysis = switch (source.type) {
+      SourceType.text => await api.analyzeText(source.text!),
+      SourceType.url => await api.analyzeUrl(source.url!),
+      _ => await api.analyzeImage(source.imageBytes!),
+    };
     if (!analysis.isRecipe || analysis.recipe == null) {
       await images.delete(source.imagePath);
+      await clearPending();
       return ImportNotRecipe(analysis.notRecipeReasonHe);
     }
     final draftId = await recipes.saveDraft(
@@ -93,9 +128,14 @@ class ImportService {
       imagePath: source.imagePath,
       contentHash: source.hash,
     );
+    await clearPending(); // the draft now holds the input
     if (analysis.questions.isNotEmpty) return ImportNeedsAnswers(draftId);
     onStage?.call(ImportStage.planning);
-    await generatePlan(draftId);
+    try {
+      await generatePlan(draftId);
+    } catch (e) {
+      return ImportPlanFailed(draftId, e);
+    }
     return ImportPlanReady(draftId);
   }
 
@@ -126,13 +166,15 @@ class ImportService {
 
   Future<void> discard(String draftId) async => images.delete(await recipes.discardDraft(draftId));
 
-  /// Startup cleanup: expired drafts, their photos, and photos no draft refers to.
+  /// Startup cleanup: expired drafts, their photos, and photos neither a draft nor
+  /// the pending (not yet sent) import refers to.
   Future<void> cleanup() async {
     for (final path in await recipes.purgeOldDrafts()) {
       await images.delete(path);
     }
     final drafts = await recipes.watchDrafts().first;
-    await images.deleteAllExcept({for (final d in drafts) ?d.sourceImagePath});
+    final pending = (await pendingInput())?.imagePath;
+    await images.deleteAllExcept({for (final d in drafts) ?d.sourceImagePath, ?pending});
   }
 }
 
@@ -141,5 +183,6 @@ final importServiceProvider = Provider<ImportService>(
     api: ref.watch(apiClientProvider),
     recipes: ref.watch(recipeRepositoryProvider),
     images: ref.watch(imageStoreProvider),
+    settings: ref.watch(settingsRepositoryProvider),
   ),
 );

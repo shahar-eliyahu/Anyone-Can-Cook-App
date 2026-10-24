@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:anyone_can_cook/core/api_client.dart';
 import 'package:anyone_can_cook/core/db/database.dart';
 import 'package:anyone_can_cook/data/recipe_repository.dart';
+import 'package:anyone_can_cook/data/settings_repository.dart';
 import 'package:anyone_can_cook/features/import/import_service.dart';
 import 'package:anyone_can_cook/models/plan_response.dart';
 import 'package:anyone_can_cook/models/recipe_analysis.dart';
@@ -42,7 +43,7 @@ void main() {
     api = FakeApi();
     images = FakeImageStore();
     recipes = RecipeRepository(db, FakeClock().call);
-    service = ImportService(api: api, recipes: recipes, images: images);
+    service = ImportService(api: api, recipes: recipes, images: images, settings: SettingsRepository(db, FakeClock().call));
   });
   tearDown(() => db.close());
 
@@ -82,14 +83,44 @@ void main() {
     expect(await recipes.watchDrafts().first, isEmpty);
   });
 
-  test('a failed photo import keeps nothing', () async {
-    api.analyses.add(const ApiFailure('ai_rate_limited', retryAfterSeconds: 60));
+  test('a failed photo import keeps the photo and the input for a retry, without retrying itself', () async {
+    api.analyses.add(const ApiFailure('ai_quota_exhausted'));
     await expectLater(
       service.analyze(ImportSource.image('/images/p.jpg', Uint8List.fromList([1]))),
-      throwsA(isA<ApiFailure>().having((f) => f.code, 'code', 'ai_rate_limited')),
+      throwsA(isA<ApiFailure>().having((f) => f.code, 'code', 'ai_quota_exhausted')),
     );
-    expect(images.deleted, ['/images/p.jpg']);
+    expect(api.calls, ['analyzeImage']); // exactly one attempt
+    expect(images.deleted, isEmpty);
+    expect((await service.pendingInput())!.imagePath, '/images/p.jpg');
     expect(await recipes.watchDrafts().first, isEmpty);
+    // Startup cleanup keeps the pending photo.
+    images.saved.addAll({'/images/p.jpg', '/images/orphan.jpg'});
+    await service.cleanup();
+    expect(images.deleted, ['/images/orphan.jpg']);
+  });
+
+  test('failed text input is kept as pending, and cleared once a draft exists', () async {
+    api.analyses.addAll([const ApiFailure('ai_rate_limited'), analysisWith(questions: [question])]);
+    await expectLater(service.analyze(const ImportSource.text('מרק עדשים')), throwsA(isA<ApiFailure>()));
+    expect((await service.pendingInput())!.text, 'מרק עדשים');
+    await service.analyze(const ImportSource.text('מרק עדשים'));
+    expect(await service.pendingInput(), isNull);
+  });
+
+  test('quota used up while planning: the analyzed draft is kept and the plan alone is retried', () async {
+    api.analyses.add(analysisWith());
+    api.plans.addAll([const ApiFailure('ai_quota_exhausted'), planResponse]);
+    final outcome = await service.analyze(const ImportSource.text('מתכון'));
+    final failed = outcome as ImportPlanFailed;
+    expect((failed.error as ApiFailure).code, 'ai_quota_exhausted');
+    expect(api.calls, ['analyzeText', 'plan']);
+    expect((await recipes.getRecipe(failed.draftId))!.isDraft, isTrue);
+    expect(await recipes.draftPlan(failed.draftId), isNull);
+    expect(await service.pendingInput(), isNull); // the draft holds the input now
+    // Later, when the service is back: only the plan call, no second analysis.
+    await service.generatePlan(failed.draftId);
+    expect(api.calls, ['analyzeText', 'plan', 'plan']);
+    expect(await recipes.draftPlan(failed.draftId), isNotNull);
   });
 
   test('an invalid plan from the server is rejected on the device', () async {
@@ -98,8 +129,10 @@ void main() {
     ]);
     api.analyses.add(analysisWith());
     api.plans.add(PlanResponse(plan: broken));
-    await expectLater(service.analyze(const ImportSource.text('x')), throwsA(isA<ApiFailure>()));
+    final outcome = await service.analyze(const ImportSource.text('x')) as ImportPlanFailed;
+    expect((outcome.error as ApiFailure).code, 'invalid_ai_output');
     final draft = (await recipes.watchDrafts().first).single;
+    expect(draft.id, outcome.draftId);
     expect(await recipes.draftPlan(draft.id), isNull);
   });
 

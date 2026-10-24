@@ -35,7 +35,23 @@ class LLMError(Exception):
 
 
 class LLMRateLimited(LLMError):
-    """The provider refused because of quota or rate limits. Never retried."""
+    """The provider refused because of quota or rate limits. Never retried.
+
+    `scope` is "day" when the provider says a daily quota is used up, "minute" for a
+    short-window limit, and "unknown" when it doesn't say. `retry_after_seconds` is set
+    only when the provider states it for a short-window limit.
+    """
+
+    def __init__(
+        self,
+        message: str = "rate limited",
+        *,
+        scope: Literal["minute", "day", "unknown"] = "unknown",
+        retry_after_seconds: int | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.scope = scope
+        self.retry_after_seconds = retry_after_seconds
 
 
 class LLMUnavailable(LLMError):

@@ -3,6 +3,7 @@ import '../core/db/database.dart';
 abstract final class SettingKeys {
   static const sampleRecipeSeeded = 'sample_recipe_seeded';
   static const importPrivacyAccepted = 'import_privacy_accepted';
+  static const pendingImport = 'pending_import';
 }
 
 class SettingsRepository {

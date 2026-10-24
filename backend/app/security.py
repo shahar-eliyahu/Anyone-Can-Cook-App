@@ -5,6 +5,7 @@ can be extracted, so it only deters casual use; counters live in memory, so they
 reset when Render restarts the service, and clients behind one IP share a limit.
 """
 
+import math
 import secrets
 import time
 from collections import defaultdict, deque
@@ -74,12 +75,33 @@ class SlidingWindowLimiter:
 
 
 class DailyBudget:
-    """App-wide cap on real AI calls per UTC day, protecting the free quota."""
+    """App-wide guard on real AI calls: a cap per UTC day, protecting the free quota, and
+    a pause after the provider reports quota or rate limits, so a used-up quota isn't
+    hit again by every request (users get the same answer without a provider call)."""
 
-    def __init__(self, today=lambda: datetime.now(UTC).date()) -> None:
+    # How long to stop calling the provider when it doesn't say. Internal only: the app is
+    # never promised a time unless the provider stated one for a short-window limit.
+    QUOTA_PAUSE_SECONDS = 3600
+    RATE_PAUSE_SECONDS = 30
+
+    def __init__(self, today=lambda: datetime.now(UTC).date(), clock=time.monotonic) -> None:
         self._today = today
+        self._clock = clock
         self._day = today()
         self.used = 0
+        self._paused_until = 0.0
+        self._pause_code = ""
+        self._pause_known_delay = False
+
+    def pause(self, code: str, seconds: float, known: bool) -> None:
+        self._paused_until = max(self._paused_until, self._clock() + seconds)
+        self._pause_code, self._pause_known_delay = code, known
+
+    def check_paused(self) -> None:
+        remaining = self._paused_until - self._clock()
+        if remaining > 0:
+            headers = {"Retry-After": str(math.ceil(remaining))} if self._pause_known_delay else None
+            raise ApiError(429, self._pause_code, headers=headers)
 
     def consume(self, cap: int) -> None:
         if self._today() != self._day:

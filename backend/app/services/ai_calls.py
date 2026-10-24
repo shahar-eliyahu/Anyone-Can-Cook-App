@@ -31,10 +31,12 @@ async def call_structured(
     budget: DailyBudget,
     purpose: str,
 ) -> T:
-    """Every attempt counts against the daily cap. Rate limits are never retried;
-    temporary failures are retried once. `LLMInvalidOutput` is left to the caller
-    (it decides whether to make a repair call)."""
+    """Every attempt counts against the daily cap. Rate limits are never retried, and
+    after one the provider isn't called again for a while; temporary failures are
+    retried once. `LLMInvalidOutput` is left to the caller (it decides whether to make
+    a repair call)."""
     for attempt in (1, 2):
+        budget.check_paused()
         budget.consume(settings.ai_daily_call_cap)
         logger.info("ai call purpose=%s attempt=%d calls_today=%d", purpose, attempt, budget.used)
         try:
@@ -45,7 +47,14 @@ async def call_structured(
         except TimeoutError as e:
             raise ApiError(504, "timeout") from e
         except LLMRateLimited as e:
-            raise ApiError(429, "ai_rate_limited", headers={"Retry-After": "60"}) from e
+            logger.warning("ai %s limit purpose=%s", e.scope, purpose)
+            if e.scope == "day":
+                budget.pause("ai_quota_exhausted", budget.QUOTA_PAUSE_SECONDS, known=False)
+                raise ApiError(429, "ai_quota_exhausted") from e
+            known = e.retry_after_seconds is not None
+            budget.pause("ai_rate_limited", e.retry_after_seconds or budget.RATE_PAUSE_SECONDS, known=known)
+            headers = {"Retry-After": str(e.retry_after_seconds)} if known else None
+            raise ApiError(429, "ai_rate_limited", headers=headers) from e
         except LLMUnavailable as e:
             if attempt == 2:
                 raise ApiError(503, "ai_unavailable") from e

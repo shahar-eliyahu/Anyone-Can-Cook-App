@@ -35,18 +35,28 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
   bool _slow = false;
   Timer? _slowTimer;
   String? _message;
+  bool _info = false; // _message is a notice, not an error
+  bool _canRetry = false;
+
+  /// The photo saved with the pending input (kept when the user leaves).
+  String? _pendingImage;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => _ensurePrivacyNotice());
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _ensurePrivacyNotice();
+      await _restorePending();
+    });
   }
 
   @override
   void dispose() {
     _slowTimer?.cancel();
-    // A photo picked but never analyzed is not kept.
-    if (_imagePath != null) unawaited(ref.read(imageStoreProvider).delete(_imagePath));
+    // A photo picked but never sent is not kept; one saved with a failed attempt is.
+    if (_imagePath != null && _imagePath != _pendingImage) {
+      unawaited(ref.read(imageStoreProvider).delete(_imagePath));
+    }
     _tabs.dispose();
     _text.dispose();
     _url.dispose();
@@ -79,6 +89,33 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
     }
   }
 
+  /// Brings back the input of an attempt that didn't go through (e.g. AI quota used up).
+  Future<void> _restorePending() async {
+    final pending = await ref.read(importServiceProvider).pendingInput();
+    if (pending == null || !mounted) return;
+    final image = pending.imagePath;
+    // Sync read: the file is small, and this keeps widget tests deterministic.
+    final bytes = image != null && File(image).existsSync() ? File(image).readAsBytesSync() : null;
+    final l10n = AppLocalizations.of(context);
+    setState(() {
+      if (pending.text case final t?) {
+        _text.text = t;
+        _tabs.index = 0;
+      } else if (pending.url case final u?) {
+        _url.text = u;
+        _tabs.index = 2;
+      } else if (bytes != null) {
+        _imagePath = _pendingImage = image;
+        _imageBytes = bytes;
+        _tabs.index = 1;
+      } else {
+        return;
+      }
+      _message = l10n.importRestored;
+      _info = true;
+    });
+  }
+
   Future<void> _pickPhoto({required bool camera}) async {
     final picked = await ref.read(photoPickerProvider)(camera: camera);
     if (picked == null) return;
@@ -94,6 +131,10 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
   }
 
   Future<void> _removePhoto() async {
+    if (_imagePath == _pendingImage) {
+      await ref.read(importServiceProvider).clearPending();
+      _pendingImage = null;
+    }
     await ref.read(imageStoreProvider).delete(_imagePath);
     setState(() => _imagePath = _imageBytes = null);
   }
@@ -143,16 +184,18 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
     setState(() {
       _stage = ImportStage.reading;
       _message = null;
+      _info = _canRetry = false;
       _slow = false;
     });
     _slowTimer = Timer(const Duration(seconds: 12), () {
       if (mounted) setState(() => _slow = true);
     });
     try {
+      if (source.type == SourceType.image) _pendingImage = source.imagePath;
       final outcome = await service.analyze(source, onStage: (s) {
         if (mounted) setState(() => _stage = s);
       });
-      _imagePath = _imageBytes = null; // now owned by the draft (or already deleted)
+      _imagePath = _imageBytes = _pendingImage = null; // now owned by the draft (or already deleted)
       if (!mounted) return;
       switch (outcome) {
         case ImportNotRecipe(:final reasonHe):
@@ -161,10 +204,18 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
           context.pushReplacement('/drafts/$draftId/clarify');
         case ImportPlanReady(:final draftId):
           context.pushReplacement('/drafts/$draftId/review');
+        case ImportPlanFailed(:final draftId, :final error):
+          // The recipe is saved; the draft's screen retries only the plan.
+          context.pushReplacement('/drafts/$draftId/clarify', extra: error);
       }
     } catch (e) {
-      if (source.type == SourceType.image) _imagePath = _imageBytes = null; // a failed photo import keeps nothing
-      if (mounted) setState(() => _message = importErrorText(l10n, e));
+      // The input (and photo) stays, on screen and saved, for a retry; nothing is retried automatically.
+      if (mounted) {
+        setState(() {
+          _message = importErrorText(l10n, e);
+          _canRetry = isRetryable(e);
+        });
+      }
     } finally {
       _slowTimer?.cancel();
       if (mounted) setState(() => _stage = null);
@@ -286,16 +337,21 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
                 else
                   FilledButton.icon(
                     onPressed: _source == null ? null : _analyze,
-                    icon: const Icon(Icons.auto_awesome),
-                    label: Text(l10n.importAnalyze),
+                    icon: Icon(_canRetry ? Icons.refresh : Icons.auto_awesome),
+                    label: Text(_canRetry ? l10n.importRetry : l10n.importAnalyze),
                   ),
                 if (_message case final m?) ...[
                   const SizedBox(height: 16),
                   Card(
-                    color: theme.colorScheme.errorContainer,
+                    color: _info ? theme.colorScheme.secondaryContainer : theme.colorScheme.errorContainer,
                     child: Padding(
                       padding: const EdgeInsets.all(12),
-                      child: Text(m, style: TextStyle(color: theme.colorScheme.onErrorContainer)),
+                      child: Text(
+                        m,
+                        style: TextStyle(
+                          color: _info ? theme.colorScheme.onSecondaryContainer : theme.colorScheme.onErrorContainer,
+                        ),
+                      ),
                     ),
                   ),
                 ],

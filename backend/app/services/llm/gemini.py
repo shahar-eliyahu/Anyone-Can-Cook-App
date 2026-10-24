@@ -3,6 +3,8 @@
 The `google-genai` SDK is imported lazily so the mock setup needs no extra dependency.
 """
 
+import math
+import re
 from collections.abc import AsyncIterator
 
 from pydantic import SecretStr, ValidationError
@@ -58,7 +60,7 @@ class GeminiProvider:
     def _translate(self, e: Exception) -> LLMError:
         if isinstance(e, self._errors.ClientError):
             if e.code == 429:
-                return LLMRateLimited("rate limited")
+                return rate_limit_error(e.details)
             return LLMError(f"client error {e.code}")
         if isinstance(e, self._errors.ServerError):
             return LLMUnavailable(f"server error {e.code}")
@@ -114,6 +116,36 @@ class GeminiProvider:
         async for chunk in stream:
             if chunk.text:
                 yield chunk.text
+
+
+def rate_limit_error(details) -> LLMRateLimited:
+    """Reads a Gemini 429 body (RESOURCE_EXHAUSTED) without trusting its shape.
+
+    The quota id says which window ran out (e.g. "...PerDay..." or "...PerMinute...");
+    RetryInfo.retryDelay ("37s") is used only for short windows: for a daily quota it
+    doesn't say when the quota resets.
+    """
+    error = details.get("error", details) if isinstance(details, dict) else {}
+    items = error.get("details") if isinstance(error, dict) else None
+    quota_ids, delay = [], None
+    for item in items if isinstance(items, list) else []:
+        if not isinstance(item, dict):
+            continue
+        kind = str(item.get("@type", ""))
+        if kind.endswith("google.rpc.QuotaFailure"):
+            for v in item.get("violations") or []:
+                if isinstance(v, dict):
+                    quota_ids.append(str(v.get("quotaId", "")) + " " + str(v.get("quotaMetric", "")))
+        elif kind.endswith("google.rpc.RetryInfo"):
+            m = re.fullmatch(r"(\d+(?:\.\d+)?)s", str(item.get("retryDelay", "")))
+            if m:
+                delay = math.ceil(float(m.group(1)))
+    text = " ".join(quota_ids).lower()
+    if "perday" in text or "per_day" in text:
+        return LLMRateLimited("daily quota exhausted", scope="day")
+    if "perminute" in text or "per_minute" in text:
+        return LLMRateLimited("per-minute limit", scope="minute", retry_after_seconds=delay)
+    return LLMRateLimited("rate limited", scope="unknown", retry_after_seconds=delay)
 
 
 def _summarize(e: ValidationError, limit: int = 20) -> str:

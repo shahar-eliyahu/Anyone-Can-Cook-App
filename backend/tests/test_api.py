@@ -209,3 +209,66 @@ def test_unexpected_errors_return_500_and_log_no_content(caplog):
         r = TestClient(demo, raise_server_exceptions=False).get("/boom")
     assert r.status_code == 500 and r.json() == {"error_code": "server_error", "detail": ""}
     assert "secret recipe text" not in caplog.text and "ValueError" in caplog.text
+
+
+# ---- quota exhaustion and rate limits from the AI provider (FakeProvider, zero real calls) ----
+
+from app.services.llm import LLMRateLimited
+
+TEXT = {"type": "text", "content": "x" * 50}
+
+
+def test_daily_quota_exhausted_is_reported_and_the_provider_is_not_called_again(client):
+    c, provider = client(provider=FakeProvider({
+        "LlmAnalysis": [LLMRateLimited(scope="day"), mock_json("sample_analysis.json")],
+    }))
+    now = [0.0]
+    app.dependency_overrides[get_ai_budget] = (lambda b: lambda: b)(DailyBudget(clock=lambda: now[0]))
+    r = c.post("/v1/recipes/analyze", json=TEXT, headers=auth())
+    assert r.status_code == 429 and r.json()["error_code"] == "ai_quota_exhausted"
+    assert "Retry-After" not in r.headers  # the reset time is not known: nothing is promised
+    assert len(provider.calls) == 1
+    # Further requests get the same answer without reaching the provider (no retry storm).
+    for _ in range(3):
+        r = c.post("/v1/recipes/analyze", json=TEXT, headers=auth())
+        assert r.status_code == 429 and r.json()["error_code"] == "ai_quota_exhausted"
+        assert "Retry-After" not in r.headers
+    assert len(provider.calls) == 1
+    # After the internal pause the provider is tried again (and now succeeds).
+    now[0] = DailyBudget.QUOTA_PAUSE_SECONDS + 1
+    r = c.post("/v1/recipes/analyze", json={"type": "text", "content": SAMPLE_SOURCE_TEXT}, headers=auth())
+    assert r.status_code == 200 and len(provider.calls) == 2
+
+
+def test_short_rate_limit_states_only_the_known_delay(client):
+    c, provider = client(provider=FakeProvider({
+        "LlmAnalysis": [LLMRateLimited(scope="minute", retry_after_seconds=20)],
+    }))
+    now = [0.0]
+    app.dependency_overrides[get_ai_budget] = (lambda b: lambda: b)(DailyBudget(clock=lambda: now[0]))
+    r = c.post("/v1/recipes/analyze", json=TEXT, headers=auth())
+    assert r.status_code == 429 and r.json()["error_code"] == "ai_rate_limited"
+    assert r.headers["Retry-After"] == "20"
+    now[0] = 5
+    r = c.post("/v1/recipes/analyze", json=TEXT, headers=auth())
+    assert r.json()["error_code"] == "ai_rate_limited" and r.headers["Retry-After"] == "15"
+    assert len(provider.calls) == 1  # paused: no call while the provider asked us to wait
+
+
+def test_rate_limit_without_a_stated_delay_promises_no_time_and_is_not_retried(client):
+    c, provider = client(provider=FakeProvider({"LlmAnalysis": [LLMRateLimited()]}))
+    r = c.post("/v1/recipes/analyze", json=TEXT, headers=auth())
+    assert r.status_code == 429 and r.json()["error_code"] == "ai_rate_limited"
+    assert "Retry-After" not in r.headers
+    assert len(provider.calls) == 1
+
+
+def test_quota_exhausted_during_planning_is_not_retried_or_repaired(client):
+    c, provider = client(provider=FakeProvider({
+        "LlmAnalysis": [mock_json("sample_analysis.json")],
+        "LlmPlan": [LLMRateLimited(scope="day")],
+    }))
+    analysis = c.post("/v1/recipes/analyze", json={"type": "text", "content": SAMPLE_SOURCE_TEXT}, headers=auth()).json()
+    r = c.post("/v1/recipes/plan", json={"analysis": analysis}, headers=auth())
+    assert r.status_code == 429 and r.json()["error_code"] == "ai_quota_exhausted"
+    assert [call["schema"] for call in provider.calls] == ["LlmAnalysis", "LlmPlan"]

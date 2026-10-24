@@ -198,4 +198,70 @@ void main() {
     expect(h.api.calls, isEmpty);
     expect(row.status, RecipeStatus.ready);
   });
+
+  testApp('AI quota used up: a clear message, no time promised, input kept after leaving, one-tap retry later',
+      (tester, h) async {
+    await acceptPrivacy(h);
+    h.api.analyses.addAll([const ApiFailure('ai_quota_exhausted'), analysis()]);
+    h.api.plans.add(planResponse);
+    await tester.pumpWidget(h.build());
+    await tester.pumpAndSettle();
+    await tapText(tester, 'מתכון חדש');
+    await tester.enterText(find.byType(TextField), 'שקשוקה לארבעה');
+    await tapText(tester, 'ניתוח המתכון');
+
+    await expectSeen(tester, find.textContaining('מכסת השימוש היומית'));
+    await expectSeen(tester, find.textContaining('המתכונים השמורים והבישול ממשיכים לעבוד'));
+    expect(find.textContaining('דקה'), findsNothing); // no reset time is promised
+    expect(find.text('שקשוקה לארבעה'), findsOneWidget);
+    expect(h.api.calls, ['analyzeText']); // not retried automatically
+
+    // Leave and come back later: the input is restored.
+    GoRouter.of(tester.element(find.byType(Scaffold).last)).pop();
+    await tester.pumpAndSettle();
+    await tapText(tester, 'מתכון חדש');
+    expect(find.text('שקשוקה לארבעה'), findsOneWidget);
+    await expectSeen(tester, find.text('שחזרנו את מה שהזנתם בניסיון הקודם.'));
+
+    // The service is back: one retry goes through.
+    await tapText(tester, 'ניתוח המתכון');
+    expect(find.text('בדיקת התוכנית'), findsOneWidget);
+    expect(h.api.calls, ['analyzeText', 'analyzeText', 'plan']);
+  });
+
+  testApp('a short rate limit shows a wait time only when the server stated one', (tester, h) async {
+    await acceptPrivacy(h);
+    h.api.analyses.addAll([
+      const ApiFailure('ai_rate_limited', retryAfterSeconds: 90),
+      const ApiFailure('ai_rate_limited'),
+    ]);
+    await tester.pumpWidget(h.build(initialLocation: '/import'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'עוגת גבינה');
+    await tapText(tester, 'ניתוח המתכון');
+    await expectSeen(tester, find.textContaining("בעוד כ-2 דק'"));
+
+    await tapText(tester, 'נסו שוב');
+    await expectSeen(tester, find.textContaining('נסו שוב בעוד כמה דקות'));
+    expect(find.textContaining("בעוד כ-"), findsNothing);
+    expect(h.api.calls, ['analyzeText', 'analyzeText']); // one call per tap, never automatic
+  });
+
+  testApp('quota used up while planning: the recipe is kept and only the plan is retried', (tester, h) async {
+    await acceptPrivacy(h);
+    h.api.analyses.add(analysis());
+    h.api.plans.addAll([const ApiFailure('ai_quota_exhausted'), planResponse]);
+    await tester.pumpWidget(h.build(initialLocation: '/import'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byType(TextField), 'עוף בתנור');
+    await tapText(tester, 'ניתוח המתכון');
+
+    await expectSeen(tester, find.textContaining('מכסת השימוש היומית'));
+    await expectSeen(tester, find.textContaining('המתכון נקרא ונשמר'));
+    expect((await allRecipes(h)).single.status, RecipeStatus.draft);
+
+    await tapText(tester, 'נסו שוב');
+    expect(find.text('בדיקת התוכנית'), findsOneWidget);
+    expect(h.api.calls, ['analyzeText', 'plan', 'plan']); // no second analysis
+  });
 }

@@ -758,10 +758,12 @@ class AppLocalizationsHe extends AppLocalizations {
   String get errRateLimited => 'הגעתם למגבלת הייבוא לשעה. נסו שוב מאוחר יותר.';
 
   @override
-  String get errAiBusy => 'שירות הבינה המלאכותית עמוס כרגע. נסו שוב בעוד דקה.';
+  String get errAiBusy =>
+      'ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
 
   @override
-  String get errDailyLimit => 'הגענו למגבלת הייבוא היומית. נסו שוב מחר.';
+  String get errDailyLimit =>
+      'הגענו למגבלת הייבוא היומית של האפליקציה. נסו שוב מחר. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
 
   @override
   String get errTooLarge =>
@@ -799,4 +801,27 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get errGeneric => 'משהו השתבש בייבוא. נסו שוב.';
+
+  @override
+  String errAiBusyRetryIn(int minutes) {
+    return 'ניתוח מתכונים עם בינה מלאכותית לא זמין כרגע בגלל עומס זמני. אפשר לנסות שוב בעוד כ-$minutes דק\'. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
+  }
+
+  @override
+  String get errAiQuota =>
+      'מכסת השימוש היומית בשירות הבינה המלאכותית נוצלה, ולכן ייבוא מתכונים חדשים לא זמין כרגע. נסו שוב מאוחר יותר. מה שהזנתם נשמר, והמתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
+
+  @override
+  String get errAiUnavailable =>
+      'שירות הבינה המלאכותית לא זמין כרגע. נסו שוב בעוד כמה דקות. המתכונים השמורים והבישול ממשיכים לעבוד כרגיל.';
+
+  @override
+  String get importRetry => 'נסו שוב';
+
+  @override
+  String get importRestored => 'שחזרנו את מה שהזנתם בניסיון הקודם.';
+
+  @override
+  String get importPlanFailedNote =>
+      'המתכון נקרא ונשמר. אפשר לנסות שוב לבנות את התוכנית בלי לקרוא אותו מחדש.';
 }

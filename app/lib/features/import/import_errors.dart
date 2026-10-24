@@ -2,13 +2,20 @@ import '../../core/api_client.dart';
 import '../../l10n/app_localizations.dart';
 
 /// Hebrew text for an import failure (backend `error_code`, or offline/timeout).
+/// A wait time is shown only when the server stated one (Retry-After); otherwise the
+/// text never promises when the service will be back.
 String importErrorText(AppLocalizations l10n, Object error) {
-  final code = error is ApiFailure ? error.code : '';
-  return switch (code) {
+  final failure = error is ApiFailure ? error : null;
+  return switch (failure?.code ?? '') {
     'offline' => l10n.errOffline,
     'timeout' => l10n.errTimeout,
     'rate_limited' => l10n.errRateLimited,
-    'ai_rate_limited' || 'ai_unavailable' => l10n.errAiBusy,
+    'ai_rate_limited' => switch (failure!.retryAfterSeconds) {
+        final s? when s > 0 => l10n.errAiBusyRetryIn((s / 60).ceil()),
+        _ => l10n.errAiBusy,
+      },
+    'ai_quota_exhausted' => l10n.errAiQuota,
+    'ai_unavailable' => l10n.errAiUnavailable,
     'daily_limit' => l10n.errDailyLimit,
     'too_large' => l10n.errTooLarge,
     'unsupported_media' => l10n.errUnsupportedImage,
@@ -23,3 +30,19 @@ String importErrorText(AppLocalizations l10n, Object error) {
     _ => l10n.errGeneric,
   };
 }
+
+/// Failures where the same request can succeed later: offer "נסו שוב" and keep the input.
+bool isRetryable(Object error) =>
+    error is ApiFailure &&
+    const {
+      'offline',
+      'timeout',
+      'rate_limited',
+      'ai_rate_limited',
+      'ai_quota_exhausted',
+      'ai_unavailable',
+      'daily_limit',
+      'fetch_failed',
+      'server_error',
+      'invalid_ai_output',
+    }.contains(error.code);

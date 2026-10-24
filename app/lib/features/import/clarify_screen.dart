@@ -14,9 +14,12 @@ import 'import_service.dart';
 /// reference. Unanswered questions and "לא יודע/ת" are sent as unknown; they are
 /// never asked again (the plan then uses a labeled estimate or explains the limitation).
 class ClarifyScreen extends ConsumerStatefulWidget {
-  const ClarifyScreen({super.key, required this.draftId});
+  const ClarifyScreen({super.key, required this.draftId, this.planError});
 
   final String draftId;
+
+  /// Set when generating the plan failed right after the import (e.g. AI quota used up).
+  final Object? planError;
 
   @override
   ConsumerState<ClarifyScreen> createState() => _ClarifyScreenState();
@@ -30,11 +33,21 @@ class _ClarifyScreenState extends ConsumerState<ClarifyScreen> {
   final _unknown = <String>{};
   bool _busy = false;
   String? _error;
+  late bool _failed = widget.planError != null;
 
   @override
   void initState() {
     super.initState();
     _load();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (widget.planError case final e? when _error == null && _failed) {
+      final l10n = AppLocalizations.of(context);
+      _error = '${importErrorText(l10n, e)}\n${l10n.importPlanFailedNote}';
+    }
   }
 
   @override
@@ -79,10 +92,16 @@ class _ClarifyScreenState extends ConsumerState<ClarifyScreen> {
       _error = null;
     });
     try {
+      // Answers are saved before the plan call, so a failure keeps them.
       await ref.read(importServiceProvider).submitAnswers(widget.draftId, _answers);
       if (mounted) context.pushReplacement('/drafts/${widget.draftId}/review');
     } catch (e) {
-      if (mounted) setState(() => _error = importErrorText(l10n, e));
+      if (mounted) {
+        setState(() {
+          _error = importErrorText(l10n, e);
+          _failed = true;
+        });
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -173,8 +192,8 @@ class _ClarifyScreenState extends ConsumerState<ClarifyScreen> {
           else
             FilledButton.icon(
               onPressed: _continue,
-              icon: const Icon(Icons.auto_awesome),
-              label: Text(l10n.clarifyContinue),
+              icon: Icon(_failed ? Icons.refresh : Icons.auto_awesome),
+              label: Text(_failed ? l10n.importRetry : l10n.clarifyContinue),
             ),
           if (_error case final e?) ...[
             const SizedBox(height: 16),
