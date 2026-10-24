@@ -34,9 +34,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get newRecipe => 'מתכון חדש';
 
   @override
-  String get noActiveSession => 'אין בישול פעיל כרגע';
-
-  @override
   String get retry => 'נסו שוב';
 
   @override
@@ -418,11 +415,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get testNotificationScheduled => 'התראת הבדיקה תגיע בעוד 10 שניות';
 
   @override
-  String serverAddress(String url) {
-    return 'כתובת השרת (מצב פיתוח): $url';
-  }
-
-  @override
   String get aboutTitle => 'אודות';
 
   @override
@@ -757,9 +749,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get durationUnderMinute => 'פחות מדקה';
 
   @override
-  String get loadingShort => '…';
-
-  @override
   String durationMinutes(int minutes) {
     return 'כ-$minutes דק\'';
   }
@@ -790,9 +779,6 @@ class AppLocalizationsHe extends AppLocalizations {
   @override
   String get overviewChecklistIntro =>
       'סמנו מה יש לכם. אם משהו חסר, נמצא יחד פתרון.';
-
-  @override
-  String get haveIt => 'יש לי';
 
   @override
   String get missingIt => 'חסר לי';
@@ -1166,9 +1152,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get voiceMic => 'דיבור עם רמי';
 
   @override
-  String get voiceTapToSpeak => 'לחצו על המיקרופון ודברו';
-
-  @override
   String get voicePreparing => 'מכינים את המיקרופון…';
 
   @override
@@ -1257,13 +1240,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get overviewReady => 'הכול מוכן. אפשר להתחיל לבשל!';
 
   @override
-  String get overviewWhatYouNeed => 'מה צריך';
-
-  @override
   String get overviewMore => 'פעולות למתכון';
-
-  @override
-  String get remyAsk => 'שאלו את רמי';
 
   @override
   String get remySheetSubtitle => 'אפשר לכתוב או לדבר';
@@ -1300,12 +1277,6 @@ class AppLocalizationsHe extends AppLocalizations {
       'סמנו \"חסר לי\" ליד המצרך ברשימה, ואציע לכם תחליף מתאים.';
 
   @override
-  String get remyListeningTitle => 'מקשיב לכם';
-
-  @override
-  String get remyTypeInstead => 'להקליד במקום';
-
-  @override
   String get remyClose => 'סגירה';
 
   @override
@@ -1315,13 +1286,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get finishCelebrate => 'בתאבון!';
 
   @override
-  String get finishBackHome => 'חזרה למטבח';
-
-  @override
   String get historyEmptyTitle => 'עוד אין היסטוריה';
-
-  @override
-  String get settingsTimersReady => 'הטיימרים יתריעו בזמן';
 
   @override
   String get settingsAboutVersionless =>
@@ -1334,15 +1299,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get timerPaused => 'מושהה';
 
   @override
-  String timerRunningUntil(Object time) {
-    return 'עד $time';
-  }
-
-  @override
   String get progressLabel => 'התקדמות הבישול';
-
-  @override
-  String get prepTaskDone => 'בוצע';
 
   @override
   String get remyAmountUnknown => 'הכמות לא צוינה';
@@ -1351,4 +1308,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String remyPrepStepCount(int count) {
     return 'במתכון יש $count שלבים.';
   }
+
+  @override
+  String get attentionAckHint => 'כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה.';
 }

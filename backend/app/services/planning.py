@@ -21,7 +21,7 @@ from app.services.llm import LLMInvalidOutput, LLMProvider, TextPart
 from app.services.validation.logic import plan_problems
 from app.services.validation.numbers import states_duration, states_number, states_temperature
 
-NOT_IN_SOURCE_HE = "לא נמצא בטקסט המקורי — סומן כהערכה"
+NOT_IN_SOURCE_HE = "לא נמצא בטקסט המקורי, ולכן סומן כהערכה"
 MAX_TIPS = 3
 
 

@@ -39,3 +39,6 @@ a pot with a lid instead of a rice cooker), with the step changes it needs. If t
 made reliably without it (e.g. no oven for a baked cake), answer "no_substitute".
 
 Use only step and timer ids that exist in <plan_steps>. Never give unsafe instructions.
+
+Hebrew style: natural, short, friendly sentences. Never use dashes (—, –, or a spaced -) as separators
+between phrases in Hebrew text; use a comma, a period or a colon instead. Hyphens inside words (כ-5) are fine.

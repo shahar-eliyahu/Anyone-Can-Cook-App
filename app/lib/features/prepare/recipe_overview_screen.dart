@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -156,6 +157,11 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (needsAck && !_acknowledged)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: Space.s),
+                    child: Text(l10n.attentionAckHint, style: theme.textTheme.bodySmall?.copyWith(color: context.palette.onTimerDoneContainer)),
+                  ),
                 if (missing.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(bottom: Space.s),
@@ -473,7 +479,12 @@ class _ItemRow extends StatelessWidget {
     final canToggle = !readOnly && !resolved;
 
     return ListTile(
-      onTap: canToggle ? () => onStatus(checked ? ItemStatus.unknown : ItemStatus.have) : null,
+      onTap: canToggle
+          ? () {
+              HapticFeedback.selectionClick();
+              onStatus(checked ? ItemStatus.unknown : ItemStatus.have);
+            }
+          : null,
       leading: _CheckCircle(
         checked: checked,
         missing: missing,

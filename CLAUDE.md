@@ -34,6 +34,8 @@ app/        Flutter (Android/iOS). Riverpod, go_router, drift (SQLite), dio, flu
   lib/features/import/         import, clarify, advanced editing (review screen)
   lib/features/assistant/      Remy: command parser, AssistantService (interpret/execute), sheet, voice
   lib/features/*/              other screens (kitchen, recipes, cooking, history, settings)
+  lib/core/theme.dart, motion.dart, widgets/   design system (colours, type, motion, shared components)
+  tool/make_icons.py           app icon + splash from docs/branding/logo.png (run with Pillow + numpy)
   lib/l10n/app_he.arb          ALL user-facing strings (Hebrew)
 backend/    FastAPI, stateless, deployed on Render Free (root dir backend/)
   app/services/llm/            LLMProvider interface; MockProvider (local/tests), GeminiProvider
@@ -65,7 +67,7 @@ Key invariants:
   #61–#63). Tests use `FakeSpeechRecognizer` / `RecordingSpeechSynthesizer` (`h.mic`, `h.speech`).
 - The recipe overview (`/recipes/:id`) is the entry point for drafts and saved recipes; the detailed review is
   optional "עריכה מתקדמת" (DECISIONS #52).
-- Beginner UX: one main action per step ("סיימתי — לשלב הבא"), timers start only from an explicit tap, no
+- Beginner UX: one main action per step ("סיימתי, לשלב הבא"), timers start only from an explicit tap, no
   developer-facing text (server, API, Gemini, database…) anywhere in the UI (DECISIONS #35, #39).
 - Phase 1 works fully offline; the backend is optional for cooking.
 - Local data uses sync-ready columns (UUID ids, `created_at`/`updated_at`, `deleted_at`, nullable `owner_id`).
@@ -82,7 +84,11 @@ Key invariants:
 - **Branding/language:** the user-facing name is **"לבשל כל אחד יכול"** (Android label, iOS display name,
   app title, every screen's app bar). All UI text, notifications and errors are Hebrew, RTL. "Anyone Can
   Cook" is the internal name for code, packages, folders, GitHub. Never rename the repo or folders.
-- **Function before polish** until Phase 4: simple, clean Hebrew UI; no styling work.
+- **Design system (Phase 4, `docs/DESIGN.md`):** colours, type, spacing and motion come from `core/theme.dart` and
+  `core/motion.dart`, never hard-coded; use the shared widgets (`AppScaffold` with "תפריט", `BottomActionBar`,
+  `NoteBanner`, `RecipeTile`, `StageLoader`…). Routes stay nested under `/`. Remy's entry point is `RemyButton`.
+  Hebrew copy: no dash separators (tested), temperatures in words, `tidyHe` for AI/user text. Animations are
+  bounded and respect `Motion.reduced`.
 - **Dependencies:** add a package only when the approved plan needs it; prefer small local code.
 - **Render/Gemini:** keep the Render configuration unchanged; no paid services; no unnecessary Gemini calls.
   Automated tests always use the mock/fake provider.

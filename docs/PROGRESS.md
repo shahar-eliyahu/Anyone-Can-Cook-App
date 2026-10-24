@@ -3,7 +3,7 @@
 Frequently changing status. Permanent rules are in `CLAUDE.md`; the approved design is `docs/PLAN.md`.
 Update this file at the end of every work step.
 
-_Last updated: 2026-10-24 (3C `536436c`, 3A `9e888f7`, 3B `cd82fa6` on origin; 3D `fee2df1` + voice commit local only)_
+_Last updated: 2026-10-24 (3C–3B on origin at `cd82fa6`; 3D `fee2df1` `9386cbb`, Phase 4 `bac3d0d` `73d2f01` + 4E commit, all local only)_
 
 ## Phase status
 
@@ -13,7 +13,7 @@ _Last updated: 2026-10-24 (3C `536436c`, 3A `9e888f7`, 3B `cd82fa6` on origin; 3
 | 1 — Deterministic cooking core (no AI) | ✅ Implemented, verified (automated + emulator), approved by the user, committed and pushed to `main` (see `git log`). |
 | 2 — AI recipe analysis & planning | ✅ Complete, committed and pushed (`a6bd1f3` Phase 2, `a372736` app icon, `fa87e71` quota handling). Deployed on Render; live Gemini recipe test by the user passed (details below). |
 | 3 — Beginner cooking experience + assistant | ✅ 3C, 3A, 3B, 3D (local-first Remy + voice) implemented and verified locally. 3C–3B are on `origin/main`; 3D is committed locally, not pushed or deployed. |
-| 4 — Polish & release | ⏸ Not started. |
+| 4 — UX/UI redesign | ✅ 4B–4E implemented and verified locally (tests + emulator), committed locally, not pushed. Release work not started. |
 
 ## Phase 1 — what exists
 
@@ -62,17 +62,15 @@ Emulator `emulator-5554` (Android 15), app built in debug, **network disabled** 
 
 - Prep-task "due" timing is rule-based (`surface`, `needed_by_step` unlocked); no time estimate before a step.
 - Backdated confirmations ("I put it in 5 minutes ago") not supported (as planned).
-- iOS not built or tested (needs macOS / Codemagic, Phase 4).
+- iOS not built or tested (needs macOS / Codemagic; release work).
 - Typing into the notes field via `adb input text` was unreliable on the emulator (test-tool limitation;
   the widget test covers notes).
-- System Hebrew font (no bundled Heebo) — styling deferred to Phase 4.
 - Timer matrix items not covered on the emulator: battery saver / "restricted" app state and vendor-specific
   restrictions (Samsung, Xiaomi). Needs a real device.
-- The "הערכה" badge explanation is on long-press only (not discoverable); revisit in Phase 4.
+- The "הערכה" badge explanation is on long-press only (advanced editing; the cooking screen shows no badges).
 - Screen-on during cooking (wakelock) not implemented; avoided an extra package. Revisit if users need it.
-- Cold start: the home screen's "המשך בישול" card briefly shows "אין בישול פעיל כרגע" before the active
-  session loads (the card treats "still loading" as "no session"). Show a neutral loading state instead.
-  Seen on the emulator 2026-10-24. Planned in Phase 3C (home screen cleanup), not Phase 4.
+- Cold start glitch ("אין בישול פעיל כרגע" before the session loads): gone in Phase 4; the cooking card appears
+  only once a session is known.
 
 ## Phase 2 progress
 
@@ -408,7 +406,7 @@ Checked what existed, changed only what was missing.
 - The wake phrase ("Hey Remy") stays later. Local understanding is rule-based; unusual phrasings go to Gemini
   (online). The server interpretation is untested against real Gemini (needs approval).
 
-### Phase 4A — UX/UI analysis and design proposal, 2026-10-24 (docs only, not committed)
+### Phase 4A — UX/UI analysis and design proposal, 2026-10-24 (commit `bac3d0d`)
 
 - Inspected every screen, the theme, routes, icons, copy and loading states. Proposal in `docs/DESIGN.md`:
   palette sampled from the final logo with contrast checked, Heebo typography, components, nested navigation with
@@ -419,13 +417,40 @@ Checked what existed, changed only what was missing.
   `context.go()` to flat routes leaves a one-page stack (no back arrow; Android back exits) after saving from
   advanced editing, on the finish screen and from history "continue"; 13 `.arb` strings plus some Dart and
   backend strings use dashes as separators.
-- The logo is stored at `docs/branding/logo.png`; the app icon is unchanged.
+- The logo is stored at `docs/branding/logo.png`.
+
+### Phase 4B–4E — the redesign, implemented 2026-10-24 (local commits)
+
+- **What:** design system, nested navigation + menu, every screen redesigned, Remy's identity, sheet and
+  preparation scope, motion with reduced-motion fallbacks, real loading stages, copy without dashes, RTL fixes,
+  new app icon and splash. Details: `docs/DESIGN.md` §12; decisions #65–#71.
+- **Bugs found and fixed:** row chevrons pointing "back"; one-page stacks after `go()` (no back arrow, Android back
+  exited); the bottom bar's `Align` covering the whole page (found by tests); a ListTile inside a coloured box
+  (ink hidden); recipe filter chips and Remy's chips overflowing at 200% text; Remy's sheet overflowing at 200%
+  text; the continuous-conversation chip scrolled out of view; the degree sign flipping sides; the "הערכה" badge
+  turning green with the new colour roles; the disabled start button not saying why; stray pixels and a channel
+  mix-up in the first icon generation (caught in previews).
+- **Tests (fakes only, zero Gemini calls):** Flutter **266/266**, analyzer clean (19 new in `phase4_ui_test.dart`:
+  back stack from a deep link and after `go()`, Android back, the menu, cooking surviving navigation with timers
+  and undo, RTL arrows, keyboard, small phone + 200% text on every main screen, Remy and the main action never
+  overlapping, reduced motion, the home cooking card, Remy before cooking (local answers offline, cooking actions
+  wait, proposals never applied); 3 in `copy_rules_test.dart`; existing tests updated for the new copy and
+  structure). Backend **186/186** on Python 3.14 and 3.12 (copy constants and prompt style rule).
+- **Emulator (Pixel 8a, Android 15), 2026-10-24:** home, menu, overview, Remy in preparation (offline answer),
+  cooking (step card, prep task, timer controls, amber states), Remy in cooking, abandon dialog, history list and
+  detail, settings, advanced editing; new recipe through a local mock backend (127.0.0.1, mock AI): the real
+  reading stage, the draft overview with its notes (draft discarded afterwards); Android back through nested pages
+  (detail → history → home → leaves only from home); reduced motion via the system animation setting (restored
+  afterwards); the new launcher icon and splash. Test session abandoned afterwards.
+- **Not verified on a real device:** the soft keyboard (the emulator uses a floating handwriting bar; covered by a
+  widget test), haptics, TalkBack/VoiceOver reading order, real speech recognition and spoken replies, iOS (icon
+  set and launch screen generated but not built), launcher icon shapes on other vendors' launchers.
 
 ## Next step
 
-0. User reviews the Phase 4A proposal (`docs/DESIGN.md`) and the open decisions in its section 10; 4B starts only
-   after approval.
-1. User reviews 3D (`fee2df1` + `9386cbb`, local only) and tries voice on a real phone.
+1. User reviews Phase 3D and Phase 4 on a real phone (`fee2df1`, `9386cbb`, `bac3d0d`, `73d2f01` and the 4E
+   commit are local only).
 2. With approval: push; small live Gemini checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 /
-   ≤ 10 calls; 3B/3D Remy ≈ 15 questions / ≤ 20 calls), then deploy.
-3. Phase 4B only after approval of 4A.
+   ≤ 10 calls; 3B/3D Remy ≈ 15 questions / ≤ 20 calls), then deploy (the backend copy and prompt style rule ship
+   with that deploy).
+3. Release work only after approval.

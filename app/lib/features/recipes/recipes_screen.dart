@@ -46,8 +46,9 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: Space.page),
-            child: Row(
+            child: Wrap(
               spacing: Space.s,
+              runSpacing: Space.xs,
               children: [
                 ChoiceChip(
                   label: Text(l10n.allRecipes),

@@ -41,12 +41,12 @@ class ProvenanceBadge extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
         decoration: BoxDecoration(
-          color: estimate ? scheme.tertiaryContainer : scheme.surfaceContainerHighest,
+          color: estimate ? scheme.secondaryContainer : scheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           label,
-          style: TextStyle(fontSize: 12, color: estimate ? scheme.onTertiaryContainer : scheme.onSurfaceVariant),
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: estimate ? scheme.onSecondaryContainer : scheme.onSurfaceVariant),
         ),
       ),
     );

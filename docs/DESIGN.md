@@ -1,7 +1,9 @@
-# Phase 4A — UX/UI design proposal ("לבשל כל אחד יכול")
+# Phase 4 — UX/UI design ("לבשל כל אחד יכול")
 
-_Status: **proposal for the user's review (2026-10-24). Nothing here is implemented.** The current app icon stays
-until the subphase that replaces it is approved._
+_Status: **implemented (Phase 4B–4E, 2026-10-24, local commits).** Written as the 4A proposal and approved by the
+user; section 12 records what was built and where it differs from the proposal. The code is the reference for
+exact values: `app/lib/core/theme.dart` (colours, type, shapes), `app/lib/core/motion.dart`,
+`app/lib/core/widgets/`._
 
 Source of truth for the visual identity: the final logo, `docs/branding/logo.png` (glossy white and light-blue
 chef's hat, blue gradient background, small crossed knife and fork in natural wood above the hat; no steam, no
@@ -315,16 +317,13 @@ Haptics: light on the main action and on ticks; medium when a timer finishes (wi
 
 ---
 
-## 10. Open decisions for the user
+## 10. Decisions (resolved when Phase 4 was approved, 2026-10-24)
 
-1. **Menu position:** the proposal puts "תפריט" at the end side (top left) on every screen, with back at the
-   start (top right). The alternative (menu top right on home, back arrow replacing it elsewhere) hides the menu
-   on inner screens, which the brief rules out.
-2. **Heebo font:** bundling 3 font files (about 300 KB, free license). Alternative: the system font.
-3. **Recipe-scoped Remy in preparation** (6.4): a small extension of the assistant (no new endpoint; the
-   existing turn endpoint with an empty session snapshot).
-4. **Icon replacement timing:** proposed in 4E, together with the adaptive icon layers.
-5. **Dark theme:** proposed as a later step (tokens ready), not in Phase 4.
+1. **Menu position:** "תפריט" on the end side (top left) of every screen, back on the start side (top right).
+2. **Heebo:** bundled (3 static weights, about 130 KB, SIL OFL; license in `app/assets/fonts/OFL.txt`).
+3. **Remy in preparation:** implemented with the existing turn endpoint; questions only (section 12).
+4. **Icon:** replaced in 4E (section 12).
+5. **Dark theme:** later; the app is light-only and so are its splash screens.
 
 ---
 
@@ -340,3 +339,47 @@ Haptics: light on the main action and on ticks; medium when a timer finishes (wi
 | **Release (separate approval)** | Store listing, privacy policy, App Check, paid Gemini tier, iOS builds | Per the release plan |
 
 No new packages are needed for 4B–4E (transitions, skeletons and haptics are local code; Heebo is a font asset).
+
+---
+
+## 12. As built (Phase 4B–4E)
+
+- **Palette:** as in 2.1, unchanged after the contrast check. `tertiaryContainer` carries the success green; the
+  "הערכה" badge uses the beige `secondaryContainer`. Wood appears in small doses only (Remy's ring, the header
+  rule, the "cooking now" label, favourites, tips).
+- **Type:** Heebo 400/500/700; titles use 700 (Heebo has no 600). Symbols such as ✓ and ⏱ fall back to the system
+  font. Temperatures are written in words ("200 מעלות") so the degree sign never flips sides in RTL.
+- **Frame:** `AppScaffold` (back on the start side, small app name above the title, "תפריט" + side menu from the
+  end side), `BottomActionBar` (above the gesture bar and the keyboard, full-width main action), `ContentWidth`
+  (max 640). A bug found by tests: an `Align` in the bottom bar filled the whole screen; bars now fit their height.
+- **Navigation:** every route is a child of `/`; menu destinations use `go()`, flows use push or replace. Android
+  back walks back to home and leaves the app only from home. Leaving cooking never stops it.
+- **Home:** header (mark, name, "מה מבשלים היום?"), the cooking card only while cooking (step, nearest timer,
+  "המשך לבשל"), "מתכון חדש", unfinished imports, up to 4 recipes (favourites first) and "לכל המתכונים". No FAB.
+- **Journey:** new recipe (segmented text/photo/link, sticky "קריאת המתכון"), real stages in a `StageLoader`
+  (reading, then planning; after 12 s a note and "יציאה": the request finishes in the background and the recipe
+  waits as an unfinished import); questions (at most 3, "לא בטוח/ה, תחליטו בשבילי"); overview (facts as pills,
+  notes, round checklist with "יש לי הכול", a ready banner when everything is ticked, a hint when "קראתי" is
+  needed, Remy + "מתחילים לבשל"); cooking; finish ("בתאבון!", the logo tilts once, time and steps, notes, sticky
+  save) then history.
+- **Cooking screen:** "שלב N מתוך M" and a filling progress bar with "חזרה" (undo) beside it; the step card (large
+  title, 20px instruction, this step's ingredients, temperature, timer, cue, safety check, help); timers in words
+  ("השהיה"/"המשך", "הוספת דקה", "אפשרויות טיימר" for less common actions), amber with three pulses when it is
+  time to check; "הפסקת הבישול" as a labelled button at the end of the page. Light haptics on the main actions.
+- **Remy:** `RemyAvatar` is a hat drawn in code (no face, no animal) in a wood ring; `RemyButton` ("רמי") sits at
+  the start of the bottom bar in cooking and preparation, never covering the main action; long press opens him
+  listening. The sheet: header, bubbles (Remy soft blue, the cook warm grey), thinking dots, approval card, a
+  voice status line with "עצירה", wrapped quick chips, "שיחה רציפה" on the microphone's side, a rounded input
+  with send and a large microphone. On large text the sheet grows and its middle scrolls.
+- **Remy before cooking:** `RemyScope.recipe`: local answers (time, first step, amounts, temperature, step count,
+  "חסר לי" → the checklist), Remy online for the rest; cooking actions answer "את זה עושים כשמתחילים לבשל";
+  proposed changes are never applied from the chat (the checklist's substitutions have their own undo).
+- **Motion:** shared-axis page transitions in the reading direction, `Appear` (staggered, capped), step slides,
+  `AttentionPulse`, `ThinkingDots`, `BreathingRing`, `SkeletonBox`, check animations. Every repeating animation is
+  bounded; with "remove animations" movement becomes a fade or nothing.
+- **Copy:** no dash separators (tests on the `.arb` file and Hebrew literals in code; `tidyHe` for text from people
+  or the AI; backend constants and a style rule in every prompt).
+- **Icon and splash (4E):** generated by `app/tool/make_icons.py` from `docs/branding/logo.png`. Adaptive icon =
+  the logo's gradient (background) + the hat and utensils separated from it and scaled to 0.81 so the utensils stay
+  inside the safe circle (foreground) + a white silhouette (monochrome); legacy Android and iOS use the logo
+  itself. Splash: the mark on the warm off-white (Android 12+ with the adaptive icon; iOS launch screen).

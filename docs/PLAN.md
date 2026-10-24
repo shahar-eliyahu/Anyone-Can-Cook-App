@@ -620,10 +620,9 @@ wake phrase ("Hey Remy") stays later (always-on listening: battery and privacy).
 #### Phase 4 and Future
 
 - Phase 4: visual identity from the final logo (`docs/branding/logo.png`, DECISIONS #64), navigation, the
-  beginner journey, an original "Remy" (רמי) look, motion and accessibility. **Phase 4A (UX/UI analysis and
-  design proposal) is in `docs/DESIGN.md`, awaiting the user's review.** Proposed subphases, each needing
-  approval: 4B foundation (theme, font, transitions, nested routes + menu, RTL fixes, copy without dashes),
-  4C screens, 4D Remy and feedback, 4E icon replacement and accessibility pass; release work separately.
+  beginner journey, an original "Remy" (רמי) look, motion and accessibility. **Implemented 2026-10-24 (4B–4E,
+  local commits); design and as-built notes in `docs/DESIGN.md`, decisions #65–#71.** Release work (store,
+  privacy policy, App Check, paid tier, iOS builds) remains separate and needs approval.
 - Future: an optional "Hey Remy" wake phrase (always-on listening). Original character only.
 
 #### Gemini usage in Phase 3

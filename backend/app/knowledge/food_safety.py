@@ -26,14 +26,14 @@ SafetyFood = Literal[
 
 FSIS_SOURCE = ReferenceSource(
     id="ref_fsis_temps",
-    title="USDA FSIS — Safe Minimum Internal Temperature Chart",
+    title="USDA FSIS: Safe Minimum Internal Temperature Chart",
     url="https://www.fsis.usda.gov/food-safety/safe-food-handling-and-preparation/food-safety-basics/safe-temperature-chart",
     kind="food_safety_reference",
 )
 
 IL_MOH_SOURCE = ReferenceSource(
     id="ref_il_moh_5keys",
-    title="משרד הבריאות — חמשת המפתחות לבטיחות מזון",
+    title="משרד הבריאות: חמשת המפתחות לבטיחות מזון",
     url="https://www.gov.il/BlobFolder/reports/safetyfood-5keys/he/files_publications_MISC_Safetyfood_5keys.pdf",
     kind="food_safety_reference",
 )

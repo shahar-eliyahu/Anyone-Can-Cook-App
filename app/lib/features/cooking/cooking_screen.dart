@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -76,6 +77,7 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
   bool _blockedBySafety(PlanStep step, StepPrimary p) => p.needsSafetyCheck && !_safetyChecked.contains(step.id);
 
   Future<void> _finishStep(PlanStep step) async {
+    HapticFeedback.lightImpact(); // felt with wet hands, without looking
     await _controller.completeStep(step.id);
     if (mounted) setState(() => _helpOpen.remove(step.id));
   }
@@ -262,7 +264,10 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
     return switch (p.kind) {
       PrimaryKind.startTimer => FilledButton.icon(
           style: FilledButton.styleFrom(minimumSize: big),
-          onPressed: () => _controller.confirmAction(step.id, p.action!.action.id),
+          onPressed: () {
+            HapticFeedback.lightImpact();
+            _controller.confirmAction(step.id, p.action!.action.id);
+          },
           icon: const Icon(Icons.timer_outlined),
           label: Text(p.action!.action.labelHe),
         ),

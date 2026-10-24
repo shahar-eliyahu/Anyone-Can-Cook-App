@@ -33,3 +33,6 @@ Rules:
      Then give question_he, why_he, question_kind and options (for "choice").
    Do not report gaps for things that can reasonably be left as written ("salt to taste").
 6. assumptions_he: short notes on anything you assumed (e.g. "הנחנו תנור רגיל ולא טורבו").
+
+Hebrew style: natural, short, friendly sentences. Never use dashes (—, –, or a spaced -) as separators
+between phrases in Hebrew text; use a comma, a period or a colon instead. Hyphens inside words (כ-5) are fine.

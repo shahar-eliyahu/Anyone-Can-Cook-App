@@ -142,12 +142,6 @@ abstract class AppLocalizations {
   /// **'מתכון חדש'**
   String get newRecipe;
 
-  /// No description provided for @noActiveSession.
-  ///
-  /// In he, this message translates to:
-  /// **'אין בישול פעיל כרגע'**
-  String get noActiveSession;
-
   /// No description provided for @retry.
   ///
   /// In he, this message translates to:
@@ -808,12 +802,6 @@ abstract class AppLocalizations {
   /// **'התראת הבדיקה תגיע בעוד 10 שניות'**
   String get testNotificationScheduled;
 
-  /// No description provided for @serverAddress.
-  ///
-  /// In he, this message translates to:
-  /// **'כתובת השרת (מצב פיתוח): {url}'**
-  String serverAddress(String url);
-
   /// No description provided for @aboutTitle.
   ///
   /// In he, this message translates to:
@@ -1414,12 +1402,6 @@ abstract class AppLocalizations {
   /// **'פחות מדקה'**
   String get durationUnderMinute;
 
-  /// No description provided for @loadingShort.
-  ///
-  /// In he, this message translates to:
-  /// **'…'**
-  String get loadingShort;
-
   /// No description provided for @durationMinutes.
   ///
   /// In he, this message translates to:
@@ -1461,12 +1443,6 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'סמנו מה יש לכם. אם משהו חסר, נמצא יחד פתרון.'**
   String get overviewChecklistIntro;
-
-  /// No description provided for @haveIt.
-  ///
-  /// In he, this message translates to:
-  /// **'יש לי'**
-  String get haveIt;
 
   /// No description provided for @missingIt.
   ///
@@ -2050,12 +2026,6 @@ abstract class AppLocalizations {
   /// **'דיבור עם רמי'**
   String get voiceMic;
 
-  /// No description provided for @voiceTapToSpeak.
-  ///
-  /// In he, this message translates to:
-  /// **'לחצו על המיקרופון ודברו'**
-  String get voiceTapToSpeak;
-
   /// No description provided for @voicePreparing.
   ///
   /// In he, this message translates to:
@@ -2212,23 +2182,11 @@ abstract class AppLocalizations {
   /// **'הכול מוכן. אפשר להתחיל לבשל!'**
   String get overviewReady;
 
-  /// No description provided for @overviewWhatYouNeed.
-  ///
-  /// In he, this message translates to:
-  /// **'מה צריך'**
-  String get overviewWhatYouNeed;
-
   /// No description provided for @overviewMore.
   ///
   /// In he, this message translates to:
   /// **'פעולות למתכון'**
   String get overviewMore;
-
-  /// No description provided for @remyAsk.
-  ///
-  /// In he, this message translates to:
-  /// **'שאלו את רמי'**
-  String get remyAsk;
 
   /// No description provided for @remySheetSubtitle.
   ///
@@ -2284,18 +2242,6 @@ abstract class AppLocalizations {
   /// **'סמנו \"חסר לי\" ליד המצרך ברשימה, ואציע לכם תחליף מתאים.'**
   String get remyPrepMissing;
 
-  /// No description provided for @remyListeningTitle.
-  ///
-  /// In he, this message translates to:
-  /// **'מקשיב לכם'**
-  String get remyListeningTitle;
-
-  /// No description provided for @remyTypeInstead.
-  ///
-  /// In he, this message translates to:
-  /// **'להקליד במקום'**
-  String get remyTypeInstead;
-
   /// No description provided for @remyClose.
   ///
   /// In he, this message translates to:
@@ -2314,23 +2260,11 @@ abstract class AppLocalizations {
   /// **'בתאבון!'**
   String get finishCelebrate;
 
-  /// No description provided for @finishBackHome.
-  ///
-  /// In he, this message translates to:
-  /// **'חזרה למטבח'**
-  String get finishBackHome;
-
   /// No description provided for @historyEmptyTitle.
   ///
   /// In he, this message translates to:
   /// **'עוד אין היסטוריה'**
   String get historyEmptyTitle;
-
-  /// No description provided for @settingsTimersReady.
-  ///
-  /// In he, this message translates to:
-  /// **'הטיימרים יתריעו בזמן'**
-  String get settingsTimersReady;
 
   /// No description provided for @settingsAboutVersionless.
   ///
@@ -2350,23 +2284,11 @@ abstract class AppLocalizations {
   /// **'מושהה'**
   String get timerPaused;
 
-  /// No description provided for @timerRunningUntil.
-  ///
-  /// In he, this message translates to:
-  /// **'עד {time}'**
-  String timerRunningUntil(Object time);
-
   /// No description provided for @progressLabel.
   ///
   /// In he, this message translates to:
   /// **'התקדמות הבישול'**
   String get progressLabel;
-
-  /// No description provided for @prepTaskDone.
-  ///
-  /// In he, this message translates to:
-  /// **'בוצע'**
-  String get prepTaskDone;
 
   /// No description provided for @remyAmountUnknown.
   ///
@@ -2379,6 +2301,12 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'במתכון יש {count} שלבים.'**
   String remyPrepStepCount(int count);
+
+  /// No description provided for @attentionAckHint.
+  ///
+  /// In he, this message translates to:
+  /// **'כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה.'**
+  String get attentionAckHint;
 }
 
 class _AppLocalizationsDelegate

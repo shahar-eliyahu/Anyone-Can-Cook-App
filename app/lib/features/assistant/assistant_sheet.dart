@@ -23,7 +23,8 @@ Future<void> showAssistantSheet(BuildContext context, RemyScope scope, {bool lis
       builder: (context) => Padding(
         padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
         child: SizedBox(
-          height: MediaQuery.sizeOf(context).height * 0.78,
+          // Taller with large text, so the conversation keeps some room.
+          height: MediaQuery.sizeOf(context).height * (MediaQuery.textScalerOf(context).scale(1) > 1.3 ? 0.94 : 0.78),
           child: AssistantPanel(scope: scope, listenOnOpen: listen),
         ),
       ),
@@ -133,17 +134,28 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
                               spacing: Space.s,
                               children: [
                                 Icon(Icons.help_outline_rounded, color: context.palette.wood, size: 20),
-                                Text(l10n.remyProposalTitle, style: theme.textTheme.titleSmall?.copyWith(color: theme.colorScheme.onSecondaryContainer)),
+                                Text(
+                                  l10n.remyProposalTitle,
+                                  style: theme.textTheme.titleSmall?.copyWith(
+                                    color: theme.colorScheme.onSecondaryContainer,
+                                  ),
+                                ),
                               ],
                             ),
                             Row(
                               spacing: Space.s,
                               children: [
                                 Expanded(
-                                  child: FilledButton(onPressed: s.busy ? null : _controller.approve, child: Text(l10n.remyApprove)),
+                                  child: FilledButton(
+                                    onPressed: s.busy ? null : _controller.approve,
+                                    child: Text(l10n.remyApprove),
+                                  ),
                                 ),
                                 Expanded(
-                                  child: OutlinedButton(onPressed: s.busy ? null : _controller.reject, child: Text(l10n.remyReject)),
+                                  child: OutlinedButton(
+                                    onPressed: s.busy ? null : _controller.reject,
+                                    child: Text(l10n.remyReject),
+                                  ),
                                 ),
                               ],
                             ),
@@ -152,52 +164,62 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
                       ),
                     ),
                   ),
-                for (final (i, m) in s.messages.reversed.indexed) _Bubble(key: ValueKey(s.messages.length - i), message: m),
+                for (final (i, m) in s.messages.reversed.indexed)
+                  _Bubble(key: ValueKey(s.messages.length - i), message: m),
                 if (s.messages.isEmpty)
-                  _Bubble(message: ChatMessage(fromUser: false, textHe: session ? l10n.remyGreeting : l10n.remyPrepGreeting)),
+                  _Bubble(
+                    message: ChatMessage(fromUser: false, textHe: session ? l10n.remyGreeting : l10n.remyPrepGreeting),
+                  ),
               ],
             ),
           ),
-          // Voice state, notes and quick requests.
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: Space.page),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AnimatedSize(
-                  duration: Motion.of(context, Motion.medium),
-                  curve: Motion.standard,
-                  child: voiceActive ? _VoiceStatus(voice: voice, onStop: _voice.cancel) : const SizedBox(width: double.infinity),
-                ),
-                if (voice.messageHe != null && !voiceActive) NoteBanner(voice.messageHe!, kind: NoteKind.warning, icon: Icons.mic_off_outlined),
-                // Without a Hebrew voice, spoken requests still work; the answers stay on screen.
-                if (voice.hebrewVoice == false)
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: Space.xs),
-                    child: Text(l10n.voiceNoHebrewVoice, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
+          // Voice state, notes and quick requests: scrolls rather than crowding out the input.
+          Flexible(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: Space.page),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  AnimatedSize(
+                    duration: Motion.of(context, Motion.medium),
+                    curve: Motion.standard,
+                    child: voiceActive
+                        ? _VoiceStatus(voice: voice, onStop: _voice.cancel)
+                        : const SizedBox(width: double.infinity),
                   ),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
+                  if (voice.messageHe != null && !voiceActive)
+                    NoteBanner(voice.messageHe!, kind: NoteKind.warning, icon: Icons.mic_off_outlined),
+                  // Without a Hebrew voice, spoken requests still work; the answers stay on screen.
+                  if (voice.hebrewVoice == false)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: Space.xs),
+                      child: Text(
+                        l10n.voiceNoHebrewVoice,
+                        style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ),
+                  // Wrapped, not scrolled: every quick request stays in view.
+                  Wrap(
                     spacing: Space.s,
+                    runSpacing: Space.xs,
                     children: [
                       for (final chip in chips)
                         ActionChip(label: Text(chip), onPressed: s.busy ? null : () => _send(chip)),
                     ],
                   ),
-                ),
-                // Voice options sit on the microphone's side, always in view.
-                if (canListen)
-                  Align(
-                    alignment: AlignmentDirectional.centerEnd,
-                    child: FilterChip(
-                      avatar: voice.continuous ? null : const Icon(Icons.all_inclusive_rounded, size: 18),
-                      label: Text(l10n.voiceContinuous),
-                      selected: voice.continuous,
-                      onSelected: _voice.setContinuous,
+                  // Voice options sit on the microphone's side, always in view.
+                  if (canListen)
+                    Align(
+                      alignment: AlignmentDirectional.centerEnd,
+                      child: FilterChip(
+                        avatar: voice.continuous ? null : const Icon(Icons.all_inclusive_rounded, size: 18),
+                        label: Text(l10n.voiceContinuous),
+                        selected: voice.continuous,
+                        onSelected: _voice.setContinuous,
+                      ),
                     ),
-                  ),
-              ],
+                ],
+              ),
             ),
           ),
           // Input: type or speak.
@@ -278,7 +300,10 @@ class _VoiceStatus extends StatelessWidget {
     final theme = Theme.of(context);
     final (IconData icon, String text) = switch (voice.phase) {
       VoicePhase.preparing => (Icons.mic_none_rounded, l10n.voicePreparing),
-      VoicePhase.listening => (Icons.mic_rounded, voice.partial.isEmpty ? l10n.voiceListening : '${l10n.voiceListening} ${voice.partial}'),
+      VoicePhase.listening => (
+        Icons.mic_rounded,
+        voice.partial.isEmpty ? l10n.voiceListening : '${l10n.voiceListening} ${voice.partial}',
+      ),
       VoicePhase.processing => (Icons.hourglass_top_rounded, '${l10n.voiceProcessing} ${voice.partial}'),
       VoicePhase.speaking => (Icons.graphic_eq_rounded, l10n.voiceSpeaking),
       VoicePhase.idle => (Icons.mic_none_rounded, ''),
@@ -288,12 +313,20 @@ class _VoiceStatus extends StatelessWidget {
       child: Container(
         margin: const EdgeInsets.only(bottom: Space.s),
         padding: const EdgeInsetsDirectional.fromSTEB(Space.m, Space.xs, Space.xs, Space.xs),
-        decoration: BoxDecoration(color: theme.colorScheme.primaryContainer, borderRadius: BorderRadius.circular(Radii.input)),
+        decoration: BoxDecoration(
+          color: theme.colorScheme.primaryContainer,
+          borderRadius: BorderRadius.circular(Radii.input),
+        ),
         child: Row(
           spacing: Space.s,
           children: [
             Icon(icon, color: AppColors.primary),
-            Expanded(child: Text(text, style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.onPrimaryContainer))),
+            Expanded(
+              child: Text(
+                text,
+                style: theme.textTheme.titleMedium?.copyWith(color: theme.colorScheme.onPrimaryContainer),
+              ),
+            ),
             if (voice.phase == VoicePhase.processing) const ThinkingDots(size: 6),
             TextButton.icon(onPressed: onStop, icon: const Icon(Icons.stop_rounded), label: Text(l10n.voiceStop)),
           ],
@@ -308,28 +341,28 @@ class _ThinkingBubble extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Align(
-        alignment: AlignmentDirectional.centerStart,
-        child: Semantics(
-          label: AppLocalizations.of(context).remyThinking,
-          child: Container(
-            margin: const EdgeInsets.symmetric(vertical: Space.xs),
-            padding: const EdgeInsets.symmetric(horizontal: Space.l, vertical: Space.m + 2),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primaryContainer,
-              borderRadius: _bubbleRadius(fromUser: false),
-            ),
-            child: const ThinkingDots(),
-          ),
+    alignment: AlignmentDirectional.centerStart,
+    child: Semantics(
+      label: AppLocalizations.of(context).remyThinking,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: Space.xs),
+        padding: const EdgeInsets.symmetric(horizontal: Space.l, vertical: Space.m + 2),
+        decoration: BoxDecoration(
+          color: Theme.of(context).colorScheme.primaryContainer,
+          borderRadius: _bubbleRadius(fromUser: false),
         ),
-      );
+        child: const ThinkingDots(),
+      ),
+    ),
+  );
 }
 
 BorderRadiusGeometry _bubbleRadius({required bool fromUser}) => BorderRadiusDirectional.only(
-      topStart: const Radius.circular(18),
-      topEnd: const Radius.circular(18),
-      bottomStart: Radius.circular(fromUser ? 18 : 4),
-      bottomEnd: Radius.circular(fromUser ? 4 : 18),
-    );
+  topStart: const Radius.circular(18),
+  topEnd: const Radius.circular(18),
+  bottomStart: Radius.circular(fromUser ? 18 : 4),
+  bottomEnd: Radius.circular(fromUser ? 4 : 18),
+);
 
 class _Bubble extends StatelessWidget {
   const _Bubble({super.key, required this.message});

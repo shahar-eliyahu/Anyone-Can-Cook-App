@@ -8,7 +8,6 @@
   "cookingHistory": "היסטוריית בישול",
   "settings": "הגדרות",
   "newRecipe": "מתכון חדש",
-  "noActiveSession": "אין בישול פעיל כרגע",
   "retry": "נסו שוב",
   "errorGeneric": "משהו השתבש. נסו שוב.",
   "allRecipes": "הכל",
@@ -282,14 +281,6 @@
   "batteryVendorHint": "בטלפונים של שיאומי, סמסונג, וואווי ו-וואן פלוס יש לפעמים הגבלות נוספות. אם טיימר לא התריע, ודאו בהגדרות הסוללה של הטלפון שהאפליקציה מורשית לפעול ברקע.",
   "testNotification": "שליחת התראת בדיקה",
   "testNotificationScheduled": "התראת הבדיקה תגיע בעוד 10 שניות",
-  "serverAddress": "כתובת השרת (מצב פיתוח): {url}",
-  "@serverAddress": {
-    "placeholders": {
-      "url": {
-        "type": "String"
-      }
-    }
-  },
   "aboutTitle": "אודות",
   "aboutBody": "בזמן הבישול האפליקציה עובדת גם בלי אינטרנט. השלבים, הטיימרים וההתקדמות נשמרים בטלפון.",
   "refresh": "רענון",
@@ -432,7 +423,6 @@
   "stepsCompletedTitle": "השלבים",
   "stepNotDone": "לא הושלם",
   "durationUnderMinute": "פחות מדקה",
-  "loadingShort": "…",
   "durationMinutes": "כ-{minutes} דק'",
   "@durationMinutes": {
     "placeholders": {
@@ -475,7 +465,6 @@
     }
   },
   "overviewChecklistIntro": "סמנו מה יש לכם. אם משהו חסר, נמצא יחד פתרון.",
-  "haveIt": "יש לי",
   "missingIt": "חסר לי",
   "haveAll": "יש לי הכול",
   "findSolution": "פתרון",
@@ -864,7 +853,6 @@
     }
   },
   "voiceMic": "דיבור עם רמי",
-  "voiceTapToSpeak": "לחצו על המיקרופון ודברו",
   "voicePreparing": "מכינים את המיקרופון…",
   "voiceListening": "מקשיב…",
   "voiceProcessing": "רגע…",
@@ -897,9 +885,7 @@
   "importLeave": "יציאה",
   "importLeaveNote": "אפשר לצאת מהמסך. כשהמתכון יהיה מוכן, הוא יחכה לכם במטבח.",
   "overviewReady": "הכול מוכן. אפשר להתחיל לבשל!",
-  "overviewWhatYouNeed": "מה צריך",
   "overviewMore": "פעולות למתכון",
-  "remyAsk": "שאלו את רמי",
   "remySheetSubtitle": "אפשר לכתוב או לדבר",
   "remyPrepGreeting": "היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.",
   "remyPrepChipFirst": "במה מתחילים?",
@@ -921,25 +907,14 @@
     }
   },
   "remyPrepMissing": "סמנו \"חסר לי\" ליד המצרך ברשימה, ואציע לכם תחליף מתאים.",
-  "remyListeningTitle": "מקשיב לכם",
-  "remyTypeInstead": "להקליד במקום",
   "remyClose": "סגירה",
   "stepIngredientsTitle": "מה צריך לשלב הזה",
   "finishCelebrate": "בתאבון!",
-  "finishBackHome": "חזרה למטבח",
   "historyEmptyTitle": "עוד אין היסטוריה",
-  "settingsTimersReady": "הטיימרים יתריעו בזמן",
   "settingsAboutVersionless": "לבשל כל אחד יכול עוזרת לבשל צעד אחר צעד, עם טיימרים, תזכורות ורמי לצידכם.",
   "fontLicense": "הגופן Heebo מופץ ברישיון SIL Open Font License.",
   "timerPaused": "מושהה",
-  "timerRunningUntil": "עד {time}",
-  "@timerRunningUntil": {
-    "placeholders": {
-      "time": {}
-    }
-  },
   "progressLabel": "התקדמות הבישול",
-  "prepTaskDone": "בוצע",
   "remyAmountUnknown": "הכמות לא צוינה",
   "remyPrepStepCount": "במתכון יש {count} שלבים.",
   "@remyPrepStepCount": {
@@ -948,5 +923,6 @@
         "type": "int"
       }
     }
-  }
+  },
+  "attentionAckHint": "כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה."
 }

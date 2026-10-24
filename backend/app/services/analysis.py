@@ -20,7 +20,7 @@ from app.services.ai_calls import call_structured
 from app.services.llm import ImagePart, LLMInvalidOutput, LLMProvider, TextPart
 from app.services.validation.numbers import states_number
 
-NOT_IN_SOURCE_HE = "לא נמצא בטקסט המקורי — סומן כהערכה"
+NOT_IN_SOURCE_HE = "לא נמצא בטקסט המקורי, ולכן סומן כהערכה"
 
 
 @dataclass
