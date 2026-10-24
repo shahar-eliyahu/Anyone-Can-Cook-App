@@ -623,7 +623,9 @@ wake phrase ("Hey Remy") stays later (always-on listening: battery and privacy).
   beginner journey, an original "Remy" (רמי) look, motion and accessibility. **Implemented 2026-10-24 (4B–4E,
   local commits); design and as-built notes in `docs/DESIGN.md`, decisions #65–#71.** Release work (store,
   privacy policy, App Check, paid tier, iOS builds) remains separate and needs approval.
-- Future: an optional "Hey Remy" wake phrase (always-on listening). Original character only.
+- "היי רמי" (hands-free in the cooking screen, the phone's own recognizer in a loop) was added in the Phase 4
+  refinement (`docs/DESIGN.md` §13). Future: a true on-device wake-word engine, if a free option without a new
+  service becomes available. Original character only.
 
 #### Gemini usage in Phase 3
 

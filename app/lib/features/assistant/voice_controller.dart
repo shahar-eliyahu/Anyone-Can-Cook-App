@@ -53,13 +53,17 @@ class VoiceController extends Notifier<VoiceState> {
   static const maxSilentTurns = 2;
   int _silentTurns = 0;
 
+  /// This conversation is holding the microphone right now (read where `state` can't be).
+  bool _usingMic = false;
+
   @override
   VoiceState build() {
     // Closing the sheet ends the conversation (no listening in the background).
     final recognizer = ref.read(speechRecognizerProvider);
     final tts = ref.read(speechSynthesizerProvider);
     ref.onDispose(() {
-      recognizer?.cancel();
+      // Only this conversation's own listening; the microphone may already be hands-free's.
+      if (_usingMic) recognizer?.cancel();
       tts.stop();
     });
     return const VoiceState();
@@ -108,10 +112,25 @@ class VoiceController extends Notifier<VoiceState> {
       final voice = await _tts.prepare();
       if (!_active) return;
       state = state.copyWith(phase: VoicePhase.listening, hebrewVoice: voice);
-      final text = (await recognizer.listenOnce(onPartial: (p) {
-        if (_active) state = state.copyWith(partial: p);
-      }))
-          .trim();
+      _usingMic = true;
+      Future<String> once() => recognizer.listenOnce(onPartial: (p) {
+            if (_active) state = state.copyWith(partial: p);
+          });
+      String text;
+      try {
+        try {
+          text = (await once()).trim();
+        } on VoiceException catch (e) {
+          // The recognizer may still be letting go of a previous session (hands-free had it a
+          // moment ago): one quiet retry before telling the cook.
+          if (e.issue != VoiceIssue.other || !_active) rethrow;
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+          if (!_active) return;
+          text = (await once()).trim();
+        }
+      } finally {
+        _usingMic = false;
+      }
       if (!_active) return; // cancelled while listening
       if (text.isEmpty) {
         _silentTurns++;
@@ -120,19 +139,42 @@ class VoiceController extends Notifier<VoiceState> {
         return;
       }
       _silentTurns = 0;
-      state = state.copyWith(phase: VoicePhase.processing, partial: text, clearMessage: true);
-      final reply = await ref.read(assistantControllerProvider(scope).notifier).sendSpoken(text);
-      if (!_active) return;
-      if (reply != null && voice) {
-        state = state.copyWith(phase: VoicePhase.speaking);
-        await _tts.speak(reply.speechHe);
-        if (!_active) return; // stopped while speaking
-      }
-      state = state.copyWith(phase: VoicePhase.idle, partial: '');
-      if (state.continuous) await listen();
+      await _respond(text, voice);
     } on VoiceException catch (e) {
       if (ref.mounted) _stop(message: messageFor(e.issue), keepContinuous: false);
     }
+  }
+
+  /// Hands-free: what the cook said right after "היי רמי" is answered at once, without
+  /// listening again first. An empty command just listens.
+  Future<void> respondTo(String transcript) async {
+    final text = transcript.trim();
+    if (text.isEmpty) return listen();
+    if (state.phase != VoicePhase.idle) return;
+    state = state.copyWith(phase: VoicePhase.processing, partial: text, clearMessage: true);
+    final voice = state.hebrewVoice ?? await _tts.prepare();
+    if (!_active) return;
+    state = state.copyWith(hebrewVoice: voice);
+    try {
+      await _respond(text, voice);
+    } on VoiceException catch (e) {
+      if (ref.mounted) _stop(message: messageFor(e.issue), keepContinuous: false);
+    }
+  }
+
+  Future<void> _respond(String text, bool voice) async {
+    state = state.copyWith(phase: VoicePhase.processing, partial: text, clearMessage: true);
+    final reply = await ref.read(assistantControllerProvider(scope).notifier).sendSpoken(text);
+    if (!_active) return;
+    if (reply != null && voice) {
+      state = state.copyWith(phase: VoicePhase.speaking);
+      await _tts.speak(reply.speechHe);
+      if (!_active) return; // stopped while speaking
+    }
+    state = state.copyWith(phase: VoicePhase.idle, partial: '');
+    // A question Remy asked by voice ("לסמן…?") is answered by voice: listen once for it.
+    final asked = ref.read(assistantControllerProvider(scope)).pending != null;
+    if (state.continuous || asked) await listen();
   }
 
   /// Still mounted and not stopped/cancelled meanwhile.

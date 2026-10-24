@@ -7,9 +7,10 @@ import '../../l10n/app_localizations.dart';
 import '../theme.dart';
 import 'brand.dart';
 
-/// The frame of every screen (docs/DESIGN.md §3): the back arrow on the start side (right in
-/// Hebrew), the small app name above the screen title, and a labelled "תפריט" button on the
-/// end side that opens the menu from the same side. Bottom bars sit above the system
+/// The frame of every screen (docs/DESIGN.md §3, §13): in Hebrew the start of the bar is the
+/// right edge, so the labelled "תפריט" sits in that corner on every screen (the menu slides in
+/// from the same side) and the back arrow, pointing right, sits right next to it; then the
+/// small app name above the screen title; screen actions stay on the far (left) side. Bottom bars sit above the system
 /// navigation and the keyboard; content is centred and never wider than a comfortable
 /// reading width.
 class AppScaffold extends StatelessWidget {
@@ -41,9 +42,20 @@ class AppScaffold extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
     final title = this.title;
+    final canGoBack = ModalRoute.of(context)?.impliesAppBarDismissal ?? false;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: title == null ? kToolbarHeight : 64,
+        automaticallyImplyLeading: false,
+        leadingWidth: (showMenu ? 64 : 0) + (canGoBack ? 48 : 0) + Space.xs,
+        leading: Row(
+          children: [
+            const SizedBox(width: Space.xs),
+            if (showMenu) const MenuButton(),
+            if (canGoBack) const BackButton(),
+          ],
+        ),
+        titleSpacing: canGoBack || showMenu ? 0 : Space.l,
         title: title == null
             ? null
             : Column(
@@ -56,11 +68,10 @@ class AppScaffold extends StatelessWidget {
               ),
         actions: [
           ...?actions,
-          if (showMenu) const MenuButton(),
           const SizedBox(width: Space.xs),
         ],
       ),
-      endDrawer: showMenu ? const AppMenu() : null,
+      drawer: showMenu ? const AppMenu() : null,
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomBar == null ? null : BottomActionBar(child: bottomBar!),
       body: SafeArea(top: false, bottom: bottomBar == null, child: ContentWidth(child: body)),
@@ -68,22 +79,36 @@ class AppScaffold extends StatelessWidget {
   }
 }
 
-/// "תפריט": one tap, always labelled (never a bare icon).
+/// "תפריט": one tap, always labelled (never a bare icon): the icon with its word under it,
+/// compact enough to share the corner with the back arrow.
 class MenuButton extends StatelessWidget {
   const MenuButton({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final label = AppLocalizations.of(context).menu;
     return Semantics(
       button: true,
       label: label,
       excludeSemantics: true,
-      child: TextButton.icon(
-        style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.onSurface),
-        onPressed: () => Scaffold.of(context).openEndDrawer(),
-        icon: const Icon(Icons.menu_rounded),
-        label: Text(label),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(Radii.input),
+        onTap: () => Scaffold.of(context).openDrawer(),
+        child: SizedBox(
+          width: 60,
+          height: 52,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.menu_rounded, color: theme.colorScheme.onSurface),
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(label, style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurface), maxLines: 1),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

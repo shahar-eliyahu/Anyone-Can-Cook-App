@@ -9,22 +9,23 @@ const doneFirst = '✓ סיימנו: הכנת תפוחי האדמה. עכשיו:
 const doneFirstSpoken = 'סיימנו: הכנת תפוחי האדמה. עכשיו: תיבול העוף.';
 
 void main() {
-  Future<String> openCooking(WidgetTester tester, AppHarness h, {bool openSheet = true}) async {
+  Future<String> openCooking(WidgetTester tester, AppHarness h) async {
     final recipeId = await h.seedSample();
     final plan = (await h.recipes.latestApprovedPlan(recipeId))!;
     final session = await h.sessions.startSession(recipeId: recipeId, planId: plan.id);
     await tester.pumpWidget(h.build(initialLocation: '/cook/${session.id}'));
     await tester.pumpAndSettle();
-    if (openSheet) {
-      await tester.tap(find.byTooltip('רמי, העוזר שלך לבישול'));
-      await tester.pumpAndSettle();
-    }
     return session.id;
   }
 
-  // The sheet's microphone (the cooking screen's own sits underneath it).
+  /// A tap on Remy: "talking to Remy" (he opens already listening).
+  Future<void> talkToRemy(WidgetTester tester) async {
+    await tester.tap(find.byTooltip('רמי, העוזר שלך לבישול'));
+    await tester.pumpAndSettle();
+  }
+
   Future<void> tapMic(WidgetTester tester) async {
-    await tester.tap(find.byTooltip('דיבור עם רמי').last);
+    await tester.tap(find.byTooltip('דיבור עם רמי'));
     await tester.pumpAndSettle();
   }
 
@@ -32,12 +33,13 @@ void main() {
   Future<Set<String>> confirmed(AppHarness h, String sessionId) async =>
       {for (final e in (await h.sessions.loadEvents(sessionId)).whereType<ActionConfirmed>()) e.stepId};
 
-  testApp('a spoken "סיימתי" runs locally, is answered on screen and read aloud', (tester, h) async {
+  testApp('a tap on Remy listens at once: a spoken "סיימתי" runs locally and is read aloud', (tester, h) async {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h);
     h.mic.utterances.add('רמי, סיימתי');
-    await tapMic(tester);
+    await talkToRemy(tester);
 
+    expect(h.mic.listens, 1); // no choice between typing and speaking first
     expect(find.text('רמי, סיימתי'), findsOneWidget); // the transcript, as if typed
     expect(find.text(doneFirst), findsOneWidget);
     expect(h.speech.spoken, [doneFirstSpoken]);
@@ -45,41 +47,48 @@ void main() {
     expect(events.map((e) => e.source).toSet(), {ActionSource.agent});
     expect(await confirmed(h, sessionId), hasLength(1));
     expect(h.api.calls, isEmpty);
+    // Voice first: typing is one small button away, not a text box in the way.
+    expect(find.text('הקלדה'), findsOneWidget);
+    expect(find.byTooltip('שליחה'), findsNothing);
   });
 
   testApp('typed and spoken requests give the same result; typed replies stay silent', (tester, h) async {
     h.api.forbidCalls = true;
     await openCooking(tester, h);
-    await typeToRemy(tester, 'כמה זמן נשאר?');
-    expect(h.speech.spoken, isEmpty);
     h.mic.utterances.add('כמה זמן נשאר?');
-    await tapMic(tester);
-    expect(find.text('אין טיימר פעיל כרגע.'), findsNWidgets(2));
+    await talkToRemy(tester);
+    expect(find.text('אין טיימר פעיל כרגע.'), findsOneWidget);
     expect(h.speech.spoken, ['אין טיימר פעיל כרגע.']);
+    await typeToRemy(tester, 'כמה זמן נשאר?');
+    expect(find.text('אין טיימר פעיל כרגע.'), findsOneWidget); // the latest exchange is shown
+    expect(find.text('כל השיחה (4)'), findsOneWidget);
+    expect(h.speech.spoken, hasLength(1));
   });
 
-  testApp('an unsure spoken request asks first; "כן" by voice approves it', (tester, h) async {
+  testApp('Remy asks before an unsure request and listens for the answer: "כן" approves', (tester, h) async {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h);
-    h.mic.utterances.add('אולי סיימתי');
-    await tapMic(tester);
-    expect(find.text('הצעה של רמי'), findsOneWidget);
-    expect(await confirmed(h, sessionId), isEmpty);
-    expect(h.speech.spoken, hasLength(1)); // the question is read aloud too
-
-    h.mic.utterances.add('כן');
-    await tapMic(tester);
+    h.mic.utterances.addAll(['אולי סיימתי', 'כן']);
+    await talkToRemy(tester);
+    expect(h.mic.listens, 2); // the question was answered by voice, no tap
     expect(find.text(doneFirst), findsOneWidget);
     expect(await confirmed(h, sessionId), hasLength(1));
+    expect(h.speech.spoken, hasLength(2)); // the question, then the result
     expect(h.speech.spoken.last, doneFirstSpoken);
   });
 
-  testApp('"לא" by voice rejects a pending confirmation', (tester, h) async {
+  testApp('"לא" by voice rejects a pending confirmation; the question shows "כן" / "לא"', (tester, h) async {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h);
-    h.mic.utterances.addAll(['אולי סיימתי', 'לא']);
-    await tapMic(tester);
-    await tapMic(tester);
+    h.mic.utterances.add('אולי סיימתי');
+    await talkToRemy(tester);
+    expect(find.text('הצעה של רמי'), findsOneWidget);
+    expect(find.text('כן'), findsOneWidget);
+    expect(find.text('לא'), findsOneWidget);
+    expect(find.textContaining('אפשר גם לומר'), findsOneWidget);
+    expect(h.mic.listening, isTrue); // waiting for the spoken answer
+    h.mic.heldPartial = 'לא';
+    await tapMic(tester); // (here the test finishes the held utterance)
     expect(find.text('בסדר, לא שיניתי כלום.'), findsOneWidget);
     expect(await confirmed(h, sessionId), isEmpty);
   });
@@ -95,21 +104,30 @@ void main() {
       h.api.forbidCalls = true;
       final sessionId = await openCooking(tester, h);
       h.mic.prepareIssue = issue;
-      await tapMic(tester);
+      await talkToRemy(tester);
       expect(find.textContaining(message), findsOneWidget);
       expect(h.mic.listens, 0);
 
       await typeToRemy(tester, 'הבא');
       expect(find.text(doneFirst), findsOneWidget);
       expect(await confirmed(h, sessionId), hasLength(1));
-      expect(find.textContaining(message), findsOneWidget); // stays until the next try
     });
   }
+
+  testApp('a busy recognizer (just released by hands-free) gets one quiet retry', (tester, h) async {
+    h.api.forbidCalls = true;
+    final sessionId = await openCooking(tester, h);
+    h.mic.utterances.addAll([VoiceIssue.other, 'סיימתי']);
+    await talkToRemy(tester);
+    expect(find.text(doneFirst), findsOneWidget);
+    expect(find.textContaining('משהו השתבש'), findsNothing);
+    expect(await confirmed(h, sessionId), hasLength(1));
+  });
 
   testApp('a recognition error while listening (offline) shows the offline note', (tester, h) async {
     await openCooking(tester, h);
     h.mic.utterances.add(VoiceIssue.network);
-    await tapMic(tester);
+    await talkToRemy(tester);
     expect(find.textContaining('צריך חיבור לאינטרנט'), findsOneWidget);
     expect(h.api.calls, isEmpty);
   });
@@ -118,7 +136,7 @@ void main() {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h);
     h.mic.utterances.add('');
-    await tapMic(tester);
+    await talkToRemy(tester);
     expect(find.text('לא שמעתי. אפשר לנסות שוב.'), findsOneWidget);
     expect(await confirmed(h, sessionId), isEmpty);
   });
@@ -129,25 +147,21 @@ void main() {
     await openCooking(tester, h);
     const note = 'אין בטלפון קול עברי להקראה, אז התשובות יופיעו כטקסט.';
     h.mic.heldPartial = 'הבא';
-    await tapMic(tester);
+    await talkToRemy(tester);
     expect(find.text(note), findsOneWidget); // visible while listening
     await tapMic(tester); // finish the utterance
     expect(find.text(doneFirst), findsOneWidget);
     expect(h.speech.spoken, isEmpty);
-
-    h.mic.utterances.add('כמה זמן נשאר?');
-    await tapMic(tester);
-    expect(find.text('אין טיימר פעיל כרגע.'), findsOneWidget);
-    expect(h.speech.spoken, isEmpty);
     expect(find.text(note), findsOneWidget);
   });
 
-  testApp('the state shows what is heard; tapping the mic again finishes the utterance', (tester, h) async {
+  testApp('the panel shows that Remy listens and what he hears; the mic finishes the utterance', (tester, h) async {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h);
     h.mic.heldPartial = 'סיימתי';
-    await tapMic(tester);
-    expect(find.text('מקשיב… סיימתי'), findsOneWidget);
+    await talkToRemy(tester);
+    expect(find.text('מקשיב…'), findsOneWidget);
+    expect(find.text('סיימתי'), findsOneWidget);
     expect(find.text('עצירה'), findsOneWidget);
     await tapMic(tester);
     expect(find.text(doneFirst), findsOneWidget);
@@ -159,24 +173,29 @@ void main() {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h);
     h.mic.heldPartial = 'סיימתי';
-    await tapMic(tester);
+    await talkToRemy(tester);
     await tester.tap(find.text('עצירה'));
     await tester.pumpAndSettle();
-    expect(find.textContaining('מקשיב'), findsNothing);
+    expect(find.text('מקשיב…'), findsNothing);
     expect(await confirmed(h, sessionId), isEmpty);
 
     await tapMic(tester);
     expect(h.mic.listening, isTrue);
     await typeToRemy(tester, 'כמה זמן נשאר?');
     expect(h.mic.listening, isFalse);
-    expect(find.textContaining('מקשיב'), findsNothing);
+    expect(find.text('מקשיב…'), findsNothing);
     expect(find.text('אין טיימר פעיל כרגע.'), findsOneWidget);
     expect(await confirmed(h, sessionId), isEmpty);
   });
 
-  testApp('continuous conversation listens again after each answer and stops after two silences', (tester, h) async {
+  testApp('a long press opens Remy quietly; continuous conversation stops after two silences', (tester, h) async {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h);
+    await tester.longPress(find.byTooltip('רמי, העוזר שלך לבישול'));
+    await tester.pumpAndSettle();
+    expect(h.mic.listens, 0);
+    expect(find.text('לחצו על המיקרופון ודברו'), findsOneWidget);
+
     await tester.tap(find.text('שיחה רציפה'));
     await tester.pumpAndSettle();
     h.mic.utterances.addAll(['הבא', 'הבא', '', '']);
@@ -185,25 +204,13 @@ void main() {
     expect(h.speech.spoken, hasLength(2));
     expect(h.mic.listens, 4);
     expect(find.text('לא שמעתי. אפשר לנסות שוב.'), findsOneWidget);
-    expect(find.textContaining('מקשיב'), findsNothing);
-  });
-
-  testApp('a long press on Remy in the cooking screen opens him already listening', (tester, h) async {
-    h.api.forbidCalls = true;
-    final sessionId = await openCooking(tester, h, openSheet: false);
-    h.mic.utterances.add('סיימתי');
-    // A long press on Remy is the quick voice shortcut.
-    await tester.longPress(find.byTooltip('רמי, העוזר שלך לבישול'));
-    await tester.pumpAndSettle();
-    expect(find.text(doneFirst), findsOneWidget);
-    expect(h.speech.spoken, [doneFirstSpoken]);
-    expect(await confirmed(h, sessionId), hasLength(1));
+    expect(find.text('מקשיב…'), findsNothing);
   });
 
   testApp('closing the sheet while listening stops the microphone and changes nothing', (tester, h) async {
     final sessionId = await openCooking(tester, h);
     h.mic.heldPartial = 'סיימתי';
-    await tapMic(tester);
+    await talkToRemy(tester);
     expect(h.mic.listening, isTrue);
     await tester.tapAt(const Offset(10, 10)); // outside the sheet
     await tester.pumpAndSettle();

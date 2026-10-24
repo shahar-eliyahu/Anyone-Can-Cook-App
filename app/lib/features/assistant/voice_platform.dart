@@ -43,7 +43,7 @@ class PlatformSpeechRecognizer implements SpeechRecognizer {
   }
 
   @override
-  Future<String> listenOnce({required void Function(String partial) onPartial}) async {
+  Future<String> listenOnce({required void Function(String partial) onPartial, bool forWakePhrase = false}) async {
     await prepare();
     final done = Completer<String>();
     _current = done;
@@ -58,9 +58,10 @@ class PlatformSpeechRecognizer implements SpeechRecognizer {
         localeId: _localeId,
         partialResults: true,
         cancelOnError: true,
-        listenMode: ListenMode.confirmation,
-        listenFor: const Duration(seconds: 20),
-        pauseFor: const Duration(seconds: 3),
+        // Hands-free waits patiently for "היי רמי"; a request after a tap ends at a short pause.
+        listenMode: forWakePhrase ? ListenMode.dictation : ListenMode.confirmation,
+        listenFor: Duration(seconds: forWakePhrase ? 60 : 20),
+        pauseFor: Duration(seconds: forWakePhrase ? 30 : 3),
       ),
     );
     return done.future;

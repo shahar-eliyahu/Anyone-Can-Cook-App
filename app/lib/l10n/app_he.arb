@@ -533,8 +533,8 @@
   "remyChipTime": "כמה זמן נשאר?",
   "remyChipHelp": "עזרה בשלב",
   "remySend": "שליחה",
-  "remyApprove": "אישור",
-  "remyReject": "לא, תודה",
+  "remyApprove": "כן",
+  "remyReject": "לא",
   "remyRejected": "בסדר, לא שיניתי כלום.",
   "remyThinking": "רמי חושב…",
   "remyProposalTitle": "הצעה של רמי",
@@ -886,7 +886,7 @@
   "importLeaveNote": "אפשר לצאת מהמסך. כשהמתכון יהיה מוכן, הוא יחכה לכם במטבח.",
   "overviewReady": "הכול מוכן. אפשר להתחיל לבשל!",
   "overviewMore": "פעולות למתכון",
-  "remySheetSubtitle": "אפשר לכתוב או לדבר",
+  "remySheetSubtitle": "אפשר לדבר או להקליד",
   "remyPrepGreeting": "היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.",
   "remyPrepChipFirst": "במה מתחילים?",
   "remyPrepChipTime": "כמה זמן זה לוקח?",
@@ -924,5 +924,25 @@
       }
     }
   },
-  "attentionAckHint": "כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה."
+  "attentionAckHint": "כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה.",
+  "handsFreeTitle": "דיבור בלי ידיים",
+  "handsFreeOffHint": "אמרו \"היי רמי\" ורמי יקשיב, בלי לגעת במסך",
+  "handsFreeListening": "מקשיב ל\"היי רמי\". המסך יישאר דלוק.",
+  "handsFreePaused": "רמי איתכם עכשיו",
+  "handsFreeStarting": "מכינים את המיקרופון…",
+  "handsFreeNetwork": "זיהוי הדיבור בטלפון הזה צריך אינטרנט, ולכן \"היי רמי\" לא זמין כרגע. אפשר ללחוץ על רמי.",
+  "handsFreeError": "\"היי רמי\" הפסיק להקשיב. אפשר להפעיל שוב, או ללחוץ על רמי.",
+  "voiceTapToSpeak": "לחצו על המיקרופון ודברו",
+  "remyRole": "העוזר שלך לבישול",
+  "remyTypeInstead": "הקלדה",
+  "remyShowConversation": "כל השיחה ({count})",
+  "@remyShowConversation": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "remyHideConversation": "רק האחרונה",
+  "remyAnswerHint": "אפשר גם לומר \"כן\" או \"לא\""
 }

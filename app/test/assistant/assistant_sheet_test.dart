@@ -5,7 +5,12 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/app_harness.dart';
 
+/// Typing is secondary in Remy's sheet: open the text field first if needed.
 Future<void> typeToRemy(WidgetTester tester, String text) async {
+  if (find.byTooltip('שליחה').evaluate().isEmpty) {
+    await tester.tap(find.text('הקלדה'));
+    await tester.pumpAndSettle();
+  }
   await tester.enterText(find.byType(TextField).last, text);
   await tester.tap(find.byTooltip('שליחה'));
   await tester.pumpAndSettle();
@@ -53,13 +58,13 @@ void main() {
     await typeToRemy(tester, 'האורז שורף למטה, מה עושים?');
     expect(find.text('אפשר להנמיך את האש באורז.'), findsOneWidget);
     expect(find.text('הצעה של רמי'), findsOneWidget);
-    await tester.tap(find.text('לא, תודה'));
+    await tester.tap(find.text('לא'));
     await tester.pumpAndSettle();
     expect(find.text('בסדר, לא שיניתי כלום.'), findsOneWidget);
     expect((await h.sessions.loadEvents(sessionId)).whereType<PlanPatched>(), isEmpty);
 
     await typeToRemy(tester, 'ושוב — האורז שורף');
-    await tester.tap(find.text('אישור'));
+    await tester.tap(find.text('כן'));
     await tester.pumpAndSettle();
     expect(find.text('✓ עדכנתי את השלבים הבאים: אש נמוכה מאוד לאורז.'), findsOneWidget);
     expect((await h.sessions.loadEvents(sessionId)).whereType<PlanPatched>().single.summaryHe, 'אש נמוכה מאוד לאורז');

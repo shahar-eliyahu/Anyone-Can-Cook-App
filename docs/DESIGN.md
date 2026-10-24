@@ -319,7 +319,8 @@ Haptics: light on the main action and on ticks; medium when a timer finishes (wi
 
 ## 10. Decisions (resolved when Phase 4 was approved, 2026-10-24)
 
-1. **Menu position:** "תפריט" on the end side (top left) of every screen, back on the start side (top right).
+1. **Menu position:** first built at the top left; moved to the top-right corner (with back beside it) in the
+   refinement of section 13.
 2. **Heebo:** bundled (3 static weights, about 130 KB, SIL OFL; license in `app/assets/fonts/OFL.txt`).
 3. **Remy in preparation:** implemented with the existing turn endpoint; questions only (section 12).
 4. **Icon:** replaced in 4E (section 12).
@@ -383,3 +384,32 @@ No new packages are needed for 4B–4E (transitions, skeletons and haptics are l
   the logo's gradient (background) + the hat and utensils separated from it and scaled to 0.81 so the utensils stay
   inside the safe circle (foreground) + a white silhouette (monochrome); legacy Android and iOS use the logo
   itself. Splash: the mark on the warm off-white (Android 12+ with the adaptive icon; iOS launch screen).
+
+---
+
+## 13. Voice-first Remy, hands-free cooking, Hebrew bar layout (refinement, 2026-10-24)
+
+- **A tap on Remy is "talking to Remy":** the sheet opens already listening (where the phone can listen).
+  A long press opens it quietly. There is no choice to make before speaking.
+- **The sheet is voice-first:** a centred avatar with a listening ring, one status line ("מקשיב…", "רגע…", "רמי
+  מדבר…") with the live transcript under it, the latest exchange only ("כל השיחה (N)" shows the rest), a large
+  central microphone (stop while speaking), "הקלדה" as a small side button, "שיחה רציפה" on the other side,
+  three quick chips. A question Remy asks shows in its own card with large "כן" / "לא" and "אפשר גם לומר כן או
+  לא", and Remy listens for the answer by himself. When typing or reading a note the header becomes a slim row.
+- **Hands-free ("היי רמי"), cooking screen only:** a "דיבור בלי ידיים" switch under the progress (off by default,
+  remembered). While on, the cooking screen is open and the app is in front: the phone's own speech recognition
+  runs in patient sessions (dictation mode, up to 60 s each, restarted in a loop); a session ends 1.4 s after the
+  phrase stops changing. "היי רמי, סיימתי" is answered at once; "היי רמי" alone opens Remy listening. Remy's sheet
+  pauses the loop (it owns the microphone; Remy never hears himself); a sheet opened by voice closes itself 4 s
+  after the answer unless touched, and the loop resumes. Leaving the screen, the app going to the background or
+  turning the switch off stops it. The screen stays on while it runs (window flag; iOS idle timer). Problems
+  (no permission, no Hebrew, offline recognition, repeated errors) turn it off with a Hebrew reason; the Remy
+  button keeps working.
+- **Why not always-listening wake-word detection:** a dedicated on-device wake-word engine needs either a paid
+  or keyed service or a large offline model plus a new package; the phone's recognizer is free and already
+  approved. Limits: recognition restarts about once a minute (some phones play a short sound each time);
+  without an offline Hebrew pack it needs the internet; it stops when the screen is off or the app is closed.
+- **Bar layout (Hebrew):** the start of the bar is the right edge, so "תפריט" (icon with its word) sits in the
+  top-right corner on every screen and opens the menu from the right; the back arrow, pointing right, sits
+  right beside it on inner screens; screen actions stay on the left.
+

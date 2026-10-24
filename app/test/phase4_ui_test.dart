@@ -96,6 +96,27 @@ void main() {
     expect(find.text('0 מתוך 5 שלבים הושלמו'), findsOneWidget);
   });
 
+  testApp('Hebrew bar layout: "תפריט" in the right corner on every screen, back beside it, menu from the right',
+      (tester, h) async {
+    phone(tester);
+    final recipeId = await h.seedSample();
+    await tester.pumpWidget(h.build(initialLocation: '/recipes/$recipeId'));
+    await tester.pumpAndSettle();
+    final menu = tester.getRect(find.text('תפריט'));
+    final back = tester.getRect(find.byType(BackButton));
+    expect(menu.center.dx, greaterThan(300)); // the right corner of a 360-wide screen
+    expect(back.center.dx, lessThan(menu.center.dx)); // next to it, on its left
+    expect(back.center.dx, greaterThan(180)); // still on the right half
+    expect(tester.getRect(find.byTooltip('פעולות למתכון')).center.dx, lessThan(100)); // actions far left
+
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(tester.getRect(find.text('תפריט')).center.dx, menu.center.dx); // same place on home
+    await tester.tap(find.text('תפריט'));
+    await tester.pumpAndSettle();
+    expect(tester.getRect(find.byType(Drawer)).right, 360); // slides in from the right
+  });
+
   testApp('RTL: forward arrows point left (chevron_right mirrors), back points right', (tester, h) async {
     await h.seedSample();
     await tester.pumpWidget(h.build(initialLocation: '/recipes'));
@@ -160,8 +181,12 @@ void main() {
     await tester.tap(find.byTooltip('רמי, העוזר שלך לבישול'));
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
-    expect(find.byType(TextField).last.hitTestable(), findsOneWidget);
+    expect(find.text('מקשיב…'), findsOneWidget); // a tap is "talking to Remy"
     expect(find.byTooltip('דיבור עם רמי').hitTestable(), findsOneWidget);
+    await tester.tap(find.text('הקלדה'));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    expect(find.byType(TextField).last.hitTestable(), findsOneWidget);
     expect(find.byTooltip('שליחה').hitTestable(), findsOneWidget);
   });
 
@@ -214,12 +239,15 @@ void main() {
       h.api.forbidCalls = true;
       await openOverviewRemy(tester, h);
       expect(find.textContaining('אפשר לשאול אותי על המתכון'), findsOneWidget);
+      await tester.ensureVisible(find.text('כמה זמן זה לוקח?'));
       await tester.tap(find.text('כמה זמן זה לוקח?'));
       await tester.pumpAndSettle();
       expect(find.textContaining('המתכון לוקח בערך'), findsOneWidget);
+      await tester.ensureVisible(find.text('במה מתחילים?'));
       await tester.tap(find.text('במה מתחילים?'));
       await tester.pumpAndSettle();
       expect(find.textContaining('מתחילים ב: הכנת תפוחי האדמה'), findsOneWidget);
+      await tester.ensureVisible(find.text('חסר לי מצרך'));
       await tester.tap(find.text('חסר לי מצרך'));
       await tester.pumpAndSettle();
       expect(find.textContaining('סמנו "חסר לי" ליד המצרך'), findsWidgets);
@@ -229,6 +257,8 @@ void main() {
     testApp('cooking commands wait for cooking: nothing starts, nothing changes', (tester, h) async {
       h.api.forbidCalls = true;
       await openOverviewRemy(tester, h);
+      await tester.tap(find.text('הקלדה'));
+      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).last, 'סיימתי');
       await tester.tap(find.byTooltip('שליחה'));
       await tester.pumpAndSettle();
@@ -247,6 +277,8 @@ void main() {
           {'op': 'replace_ingredient', 'ingredient_id': 'i3', 'name': 'שמן קנולה'},
         ]),
       ));
+      await tester.tap(find.text('הקלדה'));
+      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).last, 'אפשר להחליף את שמן הזית במשהו אחר?');
       await tester.tap(find.byTooltip('שליחה'));
       await tester.pumpAndSettle();

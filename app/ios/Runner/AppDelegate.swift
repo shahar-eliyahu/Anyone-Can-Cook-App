@@ -12,5 +12,17 @@ import UIKit
 
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    // Hands-free cooking keeps the screen on.
+    if let registrar = engineBridge.pluginRegistry.registrar(forPlugin: "ScreenAwake") {
+      let channel = FlutterMethodChannel(name: "anyone_can_cook/screen", binaryMessenger: registrar.messenger())
+      channel.setMethodCallHandler { call, result in
+        if call.method == "setKeepOn" {
+          UIApplication.shared.isIdleTimerDisabled = (call.arguments as? Bool) ?? false
+          result(nil)
+        } else {
+          result(FlutterMethodNotImplemented)
+        }
+      }
+    }
   }
 }

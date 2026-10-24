@@ -13,6 +13,8 @@ import '../../core/widgets/motion_widgets.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/cooking_plan.dart';
 import '../assistant/assistant_models.dart';
+import '../assistant/assistant_sheet.dart';
+import '../assistant/hands_free.dart';
 import '../assistant/remy_widgets.dart';
 import 'cooking_controller.dart';
 import 'engine/cooking_engine.dart';
@@ -146,6 +148,19 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
     prep.retainWhere((v) => prepIds.add(v.task.id));
     final total = plan.steps.length;
     final done = _state.doneStepCount;
+    final handsFree = ref.watch(handsFreeControllerProvider(widget.sessionId));
+    // "היי רמי" heard: Remy opens without a touch (answering at once when a request followed).
+    ref.listen(handsFreeControllerProvider(widget.sessionId).select((s) => s.wake?.id), (previous, id) {
+      final wake = ref.read(handsFreeControllerProvider(widget.sessionId)).wake;
+      if (id == null || id == previous || wake == null || !mounted) return;
+      showAssistantSheet(
+        context,
+        RemyScope.session(widget.sessionId),
+        listen: wake.command.isEmpty,
+        command: wake.command.isEmpty ? null : wake.command,
+        handsFree: true,
+      );
+    });
 
     return AppScaffold(
       title: title,
@@ -195,6 +210,11 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
             curve: Motion.standard,
             builder: (context, v, _) => LinearProgressIndicator(value: v, semanticsLabel: l10n.progressLabel),
           ),
+          if (ref.read(handsFreeControllerProvider(widget.sessionId).notifier).available)
+            _HandsFreeRow(
+              state: handsFree,
+              onChanged: (on) => ref.read(handsFreeControllerProvider(widget.sessionId).notifier).setEnabled(on),
+            ),
           if (plan.advanceNoticeHe case final notice? when done == 0)
             NoteBanner(tidyHe(notice), kind: NoteKind.tip, icon: Icons.schedule_rounded),
           if (prep.isNotEmpty) ...[
@@ -598,6 +618,51 @@ class _TimerStatus extends StatelessWidget {
               ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "דיבור בלי ידיים": one compact row with a switch. On, it says what to say and that it is
+/// listening; when it can't listen, it says why.
+class _HandsFreeRow extends StatelessWidget {
+  const _HandsFreeRow({required this.state, required this.onChanged});
+
+  final HandsFreeState state;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final theme = Theme.of(context);
+    final listening = state.enabled && state.status == HandsFreeStatus.listening;
+    final subtitle = !state.enabled
+        ? l10n.handsFreeOffHint
+        : switch (state.status) {
+            HandsFreeStatus.listening => l10n.handsFreeListening,
+            HandsFreeStatus.paused => l10n.handsFreePaused,
+            HandsFreeStatus.unavailable => state.messageHe ?? l10n.handsFreeError,
+            _ => l10n.handsFreeStarting,
+          };
+    return Padding(
+      padding: const EdgeInsets.only(top: Space.m),
+      child: Material(
+        color: state.enabled ? theme.colorScheme.primaryContainer : theme.colorScheme.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(Radii.input),
+        child: SwitchListTile(
+          value: state.enabled,
+          onChanged: onChanged,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Radii.input)),
+          secondary: BreathingRing(
+            active: listening,
+            child: Icon(
+              state.status == HandsFreeStatus.unavailable && state.enabled ? Icons.mic_off_outlined : Icons.record_voice_over_outlined,
+              color: AppColors.primary,
+            ),
+          ),
+          title: Text(l10n.handsFreeTitle, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+          subtitle: Text(subtitle),
         ),
       ),
     );

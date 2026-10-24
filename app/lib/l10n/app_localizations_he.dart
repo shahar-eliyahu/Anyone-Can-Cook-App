@@ -914,10 +914,10 @@ class AppLocalizationsHe extends AppLocalizations {
   String get remySend => 'שליחה';
 
   @override
-  String get remyApprove => 'אישור';
+  String get remyApprove => 'כן';
 
   @override
-  String get remyReject => 'לא, תודה';
+  String get remyReject => 'לא';
 
   @override
   String get remyRejected => 'בסדר, לא שיניתי כלום.';
@@ -1243,7 +1243,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get overviewMore => 'פעולות למתכון';
 
   @override
-  String get remySheetSubtitle => 'אפשר לכתוב או לדבר';
+  String get remySheetSubtitle => 'אפשר לדבר או להקליד';
 
   @override
   String get remyPrepGreeting =>
@@ -1311,4 +1311,47 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get attentionAckHint => 'כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה.';
+
+  @override
+  String get handsFreeTitle => 'דיבור בלי ידיים';
+
+  @override
+  String get handsFreeOffHint => 'אמרו \"היי רמי\" ורמי יקשיב, בלי לגעת במסך';
+
+  @override
+  String get handsFreeListening => 'מקשיב ל\"היי רמי\". המסך יישאר דלוק.';
+
+  @override
+  String get handsFreePaused => 'רמי איתכם עכשיו';
+
+  @override
+  String get handsFreeStarting => 'מכינים את המיקרופון…';
+
+  @override
+  String get handsFreeNetwork =>
+      'זיהוי הדיבור בטלפון הזה צריך אינטרנט, ולכן \"היי רמי\" לא זמין כרגע. אפשר ללחוץ על רמי.';
+
+  @override
+  String get handsFreeError =>
+      '\"היי רמי\" הפסיק להקשיב. אפשר להפעיל שוב, או ללחוץ על רמי.';
+
+  @override
+  String get voiceTapToSpeak => 'לחצו על המיקרופון ודברו';
+
+  @override
+  String get remyRole => 'העוזר שלך לבישול';
+
+  @override
+  String get remyTypeInstead => 'הקלדה';
+
+  @override
+  String remyShowConversation(int count) {
+    return 'כל השיחה ($count)';
+  }
+
+  @override
+  String get remyHideConversation => 'רק האחרונה';
+
+  @override
+  String get remyAnswerHint => 'אפשר גם לומר \"כן\" או \"לא\"';
 }

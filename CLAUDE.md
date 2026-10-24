@@ -86,7 +86,9 @@ Key invariants:
   Cook" is the internal name for code, packages, folders, GitHub. Never rename the repo or folders.
 - **Design system (Phase 4, `docs/DESIGN.md`):** colours, type, spacing and motion come from `core/theme.dart` and
   `core/motion.dart`, never hard-coded; use the shared widgets (`AppScaffold` with "תפריט", `BottomActionBar`,
-  `NoteBanner`, `RecipeTile`, `StageLoader`…). Routes stay nested under `/`. Remy's entry point is `RemyButton`.
+  `NoteBanner`, `RecipeTile`, `StageLoader`…). Routes stay nested under `/`. Remy's entry point is `RemyButton` (a tap opens him listening). "תפריט" sits in
+  the top-right corner with back beside it. Hands-free "היי רמי" lives in `assistant/hands_free.dart` (cooking
+  screen only; Remy's sheet pauses it via `remySheetOpenProvider`).
   Hebrew copy: no dash separators (tested), temperatures in words, `tidyHe` for AI/user text. Animations are
   bounded and respect `Motion.reduced`.
 - **Dependencies:** add a package only when the approved plan needs it; prefer small local code.

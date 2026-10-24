@@ -61,9 +61,8 @@ class _HatPainter extends CustomPainter {
   bool shouldRepaint(_HatPainter oldDelegate) => false;
 }
 
-/// The way to Remy, always labelled: a tap opens the conversation (typing and the
-/// microphone are both there); a long press opens it already listening (a shortcut, never
-/// the only way to speak).
+/// The way to Remy, always labelled. A tap is "talking to Remy": he opens already listening
+/// (where the phone can listen). A long press opens him quietly, to read or type.
 class RemyButton extends ConsumerWidget {
   const RemyButton({super.key, required this.scope, this.label});
 
@@ -79,7 +78,7 @@ class RemyButton extends ConsumerWidget {
     final theme = Theme.of(context);
     return Tooltip(
       message: l10n.remyTitle,
-      // The label is visible; a long press belongs to the voice shortcut, not the tooltip.
+      // The label is visible; a long press opens Remy quietly, not the tooltip.
       triggerMode: TooltipTriggerMode.manual,
       child: Semantics(
         button: true,
@@ -90,8 +89,8 @@ class RemyButton extends ConsumerWidget {
           shape: StadiumBorder(side: BorderSide(color: AppColors.brandBlue.withValues(alpha: 0.35))),
           child: InkWell(
             customBorder: const StadiumBorder(),
-            onTap: () => showAssistantSheet(context, scope),
-            onLongPress: canListen ? () => showAssistantSheet(context, scope, listen: true) : null,
+            onTap: () => showAssistantSheet(context, scope, listen: canListen),
+            onLongPress: () => showAssistantSheet(context, scope),
             child: ConstrainedBox(
               constraints: const BoxConstraints(minHeight: 52),
               child: Padding(

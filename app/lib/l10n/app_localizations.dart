@@ -1687,13 +1687,13 @@ abstract class AppLocalizations {
   /// No description provided for @remyApprove.
   ///
   /// In he, this message translates to:
-  /// **'אישור'**
+  /// **'כן'**
   String get remyApprove;
 
   /// No description provided for @remyReject.
   ///
   /// In he, this message translates to:
-  /// **'לא, תודה'**
+  /// **'לא'**
   String get remyReject;
 
   /// No description provided for @remyRejected.
@@ -2191,7 +2191,7 @@ abstract class AppLocalizations {
   /// No description provided for @remySheetSubtitle.
   ///
   /// In he, this message translates to:
-  /// **'אפשר לכתוב או לדבר'**
+  /// **'אפשר לדבר או להקליד'**
   String get remySheetSubtitle;
 
   /// No description provided for @remyPrepGreeting.
@@ -2307,6 +2307,84 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה.'**
   String get attentionAckHint;
+
+  /// No description provided for @handsFreeTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'דיבור בלי ידיים'**
+  String get handsFreeTitle;
+
+  /// No description provided for @handsFreeOffHint.
+  ///
+  /// In he, this message translates to:
+  /// **'אמרו \"היי רמי\" ורמי יקשיב, בלי לגעת במסך'**
+  String get handsFreeOffHint;
+
+  /// No description provided for @handsFreeListening.
+  ///
+  /// In he, this message translates to:
+  /// **'מקשיב ל\"היי רמי\". המסך יישאר דלוק.'**
+  String get handsFreeListening;
+
+  /// No description provided for @handsFreePaused.
+  ///
+  /// In he, this message translates to:
+  /// **'רמי איתכם עכשיו'**
+  String get handsFreePaused;
+
+  /// No description provided for @handsFreeStarting.
+  ///
+  /// In he, this message translates to:
+  /// **'מכינים את המיקרופון…'**
+  String get handsFreeStarting;
+
+  /// No description provided for @handsFreeNetwork.
+  ///
+  /// In he, this message translates to:
+  /// **'זיהוי הדיבור בטלפון הזה צריך אינטרנט, ולכן \"היי רמי\" לא זמין כרגע. אפשר ללחוץ על רמי.'**
+  String get handsFreeNetwork;
+
+  /// No description provided for @handsFreeError.
+  ///
+  /// In he, this message translates to:
+  /// **'\"היי רמי\" הפסיק להקשיב. אפשר להפעיל שוב, או ללחוץ על רמי.'**
+  String get handsFreeError;
+
+  /// No description provided for @voiceTapToSpeak.
+  ///
+  /// In he, this message translates to:
+  /// **'לחצו על המיקרופון ודברו'**
+  String get voiceTapToSpeak;
+
+  /// No description provided for @remyRole.
+  ///
+  /// In he, this message translates to:
+  /// **'העוזר שלך לבישול'**
+  String get remyRole;
+
+  /// No description provided for @remyTypeInstead.
+  ///
+  /// In he, this message translates to:
+  /// **'הקלדה'**
+  String get remyTypeInstead;
+
+  /// No description provided for @remyShowConversation.
+  ///
+  /// In he, this message translates to:
+  /// **'כל השיחה ({count})'**
+  String remyShowConversation(int count);
+
+  /// No description provided for @remyHideConversation.
+  ///
+  /// In he, this message translates to:
+  /// **'רק האחרונה'**
+  String get remyHideConversation;
+
+  /// No description provided for @remyAnswerHint.
+  ///
+  /// In he, this message translates to:
+  /// **'אפשר גם לומר \"כן\" או \"לא\"'**
+  String get remyAnswerHint;
 }
 
 class _AppLocalizationsDelegate

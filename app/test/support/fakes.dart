@@ -187,6 +187,9 @@ class FakeSpeechRecognizer implements SpeechRecognizer {
   VoiceIssue? prepareIssue;
   String heldPartial = '';
   int listens = 0;
+
+  /// Hands-free sessions among [listens].
+  int wakeListens = 0;
   Completer<String>? _held;
 
   bool get listening => _held != null && !_held!.isCompleted;
@@ -197,8 +200,9 @@ class FakeSpeechRecognizer implements SpeechRecognizer {
   }
 
   @override
-  Future<String> listenOnce({required void Function(String partial) onPartial}) async {
+  Future<String> listenOnce({required void Function(String partial) onPartial, bool forWakePhrase = false}) async {
     listens++;
+    if (forWakePhrase) wakeListens++;
     if (utterances.isEmpty) {
       if (heldPartial.isNotEmpty) onPartial(heldPartial);
       return (_held = Completer<String>()).future;

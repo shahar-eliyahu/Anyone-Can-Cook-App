@@ -27,7 +27,9 @@ abstract interface class SpeechRecognizer {
 
   /// Listens to one utterance: partial text as it is heard, then the final text (empty
   /// when nothing was said). Throws [VoiceException] on recognition errors.
-  Future<String> listenOnce({required void Function(String partial) onPartial});
+  /// [forWakePhrase]: a long, patient session for hands-free "היי רמי" (silence doesn't end it
+  /// quickly; the caller finishes it with [stop] once the phrase and command were heard).
+  Future<String> listenOnce({required void Function(String partial) onPartial, bool forWakePhrase = false});
 
   /// Finish now (the last heard text becomes final).
   Future<void> stop();

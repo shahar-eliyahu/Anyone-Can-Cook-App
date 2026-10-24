@@ -446,10 +446,36 @@ Checked what existed, changed only what was missing.
   widget test), haptics, TalkBack/VoiceOver reading order, real speech recognition and spoken replies, iOS (icon
   set and launch screen generated but not built), launcher icon shapes on other vendors' launchers.
 
+### Phase 4 refinement — voice-first Remy, "היי רמי", Hebrew bar layout, 2026-10-24 (local commit)
+
+- **What:** a tap on Remy listens at once; voice-first sheet; Remy listens for the answer to his own yes/no
+  questions; hands-free "היי רמי" in the cooking screen (switch, remembered, loop of recognizer sessions, sheet
+  hand-off, auto-close, screen kept on); "תפריט" moved to the top-right corner with back beside it on every screen.
+  Details: `docs/DESIGN.md` §13; decisions #72–#75.
+- **Bugs found and fixed:** the hands-free loop waited on the keep-screen-on platform call (never answers in
+  tests; now fire-and-forget); an extra recognizer session around each hand-off (now a hand-off flag and an
+  ordered release); reading provider state in a dispose callback (Riverpod assertion); the sheet's list squeezed
+  by the header and notes (slim header, flexible notes, the question inside the "כן/לא" card); **on the emulator:**
+  opening Remy while hands-free listened failed with "משהו השתבש" because the recognizer was still releasing
+  (now a 300 ms start while the sheet slides in, plus one quiet retry on a busy recognizer).
+- **Tests (fakes only, zero Gemini calls):** Flutter **279/279**, analyzer clean. New: `hands_free_test.dart` (wake
+  phrase matching, off by default and remembered, "היי רמי, סיימתי" with no touch, "היי רמי" then a request,
+  ignored kitchen talk, a hands-free yes/no answer, touch keeps the sheet, a tap on Remy pauses and resumes, leaving
+  stops listening, permission and offline reasons), voice tests rewritten for tap-to-listen (incl. the busy
+  retry), a bar-layout test (menu in the right corner on every screen, back beside it, drawer from the right).
+- **Emulator (Pixel 8a, Android 15):** menu/back positions; a tap on Remy asked for the microphone, then listened
+  at once; hands-free on: Google's recognizer listening in he-IL (online; no offline Hebrew pack on the emulator),
+  the window's KEEP_SCREEN_ON flag, sessions restarting about every 20–60 s with no errors; stopped and flag
+  cleared when leaving cooking and in the background, restarted on return and on resume; tapping Remy paused it
+  and it resumed after the sheet closed. The test session was abandoned, hands-free turned off and the microphone
+  permission revoked afterwards.
+- **Not verified:** saying "היי רמי" for real (the emulator has no microphone input), recognition accuracy for the
+  phrase in a noisy kitchen, restart sounds on specific phones, battery use over a long cook, iOS.
+
 ## Next step
 
 1. User reviews Phase 4 on a real phone (`bac3d0d`, `73d2f01`, `bf9853f` are local only; Phase 3D is on
-   `origin/main` at `9386cbb`).
+   `origin/main` at `9386cbb`); tries "היי רמי" in a real kitchen.
 2. With approval: push; small live Gemini checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 /
    ≤ 10 calls; 3B/3D Remy ≈ 15 questions / ≤ 20 calls), then deploy (the backend copy and prompt style rule ship
    with that deploy).
