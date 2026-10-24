@@ -99,6 +99,7 @@ class PlanStepCard extends StatelessWidget {
           children: [
             Text('${l10n.stepNumber(number[step.id]!)} · ${step.title}', style: theme.textTheme.titleSmall),
             EditableRow(onEdit: onEditInstruction, editLabel: l10n.editStep, child: Text(step.instructionHe)),
+            for (final n in step.notesHe) Text('🔄 $n'),
             for (final u in step.ingredientUses)
               if (ingredients[u.ingredientId] case final i?)
                 ProvenancedText(

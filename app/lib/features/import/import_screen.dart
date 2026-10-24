@@ -203,7 +203,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> with SingleTickerPr
         case ImportNeedsAnswers(:final draftId):
           context.pushReplacement('/drafts/$draftId/clarify');
         case ImportPlanReady(:final draftId):
-          context.pushReplacement('/drafts/$draftId/review');
+          context.pushReplacement('/recipes/$draftId');
         case ImportPlanFailed(:final draftId, :final error):
           // The recipe is saved; the draft's screen retries only the plan.
           context.pushReplacement('/drafts/$draftId/clarify', extra: error);

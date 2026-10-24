@@ -95,6 +95,8 @@ class PlanStep(ContractModel):
     # Optional short help shown only when the cook asks ("עזרה"): how to know it's ready,
     # one common problem, in plain words.
     help_he: str | None = Field(default=None, max_length=400)
+    # Short notes added when the cook accepted a substitution ("במקום שמנת: …").
+    notes_he: list[str] = []
     warnings_he: list[str] = []
     estimated_active_minutes: Minutes | None = None
 

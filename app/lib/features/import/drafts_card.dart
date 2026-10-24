@@ -11,11 +11,11 @@ final draftsProvider = StreamProvider<List<RecipeRow>>(
   (ref) => ref.watch(recipeRepositoryProvider).watchDrafts(),
 );
 
-/// Continues an unfinished import: review if a plan exists, otherwise clarify.
+/// Continues an unfinished import: the overview if a plan exists, otherwise clarify.
 Future<void> openDraft(BuildContext context, WidgetRef ref, String draftId, {bool replace = false}) async {
   final router = GoRouter.of(context);
   final hasPlan = await ref.read(recipeRepositoryProvider).draftPlan(draftId) != null;
-  final path = hasPlan ? '/drafts/$draftId/review' : '/drafts/$draftId/clarify';
+  final path = hasPlan ? '/recipes/$draftId' : '/drafts/$draftId/clarify';
   replace ? router.pushReplacement(path) : router.push(path);
 }
 

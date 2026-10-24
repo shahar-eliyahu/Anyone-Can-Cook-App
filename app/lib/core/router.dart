@@ -9,7 +9,7 @@ import '../features/import/import_screen.dart';
 import '../features/import/review_screen.dart';
 import '../features/kitchen/kitchen_screen.dart';
 import '../features/recipes/plan_review_screen.dart';
-import '../features/recipes/recipe_detail_screen.dart';
+import '../features/prepare/recipe_overview_screen.dart';
 import '../features/recipes/recipes_screen.dart';
 import '../features/settings/settings_screen.dart';
 
@@ -24,7 +24,7 @@ GoRouter createRouter({String initialLocation = '/'}) => GoRouter(
         ),
         GoRoute(
           path: '/recipes/:id',
-          builder: (context, state) => RecipeDetailScreen(recipeId: state.pathParameters['id']!),
+          builder: (context, state) => RecipeOverviewScreen(recipeId: state.pathParameters['id']!),
         ),
         GoRoute(
           path: '/recipes/:id/plan',

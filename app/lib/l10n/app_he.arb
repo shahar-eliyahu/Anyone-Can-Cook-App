@@ -432,5 +432,108 @@
   "stepsCompletedTitle": "השלבים",
   "stepNotDone": "לא הושלם",
   "durationUnderMinute": "פחות מדקה",
-  "loadingShort": "…"
+  "loadingShort": "…",
+  "durationMinutes": "כ-{minutes} דק'",
+  "@durationMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHour": "כשעה",
+  "durationHourMinutes": "כשעה ו-{minutes} דק'",
+  "@durationHourMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "durationHours": "כ-{hours} שעות",
+  "@durationHours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "overviewTotalTime": "זמן כולל: {time}",
+  "@overviewTotalTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "overviewActiveTime": "עבודה בפועל: {time}",
+  "@overviewActiveTime": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "overviewChecklistIntro": "סמנו מה יש לכם. אם משהו חסר, נמצא יחד פתרון.",
+  "haveIt": "יש לי",
+  "missingIt": "חסר לי",
+  "haveAll": "יש לי הכול",
+  "findSolution": "פתרון",
+  "stillMissing": "עוד חסר: {items}",
+  "@stillMissing": {
+    "placeholders": {
+      "items": {
+        "type": "String"
+      }
+    }
+  },
+  "insteadOf": "במקום {name}",
+  "@insteadOf": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notUsed": "לא בשימוש",
+  "optionalItem": "לא חובה",
+  "undoSubstitution": "ביטול ההחלפה",
+  "startCookingCta": "מתחילים לבשל",
+  "saveToMyRecipes": "שמירה במתכונים שלי",
+  "advancedEdit": "עריכה מתקדמת",
+  "attentionTitle": "שימו לב",
+  "attentionAck": "קראתי",
+  "attentionPhoto": "המתכון נקרא מתמונה — כדאי לוודא שהכמויות נכונות.",
+  "planOutdated": "התוכנית לא מעודכנת לשינויים שעשיתם. אפשר לטפל בזה בעריכה המתקדמת.",
+  "cookingNowLocked": "המתכון בבישול עכשיו. אפשר לשנות אותו אחרי שתסיימו.",
+  "sheetTitle": "אין לכם {name}?",
+  "@sheetTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sheetNoteHint": "מה יש לכם במקום? (לא חובה)",
+  "sheetFind": "חפשו לי פתרון",
+  "sheetSearching": "מחפשים פתרון…",
+  "sheetTryOther": "לחפש פתרון אחר",
+  "verdictWorks": "אפשר להחליף",
+  "verdictChanges": "אפשר, והתוצאה תהיה מעט שונה",
+  "verdictNotRecommended": "לא מומלץ",
+  "verdictNone": "אין לזה תחליף טוב",
+  "useThis": "להשתמש בזה",
+  "noThanks": "לא תודה",
+  "understood": "הבנתי",
+  "substitutionFailed": "לא הצלחנו להחיל את הפתרון. אפשר לנסות שוב, או לשנות ידנית בעריכה המתקדמת.",
+  "draftCancel": "ביטול הייבוא",
+  "fullPlan": "כל שלבי הבישול",
+  "attentionSafetyEstimate": "זמן הבישול בשלב \"{title}\" הוא הערכה — בדקו מוכנות לפי הסימנים בשלב.",
+  "@attentionSafetyEstimate": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  }
 }

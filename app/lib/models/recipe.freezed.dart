@@ -313,7 +313,9 @@ as String?,
 /// @nodoc
 mixin _$Ingredient {
 
- String get id; String get name; Quantity? get quantity; String? get preparation; String? get group; bool get optional;
+ String get id; String get name; Quantity? get quantity; String? get preparation; String? get group; bool get optional;/// The original name when the cook replaced it before cooking (Phase 3A).
+ String? get substitutedFor;/// The cook decided to cook without it.
+ bool get omitted;
 /// Create a copy of Ingredient
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -327,20 +329,20 @@ $IngredientCopyWith<Ingredient> get copyWith => _$IngredientCopyWithImpl<Ingredi
 @override
 bool operator ==(Object other) {
   final _this = this as Ingredient;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Ingredient&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.quantity, _this.quantity) || other.quantity == _this.quantity)&&(identical(other.preparation, _this.preparation) || other.preparation == _this.preparation)&&(identical(other.group, _this.group) || other.group == _this.group)&&(identical(other.optional, _this.optional) || other.optional == _this.optional));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Ingredient&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.quantity, _this.quantity) || other.quantity == _this.quantity)&&(identical(other.preparation, _this.preparation) || other.preparation == _this.preparation)&&(identical(other.group, _this.group) || other.group == _this.group)&&(identical(other.optional, _this.optional) || other.optional == _this.optional)&&(identical(other.substitutedFor, _this.substitutedFor) || other.substitutedFor == _this.substitutedFor)&&(identical(other.omitted, _this.omitted) || other.omitted == _this.omitted));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Ingredient;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.quantity,_this.preparation,_this.group,_this.optional);
+  return Object.hash(runtimeType,_this.id,_this.name,_this.quantity,_this.preparation,_this.group,_this.optional,_this.substitutedFor,_this.omitted);
 }
 
 @override
 String toString() {
   final _this = this as Ingredient;
-  return 'Ingredient(id: ${_this.id}, name: ${_this.name}, quantity: ${_this.quantity}, preparation: ${_this.preparation}, group: ${_this.group}, optional: ${_this.optional})';
+  return 'Ingredient(id: ${_this.id}, name: ${_this.name}, quantity: ${_this.quantity}, preparation: ${_this.preparation}, group: ${_this.group}, optional: ${_this.optional}, substitutedFor: ${_this.substitutedFor}, omitted: ${_this.omitted})';
 }
 
 
@@ -351,7 +353,7 @@ abstract mixin class $IngredientCopyWith<$Res>  {
   factory $IngredientCopyWith(Ingredient value, $Res Function(Ingredient) _then) = _$IngredientCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, Quantity? quantity, String? preparation, String? group, bool optional
+ String id, String name, Quantity? quantity, String? preparation, String? group, bool optional, String? substitutedFor, bool omitted
 });
 
 
@@ -368,7 +370,7 @@ class _$IngredientCopyWithImpl<$Res>
 
 /// Create a copy of Ingredient
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? quantity = freezed,Object? preparation = freezed,Object? group = freezed,Object? optional = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? quantity = freezed,Object? preparation = freezed,Object? group = freezed,Object? optional = null,Object? substitutedFor = freezed,Object? omitted = null,}) {
   return _then(Ingredient(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -376,6 +378,8 @@ as String,quantity: freezed == quantity ? _self.quantity : quantity // ignore: c
 as Quantity?,preparation: freezed == preparation ? _self.preparation : preparation // ignore: cast_nullable_to_non_nullable
 as String?,group: freezed == group ? _self.group : group // ignore: cast_nullable_to_non_nullable
 as String?,optional: null == optional ? _self.optional : optional // ignore: cast_nullable_to_non_nullable
+as bool,substitutedFor: freezed == substitutedFor ? _self.substitutedFor : substitutedFor // ignore: cast_nullable_to_non_nullable
+as String?,omitted: null == omitted ? _self.omitted : omitted // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -473,10 +477,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  Quantity? quantity,  String? preparation,  String? group,  bool optional)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  Quantity? quantity,  String? preparation,  String? group,  bool optional,  String? substitutedFor,  bool omitted)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Ingredient() when $default != null:
-return $default(_that.id,_that.name,_that.quantity,_that.preparation,_that.group,_that.optional);case _:
+return $default(_that.id,_that.name,_that.quantity,_that.preparation,_that.group,_that.optional,_that.substitutedFor,_that.omitted);case _:
   return orElse();
 
 }
@@ -494,10 +498,10 @@ return $default(_that.id,_that.name,_that.quantity,_that.preparation,_that.group
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  Quantity? quantity,  String? preparation,  String? group,  bool optional)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  Quantity? quantity,  String? preparation,  String? group,  bool optional,  String? substitutedFor,  bool omitted)  $default,) {final _that = this;
 switch (_that) {
 case _Ingredient():
-return $default(_that.id,_that.name,_that.quantity,_that.preparation,_that.group,_that.optional);case _:
+return $default(_that.id,_that.name,_that.quantity,_that.preparation,_that.group,_that.optional,_that.substitutedFor,_that.omitted);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -514,10 +518,10 @@ return $default(_that.id,_that.name,_that.quantity,_that.preparation,_that.group
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  Quantity? quantity,  String? preparation,  String? group,  bool optional)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  Quantity? quantity,  String? preparation,  String? group,  bool optional,  String? substitutedFor,  bool omitted)?  $default,) {final _that = this;
 switch (_that) {
 case _Ingredient() when $default != null:
-return $default(_that.id,_that.name,_that.quantity,_that.preparation,_that.group,_that.optional);case _:
+return $default(_that.id,_that.name,_that.quantity,_that.preparation,_that.group,_that.optional,_that.substitutedFor,_that.omitted);case _:
   return null;
 
 }
@@ -529,7 +533,7 @@ return $default(_that.id,_that.name,_that.quantity,_that.preparation,_that.group
 @JsonSerializable()
 
 class _Ingredient implements Ingredient {
-  const _Ingredient({required this.id, required this.name, this.quantity, this.preparation, this.group, this.optional = false});
+  const _Ingredient({required this.id, required this.name, this.quantity, this.preparation, this.group, this.optional = false, this.substitutedFor, this.omitted = false});
   factory _Ingredient.fromJson(Map<String, dynamic> json) => _$IngredientFromJson(json);
 
 @override final  String id;
@@ -538,6 +542,10 @@ class _Ingredient implements Ingredient {
 @override final  String? preparation;
 @override final  String? group;
 @override@JsonKey() final  bool optional;
+/// The original name when the cook replaced it before cooking (Phase 3A).
+@override final  String? substitutedFor;
+/// The cook decided to cook without it.
+@override@JsonKey() final  bool omitted;
 
 /// Create a copy of Ingredient
 /// with the given fields replaced by the non-null parameter values.
@@ -552,18 +560,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Ingredient&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.preparation, preparation) || other.preparation == preparation)&&(identical(other.group, group) || other.group == group)&&(identical(other.optional, optional) || other.optional == optional));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Ingredient&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.quantity, quantity) || other.quantity == quantity)&&(identical(other.preparation, preparation) || other.preparation == preparation)&&(identical(other.group, group) || other.group == group)&&(identical(other.optional, optional) || other.optional == optional)&&(identical(other.substitutedFor, substitutedFor) || other.substitutedFor == substitutedFor)&&(identical(other.omitted, omitted) || other.omitted == omitted));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,name,quantity,preparation,group,optional);
+    return Object.hash(runtimeType,id,name,quantity,preparation,group,optional,substitutedFor,omitted);
 }
 
 @override
 String toString() {
-    return 'Ingredient(id: $id, name: $name, quantity: $quantity, preparation: $preparation, group: $group, optional: $optional)';
+    return 'Ingredient(id: $id, name: $name, quantity: $quantity, preparation: $preparation, group: $group, optional: $optional, substitutedFor: $substitutedFor, omitted: $omitted)';
 }
 
 
@@ -574,7 +582,7 @@ abstract mixin class _$IngredientCopyWith<$Res> implements $IngredientCopyWith<$
   factory _$IngredientCopyWith(_Ingredient value, $Res Function(_Ingredient) _then) = __$IngredientCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, Quantity? quantity, String? preparation, String? group, bool optional
+ String id, String name, Quantity? quantity, String? preparation, String? group, bool optional, String? substitutedFor, bool omitted
 });
 
 
@@ -591,7 +599,7 @@ class __$IngredientCopyWithImpl<$Res>
 
 /// Create a copy of Ingredient
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? quantity = freezed,Object? preparation = freezed,Object? group = freezed,Object? optional = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? quantity = freezed,Object? preparation = freezed,Object? group = freezed,Object? optional = null,Object? substitutedFor = freezed,Object? omitted = null,}) {
   return _then(_Ingredient(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -599,6 +607,8 @@ as String,quantity: freezed == quantity ? _self.quantity : quantity // ignore: c
 as Quantity?,preparation: freezed == preparation ? _self.preparation : preparation // ignore: cast_nullable_to_non_nullable
 as String?,group: freezed == group ? _self.group : group // ignore: cast_nullable_to_non_nullable
 as String?,optional: null == optional ? _self.optional : optional // ignore: cast_nullable_to_non_nullable
+as bool,substitutedFor: freezed == substitutedFor ? _self.substitutedFor : substitutedFor // ignore: cast_nullable_to_non_nullable
+as String?,omitted: null == omitted ? _self.omitted : omitted // ignore: cast_nullable_to_non_nullable
 as bool,
   ));
 }
@@ -622,7 +632,7 @@ $QuantityCopyWith<$Res>? get quantity {
 /// @nodoc
 mixin _$Equipment {
 
- String get id; String get name; Provenance get provenance;
+ String get id; String get name; Provenance get provenance; String? get substitutedFor; bool get omitted;
 /// Create a copy of Equipment
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -636,20 +646,20 @@ $EquipmentCopyWith<Equipment> get copyWith => _$EquipmentCopyWithImpl<Equipment>
 @override
 bool operator ==(Object other) {
   final _this = this as Equipment;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Equipment&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.provenance, _this.provenance) || other.provenance == _this.provenance));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Equipment&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.provenance, _this.provenance) || other.provenance == _this.provenance)&&(identical(other.substitutedFor, _this.substitutedFor) || other.substitutedFor == _this.substitutedFor)&&(identical(other.omitted, _this.omitted) || other.omitted == _this.omitted));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Equipment;
-  return Object.hash(runtimeType,_this.id,_this.name,_this.provenance);
+  return Object.hash(runtimeType,_this.id,_this.name,_this.provenance,_this.substitutedFor,_this.omitted);
 }
 
 @override
 String toString() {
   final _this = this as Equipment;
-  return 'Equipment(id: ${_this.id}, name: ${_this.name}, provenance: ${_this.provenance})';
+  return 'Equipment(id: ${_this.id}, name: ${_this.name}, provenance: ${_this.provenance}, substitutedFor: ${_this.substitutedFor}, omitted: ${_this.omitted})';
 }
 
 
@@ -660,7 +670,7 @@ abstract mixin class $EquipmentCopyWith<$Res>  {
   factory $EquipmentCopyWith(Equipment value, $Res Function(Equipment) _then) = _$EquipmentCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, Provenance provenance
+ String id, String name, Provenance provenance, String? substitutedFor, bool omitted
 });
 
 
@@ -677,12 +687,14 @@ class _$EquipmentCopyWithImpl<$Res>
 
 /// Create a copy of Equipment
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? provenance = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? provenance = null,Object? substitutedFor = freezed,Object? omitted = null,}) {
   return _then(Equipment(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,provenance: null == provenance ? _self.provenance : provenance // ignore: cast_nullable_to_non_nullable
-as Provenance,
+as Provenance,substitutedFor: freezed == substitutedFor ? _self.substitutedFor : substitutedFor // ignore: cast_nullable_to_non_nullable
+as String?,omitted: null == omitted ? _self.omitted : omitted // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -767,10 +779,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  Provenance provenance)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  Provenance provenance,  String? substitutedFor,  bool omitted)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Equipment() when $default != null:
-return $default(_that.id,_that.name,_that.provenance);case _:
+return $default(_that.id,_that.name,_that.provenance,_that.substitutedFor,_that.omitted);case _:
   return orElse();
 
 }
@@ -788,10 +800,10 @@ return $default(_that.id,_that.name,_that.provenance);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  Provenance provenance)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  Provenance provenance,  String? substitutedFor,  bool omitted)  $default,) {final _that = this;
 switch (_that) {
 case _Equipment():
-return $default(_that.id,_that.name,_that.provenance);case _:
+return $default(_that.id,_that.name,_that.provenance,_that.substitutedFor,_that.omitted);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -808,10 +820,10 @@ return $default(_that.id,_that.name,_that.provenance);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  Provenance provenance)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  Provenance provenance,  String? substitutedFor,  bool omitted)?  $default,) {final _that = this;
 switch (_that) {
 case _Equipment() when $default != null:
-return $default(_that.id,_that.name,_that.provenance);case _:
+return $default(_that.id,_that.name,_that.provenance,_that.substitutedFor,_that.omitted);case _:
   return null;
 
 }
@@ -823,12 +835,14 @@ return $default(_that.id,_that.name,_that.provenance);case _:
 @JsonSerializable()
 
 class _Equipment implements Equipment {
-  const _Equipment({required this.id, required this.name, this.provenance = Provenance.original});
+  const _Equipment({required this.id, required this.name, this.provenance = Provenance.original, this.substitutedFor, this.omitted = false});
   factory _Equipment.fromJson(Map<String, dynamic> json) => _$EquipmentFromJson(json);
 
 @override final  String id;
 @override final  String name;
 @override@JsonKey() final  Provenance provenance;
+@override final  String? substitutedFor;
+@override@JsonKey() final  bool omitted;
 
 /// Create a copy of Equipment
 /// with the given fields replaced by the non-null parameter values.
@@ -843,18 +857,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Equipment&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.provenance, provenance) || other.provenance == provenance));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Equipment&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.provenance, provenance) || other.provenance == provenance)&&(identical(other.substitutedFor, substitutedFor) || other.substitutedFor == substitutedFor)&&(identical(other.omitted, omitted) || other.omitted == omitted));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,name,provenance);
+    return Object.hash(runtimeType,id,name,provenance,substitutedFor,omitted);
 }
 
 @override
 String toString() {
-    return 'Equipment(id: $id, name: $name, provenance: $provenance)';
+    return 'Equipment(id: $id, name: $name, provenance: $provenance, substitutedFor: $substitutedFor, omitted: $omitted)';
 }
 
 
@@ -865,7 +879,7 @@ abstract mixin class _$EquipmentCopyWith<$Res> implements $EquipmentCopyWith<$Re
   factory _$EquipmentCopyWith(_Equipment value, $Res Function(_Equipment) _then) = __$EquipmentCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, Provenance provenance
+ String id, String name, Provenance provenance, String? substitutedFor, bool omitted
 });
 
 
@@ -882,12 +896,14 @@ class __$EquipmentCopyWithImpl<$Res>
 
 /// Create a copy of Equipment
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? provenance = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? provenance = null,Object? substitutedFor = freezed,Object? omitted = null,}) {
   return _then(_Equipment(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
 as String,provenance: null == provenance ? _self.provenance : provenance // ignore: cast_nullable_to_non_nullable
-as Provenance,
+as Provenance,substitutedFor: freezed == substitutedFor ? _self.substitutedFor : substitutedFor // ignore: cast_nullable_to_non_nullable
+as String?,omitted: null == omitted ? _self.omitted : omitted // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

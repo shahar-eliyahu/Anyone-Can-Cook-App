@@ -25,12 +25,18 @@ class Ingredient(ContractModel):
     preparation: str | None = None
     group: str | None = None
     optional: bool = False
+    # Set when the cook replaced it before cooking (Phase 3A): the original name.
+    substituted_for: str | None = None
+    # The cook decided to cook without it (optional ingredients, accepted alternatives).
+    omitted: bool = False
 
 
 class Equipment(ContractModel):
     id: str
     name: str
     provenance: Provenance = "original"
+    substituted_for: str | None = None
+    omitted: bool = False
 
 
 class SourceStep(ContractModel):

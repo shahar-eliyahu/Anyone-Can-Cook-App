@@ -4,7 +4,10 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../features/prepare/preparation.dart';
+import '../models/cooking_plan.dart';
 import '../models/plan_response.dart';
+import '../models/recipe.dart';
 import '../models/recipe_analysis.dart';
 import 'config.dart';
 
@@ -74,6 +77,23 @@ class ApiClient {
   Future<PlanResponse> plan(RecipeAnalysis analysis) async {
     final data = await _post('/v1/recipes/plan', {'analysis': analysis.toJson()});
     return PlanResponse.fromJson(data);
+  }
+
+  /// A recipe-specific substitute for a missing item (one AI call on the server).
+  Future<SubstitutionProposal> substitute({
+    required Recipe recipe,
+    required CookingPlan plan,
+    required ItemKind kind,
+    required String targetId,
+    String? noteHe,
+  }) async {
+    final data = await _post('/v1/recipes/substitute', {
+      'recipe': recipe.toJson(),
+      'plan': plan.toJson(),
+      'target': {'kind': kind.name, 'id': targetId},
+      if (noteHe != null && noteHe.trim().isNotEmpty) 'user_note_he': noteHe.trim(),
+    });
+    return SubstitutionProposal.fromJson(data, SubstitutionSource.ai);
   }
 
   Future<RecipeAnalysis> _analysis(String path, Map<String, Object?> body) async =>

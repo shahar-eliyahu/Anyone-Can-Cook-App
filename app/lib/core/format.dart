@@ -33,3 +33,13 @@ String formatTime(DateTime t) {
   final l = t.toLocal();
   return '${_two(l.hour)}:${_two(l.minute)}';
 }
+
+/// "כ-25 דק'", "כשעה", "כשעה ו-20 דק'", "כ-2½ שעות" — for estimates, never exact.
+String formatApproxDuration(int minutes, AppLocalizations l10n) {
+  if (minutes < 55) return l10n.durationMinutes(((minutes / 5).round() * 5).clamp(5, 50));
+  if (minutes < 70) return l10n.durationHour;
+  if (minutes < 90) return l10n.durationHourMinutes(((minutes - 60) / 5).round() * 5);
+  final halfHours = (minutes / 30).round();
+  final hours = halfHours ~/ 2;
+  return l10n.durationHours(halfHours.isOdd ? '$hours½' : '$hours');
+}

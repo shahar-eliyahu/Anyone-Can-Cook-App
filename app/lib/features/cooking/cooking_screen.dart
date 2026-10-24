@@ -259,6 +259,7 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
           children: [
             Text(step.title, style: emphasized ? theme.textTheme.titleLarge : theme.textTheme.titleMedium),
             Text(step.instructionHe, style: emphasized ? theme.textTheme.bodyLarge : null),
+            for (final n in step.notesHe) Text('🔄 $n', style: theme.textTheme.titleSmall),
             for (final use in step.ingredientUses)
               if (ingredients[use.ingredientId] case final i?)
                 Text(use.quantity == null ? '• ${i.name}' : '• ${i.name} — ${use.quantity!.display}'),

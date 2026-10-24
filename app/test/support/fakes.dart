@@ -2,8 +2,11 @@ import 'dart:typed_data';
 
 import 'package:anyone_can_cook/core/api_client.dart';
 import 'package:anyone_can_cook/features/import/image_store.dart';
+import 'package:anyone_can_cook/features/prepare/preparation.dart';
 import 'package:anyone_can_cook/features/timers/timer_notifier.dart';
+import 'package:anyone_can_cook/models/cooking_plan.dart';
 import 'package:anyone_can_cook/models/plan_response.dart';
+import 'package:anyone_can_cook/models/recipe.dart';
 import 'package:anyone_can_cook/models/recipe_analysis.dart';
 
 /// Records scheduled notifications instead of talking to the OS.
@@ -104,6 +107,7 @@ class FakeApi extends ApiClient {
 
   final analyses = <Object>[];
   final plans = <Object>[];
+  final substitutions = <Object>[];
   final calls = <String>[];
   bool forbidCalls = false;
 
@@ -128,4 +132,18 @@ class FakeApi extends ApiClient {
   }
 
   RecipeAnalysis? lastPlanRequest;
+
+  @override
+  Future<SubstitutionProposal> substitute({
+    required Recipe recipe,
+    required CookingPlan plan,
+    required ItemKind kind,
+    required String targetId,
+    String? noteHe,
+  }) async {
+    lastSubstituteNote = noteHe;
+    return _next(substitutions, 'substitute');
+  }
+
+  String? lastSubstituteNote;
 }

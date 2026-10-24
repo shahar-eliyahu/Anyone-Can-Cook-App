@@ -94,7 +94,7 @@ class _ClarifyScreenState extends ConsumerState<ClarifyScreen> {
     try {
       // Answers are saved before the plan call, so a failure keeps them.
       await ref.read(importServiceProvider).submitAnswers(widget.draftId, _answers);
-      if (mounted) context.pushReplacement('/drafts/${widget.draftId}/review');
+      if (mounted) context.pushReplacement('/recipes/${widget.draftId}');
     } catch (e) {
       if (mounted) {
         setState(() {

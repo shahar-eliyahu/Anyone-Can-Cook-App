@@ -757,4 +757,147 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get loadingShort => '…';
+
+  @override
+  String durationMinutes(int minutes) {
+    return 'כ-$minutes דק\'';
+  }
+
+  @override
+  String get durationHour => 'כשעה';
+
+  @override
+  String durationHourMinutes(int minutes) {
+    return 'כשעה ו-$minutes דק\'';
+  }
+
+  @override
+  String durationHours(String hours) {
+    return 'כ-$hours שעות';
+  }
+
+  @override
+  String overviewTotalTime(String time) {
+    return 'זמן כולל: $time';
+  }
+
+  @override
+  String overviewActiveTime(String time) {
+    return 'עבודה בפועל: $time';
+  }
+
+  @override
+  String get overviewChecklistIntro =>
+      'סמנו מה יש לכם. אם משהו חסר, נמצא יחד פתרון.';
+
+  @override
+  String get haveIt => 'יש לי';
+
+  @override
+  String get missingIt => 'חסר לי';
+
+  @override
+  String get haveAll => 'יש לי הכול';
+
+  @override
+  String get findSolution => 'פתרון';
+
+  @override
+  String stillMissing(String items) {
+    return 'עוד חסר: $items';
+  }
+
+  @override
+  String insteadOf(String name) {
+    return 'במקום $name';
+  }
+
+  @override
+  String get notUsed => 'לא בשימוש';
+
+  @override
+  String get optionalItem => 'לא חובה';
+
+  @override
+  String get undoSubstitution => 'ביטול ההחלפה';
+
+  @override
+  String get startCookingCta => 'מתחילים לבשל';
+
+  @override
+  String get saveToMyRecipes => 'שמירה במתכונים שלי';
+
+  @override
+  String get advancedEdit => 'עריכה מתקדמת';
+
+  @override
+  String get attentionTitle => 'שימו לב';
+
+  @override
+  String get attentionAck => 'קראתי';
+
+  @override
+  String get attentionPhoto =>
+      'המתכון נקרא מתמונה — כדאי לוודא שהכמויות נכונות.';
+
+  @override
+  String get planOutdated =>
+      'התוכנית לא מעודכנת לשינויים שעשיתם. אפשר לטפל בזה בעריכה המתקדמת.';
+
+  @override
+  String get cookingNowLocked =>
+      'המתכון בבישול עכשיו. אפשר לשנות אותו אחרי שתסיימו.';
+
+  @override
+  String sheetTitle(String name) {
+    return 'אין לכם $name?';
+  }
+
+  @override
+  String get sheetNoteHint => 'מה יש לכם במקום? (לא חובה)';
+
+  @override
+  String get sheetFind => 'חפשו לי פתרון';
+
+  @override
+  String get sheetSearching => 'מחפשים פתרון…';
+
+  @override
+  String get sheetTryOther => 'לחפש פתרון אחר';
+
+  @override
+  String get verdictWorks => 'אפשר להחליף';
+
+  @override
+  String get verdictChanges => 'אפשר, והתוצאה תהיה מעט שונה';
+
+  @override
+  String get verdictNotRecommended => 'לא מומלץ';
+
+  @override
+  String get verdictNone => 'אין לזה תחליף טוב';
+
+  @override
+  String get useThis => 'להשתמש בזה';
+
+  @override
+  String get noThanks => 'לא תודה';
+
+  @override
+  String get understood => 'הבנתי';
+
+  @override
+  String get substitutionFailed =>
+      'לא הצלחנו להחיל את הפתרון. אפשר לנסות שוב, או לשנות ידנית בעריכה המתקדמת.';
+
+  @override
+  String get draftCancel => 'ביטול הייבוא';
+
+  @override
+  String get fullPlan => 'כל שלבי הבישול';
+
+  @override
+  String attentionSafetyEstimate(String title) {
+    return 'זמן הבישול בשלב \"$title\" הוא הערכה — בדקו מוכנות לפי הסימנים בשלב.';
+  }
 }

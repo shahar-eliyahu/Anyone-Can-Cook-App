@@ -31,6 +31,12 @@ abstract class Ingredient with _$Ingredient {
     String? preparation,
     String? group,
     @Default(false) bool optional,
+
+    /// The original name when the cook replaced it before cooking (Phase 3A).
+    String? substitutedFor,
+
+    /// The cook decided to cook without it.
+    @Default(false) bool omitted,
   }) = _Ingredient;
 
   factory Ingredient.fromJson(Map<String, dynamic> json) =>
@@ -43,6 +49,8 @@ abstract class Equipment with _$Equipment {
     required String id,
     required String name,
     @Default(Provenance.original) Provenance provenance,
+    String? substitutedFor,
+    @Default(false) bool omitted,
   }) = _Equipment;
 
   factory Equipment.fromJson(Map<String, dynamic> json) =>

@@ -31,7 +31,7 @@ Future<void> acceptPrivacy(AppHarness h) =>
 void main() {
   final title = loadSampleBundle().recipe.title;
 
-  testApp('text import: privacy notice once, review, approve, then reopen and cook with zero API calls',
+  testApp('text import: privacy notice once, simple overview, start cooking with zero further API calls',
       (tester, h) async {
     h.api.analyses.add(analysis());
     h.api.plans.add(planResponse);
@@ -46,28 +46,19 @@ void main() {
     await tester.enterText(find.byType(TextField), 'כרעי עוף בתנור עם אורז');
     await tapText(tester, 'ניתוח המתכון');
 
-    // Review: estimates and limitations are shown; approval needs the check.
-    expect(find.text('בדיקת התוכנית'), findsOneWidget);
-    await expectSeen(tester, find.text('מה הוערך'));
-    await expectSeen(tester, find.text('לא ידוע גודל התבנית'));
-    await expectSeen(tester, find.text('אישור התוכנית'));
-    expect(onPressedOf(tester, 'אישור התוכנית'), isNull);
-    await tapText(tester, 'בדקתי את הערכים המסומנים');
-    expect(onPressedOf(tester, 'אישור התוכנית'), isNotNull);
-    await tapText(tester, 'אישור התוכנית');
-
-    // Saved: the recipe detail opens; exactly one analysis and one plan call.
-    await expectSeen(tester, find.text('התחל בישול'));
+    // Overview, not a detailed review: a short "שימו לב" card; a limitation needs one acknowledgement.
+    expect(find.text('בדיקת התוכנית'), findsNothing);
     expect(find.text(title), findsWidgets);
+    await expectSeen(tester, find.text('שימו לב'));
+    await expectSeen(tester, find.text('• לא ידוע גודל התבנית'));
+    expect(onPressedOf(tester, 'מתחילים לבשל'), isNull);
+    await tapText(tester, 'קראתי');
+    expect(onPressedOf(tester, 'מתחילים לבשל'), isNotNull);
     expect(h.api.calls, ['analyzeText', 'plan']);
 
-    // Reopening and cooking never calls the API.
+    // Starting approves the draft and cooks — no further API calls.
     h.api.forbidCalls = true;
-    await tapText(tester, 'תוכנית הבישול');
-    await expectSeen(tester, find.textContaining(loadSampleBundle().plan.steps.first.title));
-    GoRouter.of(tester.element(find.byType(Scaffold).last)).pop();
-    await tester.pumpAndSettle();
-    await tapText(tester, 'התחל בישול');
+    await tapButton(tester, 'מתחילים לבשל');
     await expectSeen(tester, find.textContaining(loadSampleBundle().plan.steps.first.title));
     expect(h.api.calls, ['analyzeText', 'plan']);
     expect((await allRecipes(h)).where((r) => r.title == title).single.status, RecipeStatus.ready);
@@ -98,12 +89,12 @@ void main() {
     expect(find.byType(TextField), findsNothing);
     await tapText(tester, 'בניית התוכנית');
 
-    expect(find.text('בדיקת התוכנית'), findsOneWidget);
+    await expectSeen(tester, find.text('מתחילים לבשל'));
     expect(h.api.calls, ['analyzeText', 'plan']);
     expect(h.api.lastPlanRequest!.answers, const [Answer(questionId: 'q1', unknown: true)]);
   });
 
-  testApp('photo import: the photo is kept for review and deleted on approval', (tester, h) async {
+  testApp('photo import: the photo is kept until the recipe is saved, then deleted', (tester, h) async {
     await acceptPrivacy(h);
     h.pickedPhoto = '/picked/recipe.jpg';
     h.api.analyses.add(analysis(type: SourceType.image));
@@ -117,12 +108,12 @@ void main() {
     await tapText(tester, 'ניתוח המתכון');
 
     expect(h.api.calls, ['analyzeImage', 'plan']);
-    await expectSeen(tester, find.text('התוכנית נבנתה מתמונה — בדקו שהכמויות והזמנים נקראו נכון.'));
+    await expectSeen(tester, find.textContaining('המתכון נקרא מתמונה'));
     final draft = (await allRecipes(h)).single;
     expect(draft.sourceImagePath, '/images/1.jpg');
 
-    await tapText(tester, 'בדקתי את הערכים המסומנים');
-    await tapText(tester, 'אישור התוכנית');
+    await tapText(tester, 'קראתי');
+    await tapText(tester, 'שמירה במתכונים שלי');
     expect(h.images.deleted, ['/images/1.jpg']);
     expect((await h.recipes.getRecipe(draft.id))!.sourceImagePath, isNull);
   });
@@ -165,18 +156,19 @@ void main() {
     // The recipe can't be cooked while its plan is out of date.
     await tester.pumpWidget(h.build(initialLocation: '/recipes/$id'));
     await tester.pumpAndSettle();
-    await expectSeen(tester, find.textContaining('התוכנית לא מעודכנת לשינויים במתכון. ערכו'));
-    await expectSeen(tester, find.text('התחל בישול'));
-    expect(onPressedOf(tester, 'התחל בישול'), isNull);
+    await expectSeen(tester, find.textContaining('התוכנית לא מעודכנת לשינויים שעשיתם'));
+    expect(onPressedOf(tester, 'מתחילים לבשל'), isNull);
 
-    // Re-check it by hand, approve, and cooking is available again.
-    await tapText(tester, 'עריכת המתכון והתוכנית');
+    // Re-check it by hand in advanced editing, approve, and cooking is available again.
+    await tester.tap(find.byWidgetPredicate((w) => w is PopupMenuButton).first);
+    await tester.pumpAndSettle();
+    await tapText(tester, 'עריכה מתקדמת');
     await tapText(tester, 'בדקתי — התוכנית נכונה');
     expect(find.text('התוכנית לא מעודכנת לשינויים במתכון'), findsNothing);
     await tapText(tester, 'בדקתי את הערכים המסומנים');
     await tapText(tester, 'אישור התוכנית');
-    await expectSeen(tester, find.text('התחל בישול'));
-    expect(onPressedOf(tester, 'התחל בישול'), isNotNull);
+    await expectSeen(tester, find.text('מתחילים לבשל'));
+    expect(onPressedOf(tester, 'מתחילים לבשל'), isNotNull);
 
     final row = (await h.recipes.getRecipe(id))!;
     expect(row.planStale, isFalse);
@@ -213,7 +205,7 @@ void main() {
 
     // The service is back: one retry goes through.
     await tapText(tester, 'ניתוח המתכון');
-    expect(find.text('בדיקת התוכנית'), findsOneWidget);
+    await expectSeen(tester, find.text('מתחילים לבשל'));
     expect(h.api.calls, ['analyzeText', 'analyzeText', 'plan']);
   });
 
@@ -249,7 +241,7 @@ void main() {
     expect((await allRecipes(h)).single.status, RecipeStatus.draft);
 
     await tapText(tester, 'נסו שוב');
-    expect(find.text('בדיקת התוכנית'), findsOneWidget);
+    await expectSeen(tester, find.text('מתחילים לבשל'));
     expect(h.api.calls, ['analyzeText', 'plan', 'plan']); // no second analysis
   });
 }

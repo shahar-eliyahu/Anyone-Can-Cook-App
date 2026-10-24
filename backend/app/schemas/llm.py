@@ -163,6 +163,40 @@ class LlmPrepTask(BaseModel):
     remind_before_needed: bool = False
 
 
+class LlmStepChange(BaseModel):
+    step_id: str
+    instruction_he: str | None = None
+    note_he: str | None = None
+    # The amount of the replacement used in this step, when it differs from the whole amount.
+    use_display: str | None = None
+    use_amount: float | None = None
+    use_unit: str | None = None
+
+
+class LlmTimerChange(BaseModel):
+    timer_id: str
+    seconds: int
+    max_seconds: int | None = None
+
+
+class LlmSafetyChange(BaseModel):
+    step_id: str
+    safety_food: SafetyFoodName
+
+
+class LlmSubstitution(BaseModel):
+    verdict: Literal["works", "changes_result", "not_recommended", "no_substitute"]
+    explanation_he: str
+    replacement_name_he: str | None = None
+    # True when the best answer is to cook without it (no replacement needed).
+    omit: bool = False
+    quantity: LlmQuantity | None = None
+    effects_he: str | None = None
+    step_changes: list[LlmStepChange] = []
+    timer_changes: list[LlmTimerChange] = []
+    safety_changes: list[LlmSafetyChange] = []
+
+
 class LlmPlan(BaseModel):
     steps: list[LlmStep]
     prep_tasks: list[LlmPrepTask] = []

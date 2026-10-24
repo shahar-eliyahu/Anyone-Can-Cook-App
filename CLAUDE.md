@@ -29,10 +29,13 @@ app/        Flutter (Android/iOS). Riverpod, go_router, drift (SQLite), dio, flu
   lib/features/cooking/engine/ pure-Dart CookingEngine, events, ActionDispatcher, plan validator
   lib/features/timers/         TimerNotifier (notifications), TimerCoordinator, session restore on resume
   lib/data/                    repositories over drift (recipes, plans, sessions, events, settings)
-  lib/features/*/              screens (kitchen, recipes, cooking, history, settings)
+  lib/features/prepare/        recipe overview + checklist, substitutions (patch ops, local table)
+  lib/features/import/         import, clarify, advanced editing (review screen)
+  lib/features/*/              other screens (kitchen, recipes, cooking, history, settings)
   lib/l10n/app_he.arb          ALL user-facing strings (Hebrew)
 backend/    FastAPI, stateless, deployed on Render Free (root dir backend/)
   app/services/llm/            LLMProvider interface; MockProvider (local/tests), GeminiProvider
+  app/services/                analysis, planning, substitution (+ patching), url_fetcher, ai_calls
   app/schemas/                 Pydantic Recipe/CookingPlan — SOURCE OF TRUTH for the JSON contract
   scripts/export_schemas.py    writes shared/schema/*.json
 shared/     schema/ (exported JSON Schema), fixtures/ (sample recipe + plan used by both sides)
@@ -46,6 +49,11 @@ Key invariants:
 - Values carry provenance (`original` / `inferred` / `answered` / `user` / `reference`); AI estimates are never
   presented as recipe facts. They are labelled "הערכה" where values are reviewed (review, advanced editing, plan
   view); the cooking screen stays free of technical badges (DECISIONS #45).
+- Substitutions are concrete patch operations (shared semantics: `backend/app/services/patching.py` ↔
+  `app/lib/features/prepare/patch.dart`, checked by `shared/fixtures/patch_example.json`). The effective recipe and
+  plan are always "original + accepted operations"; never edit them ad hoc (DECISIONS #49).
+- The recipe overview (`/recipes/:id`) is the entry point for drafts and saved recipes; the detailed review is
+  optional "עריכה מתקדמת" (DECISIONS #52).
 - Beginner UX: one main action per step ("סיימתי — לשלב הבא"), timers start only from an explicit tap, no
   developer-facing text (server, API, Gemini, database…) anywhere in the UI (DECISIONS #35, #39).
 - Phase 1 works fully offline; the backend is optional for cooking.

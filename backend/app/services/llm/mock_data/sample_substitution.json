@@ -1,0 +1,11 @@
+{
+  "verdict": "changes_result",
+  "explanation_he": "תשובת דמו: אפשר להשתמש בתחליף, והתוצאה תהיה מעט שונה.",
+  "replacement_name_he": "תחליף לדוגמה",
+  "omit": false,
+  "quantity": null,
+  "effects_he": "הטעם יהיה מעט שונה.",
+  "step_changes": [],
+  "timer_changes": [],
+  "safety_changes": []
+}

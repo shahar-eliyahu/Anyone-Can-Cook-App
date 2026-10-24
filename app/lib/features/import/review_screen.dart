@@ -19,6 +19,7 @@ import '../recipes/plan_widgets.dart';
 import 'import_errors.dart';
 import 'import_service.dart';
 import 'plan_edits.dart';
+import '../prepare/preparation_service.dart';
 
 /// Review and correct a recipe and its plan before approving it: a new import
 /// (a draft) or a saved recipe being edited ([editing]). Every edit is saved
@@ -94,6 +95,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
         final analysis = _analysis!.copyWith(recipe: edit.recipe);
         await _repo.updateAnalysis(widget.recipeId, analysis, planStale: edit.outdated ? true : null);
         await _repo.saveDraftPlan(widget.recipeId, edit.plan);
+        await ref.read(preparationServiceProvider).lockAfterAdvancedEdit(widget.recipeId);
         setState(() {
           _analysis = analysis;
           _plan = edit.plan;
@@ -104,6 +106,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
 
   Future<void> _applyPlanEdit(CookingPlan plan) => _run(() async {
         await _repo.saveDraftPlan(widget.recipeId, plan);
+        await ref.read(preparationServiceProvider).lockAfterAdvancedEdit(widget.recipeId);
         setState(() {
           _plan = plan;
           _checked = false;
@@ -113,6 +116,7 @@ class _ReviewScreenState extends ConsumerState<ReviewScreen> {
   /// One /plan call from the stored (corrected) recipe; no new analysis.
   Future<void> _regenerate() => _run(() async {
         await ref.read(importServiceProvider).generatePlan(widget.recipeId);
+        await ref.read(preparationServiceProvider).lockAfterAdvancedEdit(widget.recipeId);
         await _load();
         setState(() => _checked = false);
       });

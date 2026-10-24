@@ -42,6 +42,11 @@
           "title": "Name",
           "type": "string"
         },
+        "omitted": {
+          "default": false,
+          "title": "Omitted",
+          "type": "boolean"
+        },
         "provenance": {
           "default": "original",
           "enum": [
@@ -53,6 +58,18 @@
           ],
           "title": "Provenance",
           "type": "string"
+        },
+        "substituted_for": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Substituted For"
         }
       },
       "required": [
@@ -153,6 +170,11 @@
           "title": "Name",
           "type": "string"
         },
+        "omitted": {
+          "default": false,
+          "title": "Omitted",
+          "type": "boolean"
+        },
         "optional": {
           "default": false,
           "title": "Optional",
@@ -180,6 +202,18 @@
             }
           ],
           "default": null
+        },
+        "substituted_for": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Substituted For"
         }
       },
       "required": [

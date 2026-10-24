@@ -1419,6 +1419,246 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'…'**
   String get loadingShort;
+
+  /// No description provided for @durationMinutes.
+  ///
+  /// In he, this message translates to:
+  /// **'כ-{minutes} דק\''**
+  String durationMinutes(int minutes);
+
+  /// No description provided for @durationHour.
+  ///
+  /// In he, this message translates to:
+  /// **'כשעה'**
+  String get durationHour;
+
+  /// No description provided for @durationHourMinutes.
+  ///
+  /// In he, this message translates to:
+  /// **'כשעה ו-{minutes} דק\''**
+  String durationHourMinutes(int minutes);
+
+  /// No description provided for @durationHours.
+  ///
+  /// In he, this message translates to:
+  /// **'כ-{hours} שעות'**
+  String durationHours(String hours);
+
+  /// No description provided for @overviewTotalTime.
+  ///
+  /// In he, this message translates to:
+  /// **'זמן כולל: {time}'**
+  String overviewTotalTime(String time);
+
+  /// No description provided for @overviewActiveTime.
+  ///
+  /// In he, this message translates to:
+  /// **'עבודה בפועל: {time}'**
+  String overviewActiveTime(String time);
+
+  /// No description provided for @overviewChecklistIntro.
+  ///
+  /// In he, this message translates to:
+  /// **'סמנו מה יש לכם. אם משהו חסר, נמצא יחד פתרון.'**
+  String get overviewChecklistIntro;
+
+  /// No description provided for @haveIt.
+  ///
+  /// In he, this message translates to:
+  /// **'יש לי'**
+  String get haveIt;
+
+  /// No description provided for @missingIt.
+  ///
+  /// In he, this message translates to:
+  /// **'חסר לי'**
+  String get missingIt;
+
+  /// No description provided for @haveAll.
+  ///
+  /// In he, this message translates to:
+  /// **'יש לי הכול'**
+  String get haveAll;
+
+  /// No description provided for @findSolution.
+  ///
+  /// In he, this message translates to:
+  /// **'פתרון'**
+  String get findSolution;
+
+  /// No description provided for @stillMissing.
+  ///
+  /// In he, this message translates to:
+  /// **'עוד חסר: {items}'**
+  String stillMissing(String items);
+
+  /// No description provided for @insteadOf.
+  ///
+  /// In he, this message translates to:
+  /// **'במקום {name}'**
+  String insteadOf(String name);
+
+  /// No description provided for @notUsed.
+  ///
+  /// In he, this message translates to:
+  /// **'לא בשימוש'**
+  String get notUsed;
+
+  /// No description provided for @optionalItem.
+  ///
+  /// In he, this message translates to:
+  /// **'לא חובה'**
+  String get optionalItem;
+
+  /// No description provided for @undoSubstitution.
+  ///
+  /// In he, this message translates to:
+  /// **'ביטול ההחלפה'**
+  String get undoSubstitution;
+
+  /// No description provided for @startCookingCta.
+  ///
+  /// In he, this message translates to:
+  /// **'מתחילים לבשל'**
+  String get startCookingCta;
+
+  /// No description provided for @saveToMyRecipes.
+  ///
+  /// In he, this message translates to:
+  /// **'שמירה במתכונים שלי'**
+  String get saveToMyRecipes;
+
+  /// No description provided for @advancedEdit.
+  ///
+  /// In he, this message translates to:
+  /// **'עריכה מתקדמת'**
+  String get advancedEdit;
+
+  /// No description provided for @attentionTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'שימו לב'**
+  String get attentionTitle;
+
+  /// No description provided for @attentionAck.
+  ///
+  /// In he, this message translates to:
+  /// **'קראתי'**
+  String get attentionAck;
+
+  /// No description provided for @attentionPhoto.
+  ///
+  /// In he, this message translates to:
+  /// **'המתכון נקרא מתמונה — כדאי לוודא שהכמויות נכונות.'**
+  String get attentionPhoto;
+
+  /// No description provided for @planOutdated.
+  ///
+  /// In he, this message translates to:
+  /// **'התוכנית לא מעודכנת לשינויים שעשיתם. אפשר לטפל בזה בעריכה המתקדמת.'**
+  String get planOutdated;
+
+  /// No description provided for @cookingNowLocked.
+  ///
+  /// In he, this message translates to:
+  /// **'המתכון בבישול עכשיו. אפשר לשנות אותו אחרי שתסיימו.'**
+  String get cookingNowLocked;
+
+  /// No description provided for @sheetTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'אין לכם {name}?'**
+  String sheetTitle(String name);
+
+  /// No description provided for @sheetNoteHint.
+  ///
+  /// In he, this message translates to:
+  /// **'מה יש לכם במקום? (לא חובה)'**
+  String get sheetNoteHint;
+
+  /// No description provided for @sheetFind.
+  ///
+  /// In he, this message translates to:
+  /// **'חפשו לי פתרון'**
+  String get sheetFind;
+
+  /// No description provided for @sheetSearching.
+  ///
+  /// In he, this message translates to:
+  /// **'מחפשים פתרון…'**
+  String get sheetSearching;
+
+  /// No description provided for @sheetTryOther.
+  ///
+  /// In he, this message translates to:
+  /// **'לחפש פתרון אחר'**
+  String get sheetTryOther;
+
+  /// No description provided for @verdictWorks.
+  ///
+  /// In he, this message translates to:
+  /// **'אפשר להחליף'**
+  String get verdictWorks;
+
+  /// No description provided for @verdictChanges.
+  ///
+  /// In he, this message translates to:
+  /// **'אפשר, והתוצאה תהיה מעט שונה'**
+  String get verdictChanges;
+
+  /// No description provided for @verdictNotRecommended.
+  ///
+  /// In he, this message translates to:
+  /// **'לא מומלץ'**
+  String get verdictNotRecommended;
+
+  /// No description provided for @verdictNone.
+  ///
+  /// In he, this message translates to:
+  /// **'אין לזה תחליף טוב'**
+  String get verdictNone;
+
+  /// No description provided for @useThis.
+  ///
+  /// In he, this message translates to:
+  /// **'להשתמש בזה'**
+  String get useThis;
+
+  /// No description provided for @noThanks.
+  ///
+  /// In he, this message translates to:
+  /// **'לא תודה'**
+  String get noThanks;
+
+  /// No description provided for @understood.
+  ///
+  /// In he, this message translates to:
+  /// **'הבנתי'**
+  String get understood;
+
+  /// No description provided for @substitutionFailed.
+  ///
+  /// In he, this message translates to:
+  /// **'לא הצלחנו להחיל את הפתרון. אפשר לנסות שוב, או לשנות ידנית בעריכה המתקדמת.'**
+  String get substitutionFailed;
+
+  /// No description provided for @draftCancel.
+  ///
+  /// In he, this message translates to:
+  /// **'ביטול הייבוא'**
+  String get draftCancel;
+
+  /// No description provided for @fullPlan.
+  ///
+  /// In he, this message translates to:
+  /// **'כל שלבי הבישול'**
+  String get fullPlan;
+
+  /// No description provided for @attentionSafetyEstimate.
+  ///
+  /// In he, this message translates to:
+  /// **'זמן הבישול בשלב \"{title}\" הוא הערכה — בדקו מוכנות לפי הסימנים בשלב.'**
+  String attentionSafetyEstimate(String title);
 }
 
 class _AppLocalizationsDelegate

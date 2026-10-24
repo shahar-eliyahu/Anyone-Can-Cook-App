@@ -135,6 +135,9 @@ abstract class PlanStep with _$PlanStep {
 
     /// Short help shown only on request ("עזרה").
     String? helpHe,
+
+    /// Notes added by accepted substitutions ("במקום שמנת: …").
+    @Default([]) List<String> notesHe,
     @Default([]) List<String> warningsHe,
     Minutes? estimatedActiveMinutes,
   }) = _PlanStep;

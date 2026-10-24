@@ -9,10 +9,12 @@ from app.errors import ApiError
 from app.schemas.analysis import RecipeAnalysis
 from app.schemas.api import AnalyzeRequest, PlanRequest, PlanResponse
 from app.schemas.common import ContractModel
+from app.schemas.substitution import SubstituteRequest, SubstituteResponse
 from app.security import DailyBudget, get_ai_budget, rate_limit_ai, require_app_token
 from app.services.analysis import SourceInput, analyze_source
 from app.services.llm import LLMProvider, get_llm_provider
 from app.services.planning import plan_recipe
+from app.services.substitution import suggest_substitution
 from app.services.url_fetcher import fetch_recipe_page
 
 router = APIRouter(
@@ -94,3 +96,14 @@ async def plan(
         limitations_he=result.limitations_he,
         sources=result.sources,
     )
+
+
+@router.post("/substitute", response_model=SubstituteResponse)
+async def substitute(
+    req: SubstituteRequest,
+    settings: Settings = Depends(get_settings),
+    provider: LLMProvider = Depends(get_llm_provider),
+    budget: DailyBudget = Depends(get_ai_budget),
+) -> SubstituteResponse:
+    """A recipe-specific substitute for a missing ingredient or piece of equipment (one AI call)."""
+    return await suggest_substitution(req, provider=provider, settings=settings, budget=budget)

@@ -15,7 +15,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('עוף בתנור עם תפוחי אדמה ואורז'), findsWidgets);
 
-    await tapButton(tester, 'התחל בישול');
+    await tapButton(tester, 'מתחילים לבשל');
     final session = (await h.sessions.activeSession())!;
     await expectSeen(tester, find.text('0 מתוך 5 שלבים הושלמו'));
     await expectSeen(tester, find.text('הכנת תפוחי האדמה'));

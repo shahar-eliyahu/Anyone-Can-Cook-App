@@ -3,7 +3,7 @@
 Frequently changing status. Permanent rules are in `CLAUDE.md`; the approved design is `docs/PLAN.md`.
 Update this file at the end of every work step.
 
-_Last updated: 2026-10-24 (Phase 3C implemented locally, not committed)_
+_Last updated: 2026-10-24 (Phase 3C committed `536436c`; Phase 3A implemented, local commit)_
 
 ## Phase status
 
@@ -12,7 +12,7 @@ _Last updated: 2026-10-24 (Phase 3C implemented locally, not committed)_
 | 0 — Local foundations | ✅ Complete, committed and pushed (`1196478`). Render verified: `/health` 200, `/internal/ai-check` 404. |
 | 1 — Deterministic cooking core (no AI) | ✅ Implemented, verified (automated + emulator), approved by the user, committed and pushed to `main` (see `git log`). |
 | 2 — AI recipe analysis & planning | ✅ Complete, committed and pushed (`a6bd1f3` Phase 2, `a372736` app icon, `fa87e71` quota handling). Deployed on Render; live Gemini recipe test by the user passed (details below). |
-| 3 — Beginner cooking experience + assistant | 🔄 3C implemented and verified locally (tests + emulator), not committed or deployed. 3A and 3B not started. |
+| 3 — Beginner cooking experience + assistant | 🔄 3C and 3A implemented and verified locally (tests + emulator), committed locally, not pushed or deployed. 3B not started. |
 | 4 — Polish & release | ⏸ Not started. |
 
 ## Phase 1 — what exists
@@ -216,7 +216,7 @@ Checked what existed, changed only what was missing.
 - Product direction approved 2026-10-24 (`docs/PLAN.md` "Phase 3 — final product direction"; decisions #33–#47).
 - Order: **3C** → **3A** (overview, checklist, substitutions) → **3B** (assistant) → Phase 4 → Future (voice).
 
-### Phase 3C — implemented 2026-10-24 (local, not committed)
+### Phase 3C — implemented 2026-10-24 (local commit `536436c`)
 
 - **Food safety (backend):** stovetop eggs (`eggs_stovetop`: omelette, scrambled, fried) → "cook until set, no runny
   egg", no temperature, no forced confirmation; baked egg dishes keep 71°C as reference value with an observable cue
@@ -267,8 +267,55 @@ Checked what existed, changed only what was missing.
   implemented as: beginner-friendly history summary, and a fixed bottom action bar inside the safe area (Android
   15 edge-to-edge) with wrapping rows. Adjust if something else was meant.
 
+### Phase 3A — implemented 2026-10-24 (local commit)
+
+- **Flow:** import → (questions if needed) → **overview** (`/recipes/:id`, also for saved recipes): name, servings,
+  estimated total and hands-on time (computed on the device), a short "שימו לב" card (warnings, limitations,
+  safety-relevant estimates, photo note; "קראתי" only for drafts that need it), advance notice, the checklist of
+  every ingredient (with amounts) and piece of equipment, and one main button "מתחילים לבשל" (drafts are approved
+  then; "שמירה במתכונים שלי" saves without cooking). Favorite, rename, source, delete / cancel import in the menu;
+  "עריכה מתקדמת" opens the Phase 2 review screen; "כל שלבי הבישול" the full plan.
+- **Checklist:** "יש לי" per item, "יש לי הכול", "חסר לי" → a sheet: a local answer at once when the table has one,
+  otherwise (or "לחפש פתרון אחר") the cook's note ("יש לי חלב") and one server call. Verdicts: works / changes the
+  result (how) / not recommended / no reliable substitute (explained, item stays missing, cooking still allowed).
+  Accepted substitutions show "במקום …", the effect, and "ביטול ההחלפה". Missing items are listed above the button.
+- **Local table** (`app/lib/features/prepare/local_substitutions.dart`): sour cream ↔ yogurt, cream → milk + butter
+  (not for whipping), buttermilk, butter → margarine / oil (not in pastry), self-rising flour, brown sugar, honey,
+  milk → plant milk, garlic → powder, stock → water + powder; no scale (grams → cups/spoons with a density table,
+  unknown ones named), no thermometer (honest signs-only wording, confirmation kept), no mixer (by hand).
+- **Server:** `POST /v1/recipes/substitute` (token + rate limits; one AI call + at most one repair), `LlmSubstitution`
+  schema, `substitute_recipe.md` prompt, `services/substitution.py` (answer → operations → apply → validate →
+  safety recompute), `services/patching.py`; contract additions `Ingredient/Equipment.substituted_for/omitted`,
+  `PlanStep.notes_he`; `substitution_response.schema.json`; mock answer for local development.
+- **App internals:** `patch.dart` (same semantics as the server; shared fixture), `preparation.dart`
+  (marks, substitutions, base snapshot, effective recipe/plan), `preparation_service.dart`, repository
+  `savePreparation` / `applyPreparation` and extra-key preservation, API `substitute`, cooking and plan views show
+  step notes ("🔄 …"), advanced edits lock substitutions, the old recipe detail screen was replaced.
+- **Tests (fakes only, zero Gemini calls):** backend **158/158** (16 new: patch fixture, verdicts, notes, equipment,
+  omit, safety recompute both ways, repair, endpoint token/422/rate limit); Flutter **152/152**, analyzer clean
+  (new: patch fixture + local table + estimate 12, preparation service 10, overview/sheet widget flows 7).
+  **Intentionally changed tests:** import flows land on the overview ("שימו לב" + "קראתי" instead of the review
+  screen's check box); cooking flow starts with "מתחילים לבשל"; the stale-plan test reaches advanced editing from
+  the overview menu.
+- **Emulator (local backend, `AI_PROVIDER=mock`, 127.0.0.1), 2026-10-24:** new build installed over existing data;
+  the Phase 2 recipe opened in the overview (time chips, "שימו לב", checklist); olive oil → sheet → one
+  `/v1/recipes/substitute` call → accepted ("במקום שמן זית", effect, undo) → undo restored it → re-applied → cooking
+  showed "🔄 במקום שמן זית: …" on the step; a new text import opened the overview directly ("קראתי" gates
+  "מתחילים לבשל"). Test session abandoned, test draft discarded and the substitution undone afterwards.
+
+### Phase 3A — limitations
+
+- No automatic plan regeneration when an AI substitution stays invalid (#51); a user-initiated "rebuild the plan"
+  for old saved recipes (#46) is still only possible through advanced editing after a change.
+- Local rules don't rewrite instruction text (notes instead); quantities in local rules use simple ratios.
+- The no-scale conversion covers common ingredients only; others are named in the effect line.
+- The substitution prompt is untested against real Gemini (needs approval; suggested ≤ 5 substitutions,
+  ≤ 10 calls).
+- Mid-cooking substitutions are Phase 3B.
+
 ## Next step
 
-1. User reviews 3C (phone test list in the final report); approval to commit locally.
-2. With approval: small live check of the new plan rules (≤ 2 recipes, ≤ 6 Gemini calls), then deploy.
-3. Then Phase 3A (only after approval).
+1. User reviews 3C + 3A (commits are local only).
+2. With approval: small live checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 / ≤ 10 calls),
+   then push and deploy.
+3. Phase 3B only after approval.

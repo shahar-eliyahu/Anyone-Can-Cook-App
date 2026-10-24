@@ -190,6 +190,14 @@
           "title": "Kind",
           "type": "string"
         },
+        "notes_he": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Notes He",
+          "type": "array"
+        },
         "parallel_ok": {
           "default": false,
           "title": "Parallel Ok",

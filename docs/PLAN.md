@@ -529,6 +529,9 @@ sessions keep working; timers and notifications unchanged offline; no developer 
 
 #### Phase 3A — recipe overview, checklist, missing items, substitutions
 
+Status: implemented locally 2026-10-24 (see `docs/PROGRESS.md`; decisions #48–#52). Deviation: no automatic
+`/plan` regeneration when an AI substitution stays invalid — a clear message and advanced editing instead (#51).
+
 - After import the app analyzes and plans automatically, then shows the **overview**: name, servings,
   estimated duration (computed locally from steps and timers), short useful notes; a short "שימו לב" card only
   for safety-relevant estimates or limitations. Questions only when needed for a reliable plan.

@@ -215,6 +215,9 @@ _PlanStep _$PlanStepFromJson(Map<String, dynamic> json) => _PlanStep(
       : Temperature.fromJson(json['temperature'] as Map<String, dynamic>),
   donenessCueHe: json['doneness_cue_he'] as String?,
   helpHe: json['help_he'] as String?,
+  notesHe:
+      (json['notes_he'] as List<dynamic>?)?.map((e) => e as String).toList() ??
+      const [],
   warningsHe:
       (json['warnings_he'] as List<dynamic>?)
           ?.map((e) => e as String)
@@ -243,6 +246,7 @@ Map<String, dynamic> _$PlanStepToJson(_PlanStep instance) => <String, dynamic>{
   'temperature': instance.temperature?.toJson(),
   'doneness_cue_he': instance.donenessCueHe,
   'help_he': instance.helpHe,
+  'notes_he': instance.notesHe,
   'warnings_he': instance.warningsHe,
   'estimated_active_minutes': instance.estimatedActiveMinutes?.toJson(),
 };

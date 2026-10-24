@@ -9,6 +9,7 @@ import '../models/recipe.dart';
 import '../models/plan_response.dart';
 import '../models/recipe_analysis.dart';
 import '../models/recipe_bundle.dart';
+import '../features/prepare/preparation.dart';
 
 class RecipeHasActiveSessionException implements Exception {
   const RecipeHasActiveSessionException();
@@ -48,6 +49,26 @@ extension RecipeRowX on RecipeRow {
   }
 }
 
+extension RecipePreparationX on RecipeRow {
+  /// The cook's preparation (have/missing, substitutions); empty when none was saved.
+  Preparation get preparation {
+    final raw = analysisJson == null ? null : (jsonDecode(analysisJson!) as Map<String, dynamic>)['preparation'];
+    return raw is Map<String, dynamic> ? Preparation.fromJson(raw) : const Preparation();
+  }
+}
+
+/// Keys kept in `analysis_json` next to the analysis itself; every write preserves them.
+const _extraKeys = ['plan_review', 'preparation'];
+
+Map<String, dynamic> _withExtras(String? oldJson, Map<String, dynamic> map) {
+  if (oldJson == null) return map;
+  final old = jsonDecode(oldJson) as Map<String, dynamic>;
+  for (final k in _extraKeys) {
+    if (old[k] != null && !map.containsKey(k)) map[k] = old[k];
+  }
+  return map;
+}
+
 class PlanReviewInfo {
   const PlanReviewInfo({this.warningsHe = const [], this.limitationsHe = const [], this.sources = const []});
   final List<String> warningsHe;
@@ -65,6 +86,9 @@ abstract final class PlanStatus {
   static const approved = 'approved';
   static const superseded = 'superseded';
 }
+
+Map<String, dynamic> _json(RecipeAnalysis analysis) =>
+    jsonDecode(jsonEncode(analysis.toJson())) as Map<String, dynamic>;
 
 extension PlanRowX on PlanRow {
   CookingPlan get plan =>
@@ -237,9 +261,7 @@ class RecipeRepository {
   /// Replaces the stored analysis (keeping the latest plan review information).
   Future<void> updateAnalysis(String recipeId, RecipeAnalysis analysis, {bool? planStale}) async {
     final row = await (_db.select(_db.recipes)..where((r) => r.id.equals(recipeId))).getSingle();
-    final old = row.analysisJson == null ? const <String, dynamic>{} : jsonDecode(row.analysisJson!) as Map<String, dynamic>;
-    final map = analysis.toJson();
-    if (old['plan_review'] != null) map['plan_review'] = old['plan_review'];
+    final map = _withExtras(row.analysisJson, _json(analysis));
     await (_db.update(_db.recipes)..where((r) => r.id.equals(recipeId))).write(RecipesCompanion(
       title: Value(analysis.recipe?.title ?? row.title),
       analysisJson: Value(jsonEncode(map)),
@@ -308,6 +330,7 @@ class RecipeRepository {
     final id = newId();
     await _db.transaction(() async {
       final previous = await latestApprovedPlan(recipeId);
+      final row = await (_db.select(_db.recipes)..where((r) => r.id.equals(recipeId))).getSingle();
       await (_db.update(_db.plans)
             ..where((p) => p.recipeId.equals(recipeId) & p.status.equals(PlanStatus.approved)))
           .write(PlansCompanion(status: const Value(PlanStatus.superseded), updatedAt: Value(now)));
@@ -329,13 +352,44 @@ class RecipeRepository {
         status: const Value(RecipeStatus.ready),
         planStale: const Value(false),
         title: analysis?.recipe == null ? const Value.absent() : Value(analysis!.recipe!.title),
-        analysisJson: analysis == null ? const Value.absent() : Value(jsonEncode(analysis.toJson())),
+        analysisJson: analysis == null ? const Value.absent() : Value(jsonEncode(_withExtras(row.analysisJson, _json(analysis)))),
         sourceImagePath: const Value(null),
         updatedAt: Value(now),
       ));
     });
     return id;
   }
+
+  /// Saves the cook's preparation (marks and substitutions) without touching the plan.
+  Future<void> savePreparation(String recipeId, Preparation prep) => _db.transaction(() async {
+        final row = await (_db.select(_db.recipes)..where((r) => r.id.equals(recipeId))).getSingle();
+        final map = row.analysisJson == null
+            ? <String, dynamic>{}
+            : jsonDecode(row.analysisJson!) as Map<String, dynamic>;
+        map['preparation'] = jsonDecode(jsonEncode(prep.toJson()));
+        await (_db.update(_db.recipes)..where((r) => r.id.equals(recipeId)))
+            .write(RecipesCompanion(analysisJson: Value(jsonEncode(map)), updatedAt: Value(_now())));
+      });
+
+  /// Stores the recipe and plan after substitutions changed (accepted or undone): a draft
+  /// gets a new draft plan; a saved recipe gets a new approved plan version (sessions that
+  /// already started keep the plan they started with).
+  Future<void> applyPreparation(
+    String recipeId, {
+    required RecipeAnalysis analysis,
+    required CookingPlan plan,
+    required Preparation prep,
+  }) =>
+      _db.transaction(() async {
+        final row = (await getRecipe(recipeId))!;
+        if (row.isDraft) {
+          await updateAnalysis(recipeId, analysis);
+          await saveDraftPlan(recipeId, plan);
+        } else {
+          await approvePlan(recipeId, plan, analysis: analysis);
+        }
+        await savePreparation(recipeId, prep);
+      });
 
   Stream<List<RecipeRow>> watchDrafts() => (_db.select(_db.recipes)
         ..where((r) => r.deletedAt.isNull() & r.status.equals(RecipeStatus.draft))

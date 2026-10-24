@@ -1,0 +1,482 @@
+{
+  "$defs": {
+    "AddStepNote": {
+      "additionalProperties": false,
+      "properties": {
+        "note_he": {
+          "maxLength": 300,
+          "minLength": 1,
+          "title": "Note He",
+          "type": "string"
+        },
+        "op": {
+          "const": "add_step_note",
+          "title": "Op",
+          "type": "string"
+        },
+        "step_id": {
+          "title": "Step Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "step_id",
+        "note_he"
+      ],
+      "title": "AddStepNote",
+      "type": "object"
+    },
+    "OmitEquipment": {
+      "additionalProperties": false,
+      "properties": {
+        "equipment_id": {
+          "title": "Equipment Id",
+          "type": "string"
+        },
+        "op": {
+          "const": "omit_equipment",
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "equipment_id"
+      ],
+      "title": "OmitEquipment",
+      "type": "object"
+    },
+    "OmitIngredient": {
+      "additionalProperties": false,
+      "properties": {
+        "ingredient_id": {
+          "title": "Ingredient Id",
+          "type": "string"
+        },
+        "op": {
+          "const": "omit_ingredient",
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "ingredient_id"
+      ],
+      "title": "OmitIngredient",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Amount"
+        },
+        "amount_max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Amount Max"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "display": {
+          "title": "Display",
+          "type": "string"
+        },
+        "note_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note He"
+        },
+        "provenance": {
+          "enum": [
+            "original",
+            "inferred",
+            "answered",
+            "user",
+            "reference"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "source_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "display",
+        "provenance"
+      ],
+      "title": "Quantity",
+      "type": "object"
+    },
+    "ReplaceEquipment": {
+      "additionalProperties": false,
+      "properties": {
+        "equipment_id": {
+          "title": "Equipment Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "op": {
+          "const": "replace_equipment",
+          "title": "Op",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "equipment_id",
+        "name"
+      ],
+      "title": "ReplaceEquipment",
+      "type": "object"
+    },
+    "ReplaceIngredient": {
+      "additionalProperties": false,
+      "properties": {
+        "ingredient_id": {
+          "title": "Ingredient Id",
+          "type": "string"
+        },
+        "name": {
+          "maxLength": 120,
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "op": {
+          "const": "replace_ingredient",
+          "title": "Op",
+          "type": "string"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "op",
+        "ingredient_id",
+        "name"
+      ],
+      "title": "ReplaceIngredient",
+      "type": "object"
+    },
+    "SetIngredientUse": {
+      "additionalProperties": false,
+      "properties": {
+        "ingredient_id": {
+          "title": "Ingredient Id",
+          "type": "string"
+        },
+        "op": {
+          "const": "set_ingredient_use",
+          "title": "Op",
+          "type": "string"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "step_id": {
+          "title": "Step Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "step_id",
+        "ingredient_id"
+      ],
+      "title": "SetIngredientUse",
+      "type": "object"
+    },
+    "SetStepSafety": {
+      "additionalProperties": false,
+      "description": "Concrete safety lines for a step (computed by the server from the food-safety table).",
+      "properties": {
+        "confirm_completion": {
+          "default": false,
+          "title": "Confirm Completion",
+          "type": "boolean"
+        },
+        "doneness_cue_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Doneness Cue He"
+        },
+        "op": {
+          "const": "set_step_safety",
+          "title": "Op",
+          "type": "string"
+        },
+        "step_id": {
+          "title": "Step Id",
+          "type": "string"
+        },
+        "warnings_he": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings He",
+          "type": "array"
+        }
+      },
+      "required": [
+        "op",
+        "step_id"
+      ],
+      "title": "SetStepSafety",
+      "type": "object"
+    },
+    "SetStepText": {
+      "additionalProperties": false,
+      "properties": {
+        "instruction_he": {
+          "maxLength": 600,
+          "minLength": 1,
+          "title": "Instruction He",
+          "type": "string"
+        },
+        "op": {
+          "const": "set_step_text",
+          "title": "Op",
+          "type": "string"
+        },
+        "step_id": {
+          "title": "Step Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "step_id",
+        "instruction_he"
+      ],
+      "title": "SetStepText",
+      "type": "object"
+    },
+    "SetTimerSeconds": {
+      "additionalProperties": false,
+      "properties": {
+        "max_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 259200,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Seconds"
+        },
+        "op": {
+          "const": "set_timer_seconds",
+          "title": "Op",
+          "type": "string"
+        },
+        "seconds": {
+          "exclusiveMinimum": 0,
+          "maximum": 259200,
+          "title": "Seconds",
+          "type": "integer"
+        },
+        "timer_id": {
+          "title": "Timer Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "op",
+        "timer_id",
+        "seconds"
+      ],
+      "title": "SetTimerSeconds",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "effects_he": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Effects He"
+    },
+    "explanation_he": {
+      "title": "Explanation He",
+      "type": "string"
+    },
+    "ops": {
+      "default": [],
+      "items": {
+        "discriminator": {
+          "mapping": {
+            "add_step_note": "#/$defs/AddStepNote",
+            "omit_equipment": "#/$defs/OmitEquipment",
+            "omit_ingredient": "#/$defs/OmitIngredient",
+            "replace_equipment": "#/$defs/ReplaceEquipment",
+            "replace_ingredient": "#/$defs/ReplaceIngredient",
+            "set_ingredient_use": "#/$defs/SetIngredientUse",
+            "set_step_safety": "#/$defs/SetStepSafety",
+            "set_step_text": "#/$defs/SetStepText",
+            "set_timer_seconds": "#/$defs/SetTimerSeconds"
+          },
+          "propertyName": "op"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/$defs/ReplaceIngredient"
+          },
+          {
+            "$ref": "#/$defs/OmitIngredient"
+          },
+          {
+            "$ref": "#/$defs/ReplaceEquipment"
+          },
+          {
+            "$ref": "#/$defs/OmitEquipment"
+          },
+          {
+            "$ref": "#/$defs/SetIngredientUse"
+          },
+          {
+            "$ref": "#/$defs/SetStepText"
+          },
+          {
+            "$ref": "#/$defs/AddStepNote"
+          },
+          {
+            "$ref": "#/$defs/SetTimerSeconds"
+          },
+          {
+            "$ref": "#/$defs/SetStepSafety"
+          }
+        ]
+      },
+      "title": "Ops",
+      "type": "array"
+    },
+    "replacement_name_he": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Replacement Name He"
+    },
+    "verdict": {
+      "enum": [
+        "works",
+        "changes_result",
+        "not_recommended",
+        "no_substitute"
+      ],
+      "title": "Verdict",
+      "type": "string"
+    }
+  },
+  "required": [
+    "verdict",
+    "explanation_he"
+  ],
+  "title": "SubstituteResponse",
+  "type": "object"
+}

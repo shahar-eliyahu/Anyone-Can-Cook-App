@@ -1,0 +1,33 @@
+{
+  "description": "Substitution patch operations applied to sample_recipe.json; the backend (app/services/patching.py) and the app (lib/features/prepare/patch.dart) must both produce the expectations below.",
+  "ops": [
+    {"op": "replace_ingredient", "ingredient_id": "i3", "name": "שמן קנולה",
+     "quantity": {"amount": 3, "unit": "כפות", "display": "3 כפות", "provenance": "inferred", "note_he": "תחליף"}},
+    {"op": "set_ingredient_use", "step_id": "s1", "ingredient_id": "i3",
+     "quantity": {"amount": 1, "unit": "כף", "display": "1 כף", "provenance": "inferred", "note_he": "תחליף"}},
+    {"op": "add_step_note", "step_id": "s1", "note_he": "במקום שמן זית: שמן קנולה"},
+    {"op": "add_step_note", "step_id": "s1", "note_he": "במקום שמן זית: שמן קנולה"},
+    {"op": "omit_ingredient", "ingredient_id": "i6"},
+    {"op": "replace_equipment", "equipment_id": "e4", "name": "סיר גדול"},
+    {"op": "omit_equipment", "equipment_id": "e3"},
+    {"op": "set_step_text", "step_id": "s2", "instruction_he": "שפשפו את העוף בשמן ובתבלינים."},
+    {"op": "set_timer_seconds", "timer_id": "t2", "seconds": 1200, "max_seconds": 1000},
+    {"op": "set_step_safety", "step_id": "s3", "warnings_he": ["בדקו שהעוף עשוי."], "doneness_cue_he": "אין ורוד ליד העצם.", "confirm_completion": false}
+  ],
+  "expect": {
+    "ingredients": {
+      "i3": {"name": "שמן קנולה", "substituted_for": "שמן זית", "omitted": false, "quantity_display": "3 כפות"},
+      "i6": {"name": "פלפל שחור", "substituted_for": null, "omitted": true, "quantity_display": "לפי הטעם"}
+    },
+    "equipment": {
+      "e4": {"name": "סיר גדול", "substituted_for": "קערה גדולה", "omitted": false},
+      "e3": {"name": "סכין וקרש חיתוך", "substituted_for": null, "omitted": true}
+    },
+    "steps": {
+      "s1": {"use_displays": {"i3": "1 כף"}, "notes_he": ["במקום שמן זית: שמן קנולה"], "equipment_ids": ["e1", "e4"]},
+      "s2": {"instruction_he": "שפשפו את העוף בשמן ובתבלינים.", "ingredient_ids": ["i1", "i3", "i4", "i5"]},
+      "s3": {"warnings_he": ["בדקו שהעוף עשוי."], "doneness_cue_he": "אין ורוד ליד העצם.", "completing_policy": "auto_ok"}
+    },
+    "timers": {"t2": {"seconds": 1200, "max_seconds": null, "provenance": "inferred"}}
+  }
+}

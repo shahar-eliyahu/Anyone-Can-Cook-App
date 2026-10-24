@@ -55,6 +55,8 @@ _Ingredient _$IngredientFromJson(Map<String, dynamic> json) => _Ingredient(
   preparation: json['preparation'] as String?,
   group: json['group'] as String?,
   optional: json['optional'] as bool? ?? false,
+  substitutedFor: json['substituted_for'] as String?,
+  omitted: json['omitted'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$IngredientToJson(_Ingredient instance) =>
@@ -65,6 +67,8 @@ Map<String, dynamic> _$IngredientToJson(_Ingredient instance) =>
       'preparation': instance.preparation,
       'group': instance.group,
       'optional': instance.optional,
+      'substituted_for': instance.substitutedFor,
+      'omitted': instance.omitted,
     };
 
 _Equipment _$EquipmentFromJson(Map<String, dynamic> json) => _Equipment(
@@ -73,6 +77,8 @@ _Equipment _$EquipmentFromJson(Map<String, dynamic> json) => _Equipment(
   provenance:
       $enumDecodeNullable(_$ProvenanceEnumMap, json['provenance']) ??
       Provenance.original,
+  substitutedFor: json['substituted_for'] as String?,
+  omitted: json['omitted'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$EquipmentToJson(_Equipment instance) =>
@@ -80,6 +86,8 @@ Map<String, dynamic> _$EquipmentToJson(_Equipment instance) =>
       'id': instance.id,
       'name': instance.name,
       'provenance': _$ProvenanceEnumMap[instance.provenance]!,
+      'substituted_for': instance.substitutedFor,
+      'omitted': instance.omitted,
     };
 
 _SourceStep _$SourceStepFromJson(Map<String, dynamic> json) =>
