@@ -3,7 +3,7 @@
 Frequently changing status. Permanent rules are in `CLAUDE.md`; the approved design is `docs/PLAN.md`.
 Update this file at the end of every work step.
 
-_Last updated: 2026-10-24 (Phase 3C `536436c`, 3A `9e888f7`, 3B `cd82fa6`, 3D local-first commit; nothing pushed)_
+_Last updated: 2026-10-24 (3C `536436c`, 3A `9e888f7`, 3B `cd82fa6` on origin; 3D `fee2df1` + voice commit local only)_
 
 ## Phase status
 
@@ -12,7 +12,7 @@ _Last updated: 2026-10-24 (Phase 3C `536436c`, 3A `9e888f7`, 3B `cd82fa6`, 3D lo
 | 0 — Local foundations | ✅ Complete, committed and pushed (`1196478`). Render verified: `/health` 200, `/internal/ai-check` 404. |
 | 1 — Deterministic cooking core (no AI) | ✅ Implemented, verified (automated + emulator), approved by the user, committed and pushed to `main` (see `git log`). |
 | 2 — AI recipe analysis & planning | ✅ Complete, committed and pushed (`a6bd1f3` Phase 2, `a372736` app icon, `fa87e71` quota handling). Deployed on Render; live Gemini recipe test by the user passed (details below). |
-| 3 — Beginner cooking experience + assistant | 🔄 3C, 3A, 3B and 3D's local-first understanding + voice seams implemented and verified locally, committed locally, not pushed or deployed. Speech packages (3D) wait for approval. |
+| 3 — Beginner cooking experience + assistant | ✅ 3C, 3A, 3B, 3D (local-first Remy + voice) implemented and verified locally. 3C–3B are on `origin/main`; 3D is committed locally, not pushed or deployed. |
 | 4 — Polish & release | ⏸ Not started. |
 
 ## Phase 1 — what exists
@@ -376,16 +376,41 @@ Checked what existed, changed only what was missing.
 - **Emulator (offline, no backend), 2026-10-24:** Remy sheet: "done" finished the step, "back" undid it; test
   session abandoned afterwards.
 
+### Phase 3D — voice, implemented 2026-10-24 (local commit)
+
+- **Packages (approved, free):** `speech_to_text` 7.5.0, `flutter_tts` 4.2.5 (the lock adds only these plus
+  `speech_to_text_platform_interface` and `speech_to_text_windows`). Android: `RECORD_AUDIO` + `<queries>` for the
+  recognition and TTS services; iOS: Hebrew microphone and speech-recognition usage strings.
+- **Code:** `voice.dart` (interfaces, `VoiceIssue`, providers), `voice_platform.dart` (Hebrew locale, error
+  mapping, he-IL/iw-IL voice), `voice_controller.dart` (phases, partial transcript, continuous mode, notes);
+  `AssistantController` returns replies and accepts "כן"/"לא" for a pending confirmation; mic + status line + stop +
+  "שיחה רציפה" in the Remy sheet; a mic in the cooking app bar that opens Remy already listening.
+- **Tests (fakes only, zero Gemini calls):** Flutter **244/244**, analyzer clean. 16 widget tests in
+  `voice_test.dart`: spoken command acts locally and is spoken; typed = spoken; unsure → asks, "כן"/"לא" by voice;
+  permission denied / no service / no Hebrew / offline at start; offline error while listening; silence; no Hebrew
+  voice → text + steady note; partial transcript + finish by tap; stop and typing take over; continuous mode stops
+  after 2 silences; cooking-screen mic; closing the sheet stops listening. 2 unit tests: error mapping, yes/no.
+  The old spoken widget test moved into `voice_test.dart`. Backend **186/186** (unchanged).
+- **Emulator (Pixel 8a API 35, offline, no backend), 2026-10-24:** mic visible in the cooking screen and the
+  sheet; Android permission prompt; "Don't allow" → the Hebrew permission note, typing still worked; with the
+  permission: "מקשיב…" + "עצירה", silence → "לא שמעתי. אפשר לנסות שוב.", "עצירה" → back to idle with nothing sent;
+  the Hebrew TTS voice (he-IL) is available; typed "done"/"back" still finished/undid the step. Found and fixed:
+  the emulator's recognizer lists 31 languages without Hebrew yet accepts `he_IL` (so Hebrew is tried, not
+  refused); the no-Hebrew-voice note was hidden while listening (now a steady line). Test session abandoned and the
+  microphone permission revoked again afterwards.
+
 ### Phase 3D — pending / limitations
 
-- Speech recognition and text-to-speech packages, the microphone button and hands-free mode wait for dependency
-  approval; the wake phrase stays later.
-- Local understanding is rule-based; unusual phrasings still go to Gemini (online).
-- The server interpretation is untested against real Gemini (needs approval).
+- Real speech was not recognized on the emulator (no microphone input): recognition quality, real Hebrew
+  transcripts → commands, and hearing the replies need a check on the user's phone.
+- Recognition on most Android phones uses Google's service; offline Hebrew recognition depends on the phone
+  (offline language packs). Without it the cook gets the offline note and can type; local commands work offline.
+- The wake phrase ("Hey Remy") stays later. Local understanding is rule-based; unusual phrasings go to Gemini
+  (online). The server interpretation is untested against real Gemini (needs approval).
 
 ## Next step
 
-1. User reviews 3C + 3A + 3B + 3D local-first (commits are local only); approves (or not) the speech packages.
-2. With approval: small live checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 / ≤ 10 calls;
-   3B Remy ≈ 15 questions / ≤ 20 calls), then push and deploy.
-3. Phase 3D (voice) only after approval.
+1. User reviews 3D (`fee2df1` + the voice commit, local only) and tries voice on a real phone.
+2. With approval: push; small live Gemini checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 /
+   ≤ 10 calls; 3B/3D Remy ≈ 15 questions / ≤ 20 calls), then deploy.
+3. Phase 4 only after approval.

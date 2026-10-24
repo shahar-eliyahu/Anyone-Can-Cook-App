@@ -8,6 +8,7 @@ import '../../core/widgets/app_scaffold.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/cooking_plan.dart';
 import '../assistant/assistant_sheet.dart';
+import '../assistant/voice.dart';
 import 'cooking_controller.dart';
 import 'engine/cooking_engine.dart';
 
@@ -151,6 +152,12 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
           icon: const Icon(Icons.assistant_outlined),
           onPressed: () => showAssistantSheet(context, widget.sessionId),
         ),
+        if (ref.watch(speechRecognizerProvider) != null)
+          IconButton(
+            tooltip: l10n.voiceMic,
+            icon: const Icon(Icons.mic_none),
+            onPressed: () => showAssistantSheet(context, widget.sessionId, listen: true),
+          ),
         PopupMenuButton<String>(
           onSelected: (_) => _abandon(),
           itemBuilder: (context) => [PopupMenuItem(value: 'abandon', child: Text(l10n.abandonCooking))],

@@ -1160,4 +1160,55 @@ class AppLocalizationsHe extends AppLocalizations {
   String remyConfirmNext(String title) {
     return 'לסיים את \"$title\" ולעבור לשלב הבא?';
   }
+
+  @override
+  String get voiceMic => 'דיבור עם רמי';
+
+  @override
+  String get voiceTapToSpeak => 'לחצו על המיקרופון ודברו';
+
+  @override
+  String get voicePreparing => 'מכינים את המיקרופון…';
+
+  @override
+  String get voiceListening => 'מקשיב…';
+
+  @override
+  String get voiceProcessing => 'רגע…';
+
+  @override
+  String get voiceSpeaking => 'רמי מדבר… (לחצו כדי לעצור)';
+
+  @override
+  String get voiceStop => 'עצירה';
+
+  @override
+  String get voiceContinuous => 'שיחה רציפה';
+
+  @override
+  String get voicePermissionDenied =>
+      'כדי לדבר עם רמי צריך לאשר גישה למיקרופון. אפשר לאשר בהגדרות הטלפון, או פשוט להקליד.';
+
+  @override
+  String get voiceUnavailable =>
+      'זיהוי דיבור לא זמין בטלפון הזה. אפשר להקליד לרמי.';
+
+  @override
+  String get voiceHebrewUnsupported =>
+      'זיהוי דיבור בעברית לא זמין בטלפון הזה. אפשר להקליד לרמי.';
+
+  @override
+  String get voiceNetwork =>
+      'זיהוי הדיבור בטלפון הזה צריך חיבור לאינטרנט. אפשר להקליד — פקודות הבישול עובדות גם בלי אינטרנט.';
+
+  @override
+  String get voiceNoSpeech => 'לא שמעתי. אפשר לנסות שוב.';
+
+  @override
+  String get voiceError =>
+      'משהו השתבש בזיהוי הדיבור. אפשר לנסות שוב או להקליד.';
+
+  @override
+  String get voiceNoHebrewVoice =>
+      'אין בטלפון קול עברי להקראה, אז התשובות יופיעו כטקסט.';
 }

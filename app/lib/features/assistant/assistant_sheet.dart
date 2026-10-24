@@ -4,11 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../l10n/app_localizations.dart';
 import 'assistant_controller.dart';
 import 'assistant_models.dart';
+import 'voice_controller.dart';
 
 /// Remy's conversation sheet in the cooking screen: typed questions and commands, quick
-/// chips, and approval cards. (A microphone joins this sheet in Phase 3D; it sends the
-/// same [AssistantInput] with `modality: voice`.)
-Future<void> showAssistantSheet(BuildContext context, String sessionId) => showModalBottomSheet<void>(
+/// chips, approval cards and the microphone (spoken requests take the same pipeline).
+/// [listen] starts listening as soon as the sheet opens (the cooking screen's microphone).
+Future<void> showAssistantSheet(BuildContext context, String sessionId, {bool listen = false}) =>
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       showDragHandle: true,
@@ -16,15 +18,16 @@ Future<void> showAssistantSheet(BuildContext context, String sessionId) => showM
         padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
         child: SizedBox(
           height: MediaQuery.sizeOf(context).height * 0.7,
-          child: AssistantPanel(sessionId: sessionId),
+          child: AssistantPanel(sessionId: sessionId, listenOnOpen: listen),
         ),
       ),
     );
 
 class AssistantPanel extends ConsumerStatefulWidget {
-  const AssistantPanel({super.key, required this.sessionId});
+  const AssistantPanel({super.key, required this.sessionId, this.listenOnOpen = false});
 
   final String sessionId;
+  final bool listenOnOpen;
 
   @override
   ConsumerState<AssistantPanel> createState() => _AssistantPanelState();
@@ -34,6 +37,13 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
   final _text = TextEditingController();
 
   AssistantController get _controller => ref.read(assistantControllerProvider(widget.sessionId).notifier);
+  VoiceController get _voice => ref.read(voiceControllerProvider(widget.sessionId).notifier);
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.listenOnOpen) WidgetsBinding.instance.addPostFrameCallback((_) => mounted ? _voice.listen() : null);
+  }
 
   @override
   void dispose() {
@@ -44,6 +54,7 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
   void _send(String text) {
     if (text.trim().isEmpty) return;
     _text.clear();
+    _voice.cancel(); // typing takes over from the microphone
     _controller.send(AssistantInput(text));
   }
 
@@ -53,6 +64,9 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
     final theme = Theme.of(context);
     final s = ref.watch(assistantControllerProvider(widget.sessionId));
     final pending = s.pending;
+    final voice = ref.watch(voiceControllerProvider(widget.sessionId));
+    final canListen = _voice.available;
+    final voiceActive = voice.phase != VoicePhase.idle;
 
     return SafeArea(
       child: Padding(
@@ -102,8 +116,39 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
               children: [
                 for (final chip in [l10n.remyChipNow, l10n.remyChipTime, l10n.remyChipHelp])
                   ActionChip(label: Text(chip), onPressed: s.busy ? null : () => _send(chip)),
+                if (canListen)
+                  FilterChip(
+                    label: Text(l10n.voiceContinuous),
+                    selected: voice.continuous,
+                    onSelected: _voice.setContinuous,
+                  ),
               ],
             ),
+            if (voice.messageHe != null && !voiceActive)
+              Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Text(voice.messageHe!, style: TextStyle(color: theme.colorScheme.error)),
+              ),
+            // Without a Hebrew voice, spoken requests still work; the answers stay on screen.
+            if (voice.hebrewVoice == false) Text(l10n.voiceNoHebrewVoice, style: theme.textTheme.bodySmall),
+            if (voiceActive)
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      switch (voice.phase) {
+                        VoicePhase.preparing => l10n.voicePreparing,
+                        VoicePhase.listening => voice.partial.isEmpty ? l10n.voiceListening : '${l10n.voiceListening} ${voice.partial}',
+                        VoicePhase.processing => '${l10n.voiceProcessing} ${voice.partial}',
+                        VoicePhase.speaking => l10n.voiceSpeaking,
+                        VoicePhase.idle => '',
+                      },
+                      style: theme.textTheme.titleMedium,
+                    ),
+                  ),
+                  TextButton.icon(onPressed: _voice.cancel, icon: const Icon(Icons.stop), label: Text(l10n.voiceStop)),
+                ],
+              ),
             Row(
               children: [
                 Expanded(
@@ -121,6 +166,15 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
                   onPressed: s.busy ? null : () => _send(_text.text),
                   icon: const Icon(Icons.send),
                 ),
+                if (canListen)
+                  IconButton.filledTonal(
+                    tooltip: l10n.voiceMic,
+                    isSelected: voiceActive,
+                    // Tapping while listening finishes the utterance; while speaking, stops Remy.
+                    onPressed: s.busy && !voiceActive ? null : _voice.toggle,
+                    icon: const Icon(Icons.mic_none),
+                    selectedIcon: const Icon(Icons.mic),
+                  ),
               ],
             ),
           ],

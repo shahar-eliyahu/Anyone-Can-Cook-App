@@ -72,6 +72,10 @@
 	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>כדי לצלם מתכון ולייבא אותו. התמונה נשמרת רק עד שתאשרו את התוכנית.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>כדי לדבר עם רמי, עוזר הבישול, בזמן הבישול.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>כדי להבין מה אומרים לרמי בזמן הבישול.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>כדי לבחור תמונה של מתכון ולייבא אותה. התמונה נשמרת רק עד שתאשרו את התוכנית.</string>
 </dict>

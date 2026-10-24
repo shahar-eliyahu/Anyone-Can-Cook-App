@@ -600,11 +600,11 @@ plan); Gemini only as a fallback interpreter returning a strict command from the
 the live engine; at most one Gemini call per unresolved request, no automatic retry; ambiguity resolved by asking
 locally; voice and text through the same pipeline; offline keeps every local command working.
 
-Status (2026-10-24): local-first refinements and the voice seams implemented locally (see `docs/PROGRESS.md`,
-decisions #58–#60). **Pending the user's approval of dependencies:** on-device speech recognition and
-text-to-speech packages (candidates: `speech_to_text` and `flutter_tts`, free, using the phone's own engines;
-Hebrew support to be checked on the user's phone), a microphone button in the Remy sheet and in the cooking screen,
-hands-free mode. The wake phrase ("Hey Remy") stays later (continuous listening: battery and privacy).
+Status (2026-10-24): **implemented locally** (see `docs/PROGRESS.md`, decisions #58–#63). Local-first refinements
+(`fee2df1`), then voice with the approved free packages `speech_to_text` and `flutter_tts` (the phone's own
+engines): Hebrew recognition, spoken replies, a microphone in the Remy sheet and in the cooking screen, listening /
+processing / speaking states, permission handling, an optional "שיחה רציפה" (continuous conversation) mode. The
+wake phrase ("Hey Remy") stays later (always-on listening: battery and privacy).
 
 - Implemented: word-family parser with prefix-aware and one-letter-tolerant matching, uncertainty markers,
   question detection, local Q&A (amounts, temperature, next step, this step's ingredients, steps left), local
@@ -613,13 +613,14 @@ hands-free mode. The wake phrase ("Hey Remy") stays later (continuous listening:
   start_timer_action, whats_next, help) validated on the server and again in the app; one call, no repair, no
   retry; minimal context (no source text, completed steps by title); `SpeechRecognizer` / `SpeechSynthesizer`
   interfaces with silent defaults; spoken requests get `speechHe` read aloud once an engine is added.
+- Voice: `VoiceController` (per session) runs listen → `sendSpoken` (the same pipeline as typed text) → speak
+  `speechHe`; "כן" / "לא" answers a pending confirmation by voice; every speech problem becomes a Hebrew note and
+  typing keeps working.
 
 #### Phase 4 and Future
 
 - Phase 4: visual refinement, an original "Remy" (רמי) look, settings wording, release work.
-- Future: microphone, speech-to-text and text-to-speech, hands-free commands answered locally ("הבא", "כמה זמן
-  נשאר?"), then an optional "Hey Remy" wake phrase. No voice packages, continuous listening or wake word now;
-  original character only.
+- Future: an optional "Hey Remy" wake phrase (always-on listening). Original character only.
 
 #### Gemini usage in Phase 3
 

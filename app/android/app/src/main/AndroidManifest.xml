@@ -3,6 +3,8 @@
     <!-- Cooking timers: reschedule after reboot, and fire on time while idle (user-granted). -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
+    <!-- Talking to Remy (asked on the first microphone tap, never at start-up). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
     <application
         android:label="לבשל כל אחד יכול"
         android:name="${applicationName}"
@@ -54,6 +56,13 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- The phone's own speech recognition and text-to-speech services (Remy's voice). -->
+        <intent>
+            <action android:name="android.speech.RecognitionService"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE"/>
         </intent>
     </queries>
 </manifest>

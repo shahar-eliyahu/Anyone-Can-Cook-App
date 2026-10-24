@@ -2043,6 +2043,96 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'לסיים את \"{title}\" ולעבור לשלב הבא?'**
   String remyConfirmNext(String title);
+
+  /// No description provided for @voiceMic.
+  ///
+  /// In he, this message translates to:
+  /// **'דיבור עם רמי'**
+  String get voiceMic;
+
+  /// No description provided for @voiceTapToSpeak.
+  ///
+  /// In he, this message translates to:
+  /// **'לחצו על המיקרופון ודברו'**
+  String get voiceTapToSpeak;
+
+  /// No description provided for @voicePreparing.
+  ///
+  /// In he, this message translates to:
+  /// **'מכינים את המיקרופון…'**
+  String get voicePreparing;
+
+  /// No description provided for @voiceListening.
+  ///
+  /// In he, this message translates to:
+  /// **'מקשיב…'**
+  String get voiceListening;
+
+  /// No description provided for @voiceProcessing.
+  ///
+  /// In he, this message translates to:
+  /// **'רגע…'**
+  String get voiceProcessing;
+
+  /// No description provided for @voiceSpeaking.
+  ///
+  /// In he, this message translates to:
+  /// **'רמי מדבר… (לחצו כדי לעצור)'**
+  String get voiceSpeaking;
+
+  /// No description provided for @voiceStop.
+  ///
+  /// In he, this message translates to:
+  /// **'עצירה'**
+  String get voiceStop;
+
+  /// No description provided for @voiceContinuous.
+  ///
+  /// In he, this message translates to:
+  /// **'שיחה רציפה'**
+  String get voiceContinuous;
+
+  /// No description provided for @voicePermissionDenied.
+  ///
+  /// In he, this message translates to:
+  /// **'כדי לדבר עם רמי צריך לאשר גישה למיקרופון. אפשר לאשר בהגדרות הטלפון, או פשוט להקליד.'**
+  String get voicePermissionDenied;
+
+  /// No description provided for @voiceUnavailable.
+  ///
+  /// In he, this message translates to:
+  /// **'זיהוי דיבור לא זמין בטלפון הזה. אפשר להקליד לרמי.'**
+  String get voiceUnavailable;
+
+  /// No description provided for @voiceHebrewUnsupported.
+  ///
+  /// In he, this message translates to:
+  /// **'זיהוי דיבור בעברית לא זמין בטלפון הזה. אפשר להקליד לרמי.'**
+  String get voiceHebrewUnsupported;
+
+  /// No description provided for @voiceNetwork.
+  ///
+  /// In he, this message translates to:
+  /// **'זיהוי הדיבור בטלפון הזה צריך חיבור לאינטרנט. אפשר להקליד — פקודות הבישול עובדות גם בלי אינטרנט.'**
+  String get voiceNetwork;
+
+  /// No description provided for @voiceNoSpeech.
+  ///
+  /// In he, this message translates to:
+  /// **'לא שמעתי. אפשר לנסות שוב.'**
+  String get voiceNoSpeech;
+
+  /// No description provided for @voiceError.
+  ///
+  /// In he, this message translates to:
+  /// **'משהו השתבש בזיהוי הדיבור. אפשר לנסות שוב או להקליד.'**
+  String get voiceError;
+
+  /// No description provided for @voiceNoHebrewVoice.
+  ///
+  /// In he, this message translates to:
+  /// **'אין בטלפון קול עברי להקראה, אז התשובות יופיעו כטקסט.'**
+  String get voiceNoHebrewVoice;
 }
 
 class _AppLocalizationsDelegate

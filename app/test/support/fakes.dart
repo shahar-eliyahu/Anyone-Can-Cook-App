@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:anyone_can_cook/core/api_client.dart';
@@ -165,11 +166,56 @@ class FakeApi extends ApiClient {
   ({String message, String modality, Map<String, Object?> snapshot, List<Map<String, String>> history})? lastTurn;
 }
 
-/// Records what Remy would say aloud (text-to-speech is a Phase 3D package).
+/// Records what Remy says aloud. [hebrew] false = a phone without a Hebrew voice.
 class RecordingSpeechSynthesizer implements SpeechSynthesizer {
   final spoken = <String>[];
+  bool hebrew = true;
+  int stops = 0;
+  @override
+  Future<bool> prepare() async => hebrew;
   @override
   Future<void> speak(String textHe) async => spoken.add(textHe);
   @override
-  Future<void> stop() async {}
+  Future<void> stop() async => stops++;
+}
+
+/// Scripted speech recognition: each listen takes the next utterance — a transcript
+/// (heard as one partial, then final) or a [VoiceIssue] (thrown). With nothing queued,
+/// it keeps listening until [stop] (returns what was heard: [heldPartial]) or [cancel].
+class FakeSpeechRecognizer implements SpeechRecognizer {
+  final utterances = <Object>[];
+  VoiceIssue? prepareIssue;
+  String heldPartial = '';
+  int listens = 0;
+  Completer<String>? _held;
+
+  bool get listening => _held != null && !_held!.isCompleted;
+
+  @override
+  Future<void> prepare() async {
+    if (prepareIssue != null) throw VoiceException(prepareIssue!);
+  }
+
+  @override
+  Future<String> listenOnce({required void Function(String partial) onPartial}) async {
+    listens++;
+    if (utterances.isEmpty) {
+      if (heldPartial.isNotEmpty) onPartial(heldPartial);
+      return (_held = Completer<String>()).future;
+    }
+    final next = utterances.removeAt(0);
+    if (next is VoiceIssue) throw VoiceException(next);
+    onPartial(next as String);
+    return next;
+  }
+
+  @override
+  Future<void> stop() async {
+    if (listening) _held!.complete(heldPartial);
+  }
+
+  @override
+  Future<void> cancel() async {
+    if (listening) _held!.complete('');
+  }
 }

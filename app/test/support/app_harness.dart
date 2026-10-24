@@ -38,6 +38,7 @@ class AppHarness {
   final api = FakeApi();
   final images = FakeImageStore();
   final speech = RecordingSpeechSynthesizer();
+  final mic = FakeSpeechRecognizer();
 
   /// What the camera/gallery picker returns (null: the user cancelled).
   String? pickedPhoto;
@@ -73,6 +74,7 @@ class AppHarness {
           apiClientProvider.overrideWithValue(api),
           imageStoreProvider.overrideWithValue(images),
           speechSynthesizerProvider.overrideWithValue(speech),
+          speechRecognizerProvider.overrideWithValue(mic),
           photoPickerProvider.overrideWithValue(({required bool camera}) async => pickedPhoto),
           healthProvider.overrideWith(
             (ref) => (health ??

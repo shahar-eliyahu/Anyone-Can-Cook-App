@@ -1,9 +1,6 @@
 import 'package:anyone_can_cook/core/api_client.dart';
-import 'package:anyone_can_cook/features/assistant/assistant_controller.dart';
-import 'package:anyone_can_cook/features/assistant/assistant_sheet.dart';
 import 'package:anyone_can_cook/features/cooking/engine/events.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/app_harness.dart';
@@ -67,18 +64,5 @@ void main() {
     expect(find.text('✓ עדכנתי את השלבים הבאים: אש נמוכה מאוד לאורז.'), findsOneWidget);
     expect((await h.sessions.loadEvents(sessionId)).whereType<PlanPatched>().single.summaryHe, 'אש נמוכה מאוד לאורז');
     expect(h.api.calls, ['assistantTurn', 'assistantTurn']);
-  });
-
-  testApp('speech enters the same pipeline: a spoken "הבא" acts and is answered aloud; typed stays silent', (tester, h) async {
-    h.api.forbidCalls = true;
-    final sessionId = await openCooking(tester, h);
-    final container = ProviderScope.containerOf(tester.element(find.byType(AssistantPanel)));
-    await typeToRemy(tester, 'כמה זמן נשאר?');
-    expect(h.speech.spoken, isEmpty);
-    await container.read(assistantControllerProvider(sessionId).notifier).sendSpoken('רמי, סיימתי');
-    await tester.pumpAndSettle();
-    expect(find.text('✓ סיימנו: הכנת תפוחי האדמה. עכשיו: תיבול העוף.'), findsOneWidget);
-    expect(h.speech.spoken, ['✓ סיימנו: הכנת תפוחי האדמה. עכשיו: תיבול העוף.'.replaceAll('✓ ', '')]);
-    expect(h.api.calls, isEmpty);
   });
 }

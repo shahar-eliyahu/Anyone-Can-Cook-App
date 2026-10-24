@@ -6,7 +6,7 @@ import '../../l10n/app_localizations.dart';
 import '../cooking/cooking_controller.dart';
 import 'assistant_models.dart';
 import 'assistant_service.dart';
-import 'voice.dart';
+import 'command_parser.dart';
 
 class ChatMessage {
   const ChatMessage({required this.fromUser, required this.textHe, String? speechHe}) : speechHe = speechHe ?? textHe;
@@ -48,9 +48,23 @@ class AssistantController extends Notifier<AssistantState> {
   AssistantService get _service => ref.read(assistantServiceProvider);
   CookingController get _cooking => ref.read(cookingControllerProvider(sessionId).notifier);
 
-  Future<void> send(AssistantInput input) async {
+  /// One message from the cook, typed or spoken. Returns what Remy answered (the voice
+  /// controller reads it aloud), or null when nothing was sent.
+  Future<AssistantReply?> send(AssistantInput input) async {
     final text = input.text.trim();
-    if (text.isEmpty || state.busy) return;
+    if (text.isEmpty || state.busy) return null;
+    // A pending confirmation can be answered in words: "כן" / "לא".
+    if (state.pending != null) {
+      switch (yesOrNo(text)) {
+        case true:
+          _addUser(text);
+          return approve();
+        case false:
+          _addUser(text);
+          return reject();
+        case null:
+      }
+    }
     final history = [for (final m in state.messages) ChatTurn(fromUser: m.fromUser, textHe: m.textHe)];
     state = state.copyWith(
       messages: [...state.messages, ChatMessage(fromUser: true, textHe: text)],
@@ -67,48 +81,56 @@ class AssistantController extends Notifier<AssistantState> {
         now: actions.now(),
         history: history,
       );
-      final spoken = input.modality == InputModality.voice;
       if (reply.action != null && !reply.requiresConfirmation) {
-        final result = await _service.execute(reply.action!, actions);
-        _say(result, speak: spoken);
-      } else {
-        _say(reply, pending: reply.action == null ? null : reply, speak: spoken);
+        return _say(await _service.execute(reply.action!, actions));
       }
+      return _say(reply, pending: reply.action == null ? null : reply);
     } finally {
       state = state.copyWith(busy: false);
     }
   }
 
-  Future<void> approve() async {
+  Future<AssistantReply?> approve() async {
     final pending = state.pending;
-    if (pending?.action == null || state.busy) return;
+    if (pending?.action == null || state.busy) return null;
     state = state.copyWith(clearPending: true, busy: true);
     try {
-      _say(await _service.execute(pending!.action!, _cooking.assistantActions));
+      return _say(await _service.execute(pending!.action!, _cooking.assistantActions));
     } finally {
       state = state.copyWith(busy: false);
     }
   }
 
-  void reject() {
-    if (state.pending == null) return;
-    final text = _rejectedText;
-    state = state.copyWith(clearPending: true, messages: [...state.messages, ChatMessage(fromUser: false, textHe: text)]);
+  AssistantReply? reject() {
+    if (state.pending == null) return null;
+    state = state.copyWith(clearPending: true);
+    return _say(AssistantReply(answerHe: lookupAppLocalizations(const Locale('he')).remyRejected));
   }
 
-  String get _rejectedText => lookupAppLocalizations(const Locale('he')).remyRejected;
-
   /// What speech recognition delivers: the same pipeline as typed text.
-  Future<void> sendSpoken(String transcript) => send(AssistantInput(transcript, modality: InputModality.voice));
+  Future<AssistantReply?> sendSpoken(String transcript) =>
+      send(AssistantInput(transcript, modality: InputModality.voice));
 
-  void _say(AssistantReply reply, {AssistantReply? pending, bool speak = false}) {
+  void _addUser(String text) =>
+      state = state.copyWith(messages: [...state.messages, ChatMessage(fromUser: true, textHe: text)]);
+
+  AssistantReply _say(AssistantReply reply, {AssistantReply? pending}) {
     state = state.copyWith(
       messages: [...state.messages, ChatMessage(fromUser: false, textHe: reply.answerHe, speechHe: reply.speechHe)],
       pending: pending,
     );
-    // Spoken requests get spoken answers (silent until a text-to-speech engine is added).
-    if (speak) ref.read(speechSynthesizerProvider).speak(reply.speechHe);
+    return reply;
   }
+}
+
+/// "כן" → true, "לא" → false, anything else → null (a new request).
+bool? yesOrNo(String text) {
+  final s = normalizeCommand(text);
+  const yes = {'כן', 'כן בבקשה', 'אישור', 'מאשר', 'מאשרת', 'בטח', 'נכון', 'בסדר', 'תעשה את זה', 'תעשי את זה', 'קדימה', 'yes', 'ok'};
+  const no = {'לא', 'לא תודה', 'עזוב', 'עזבי', 'לא צריך', 'אל תעשה', 'אל תעשי', 'בטל', 'no'};
+  if (yes.contains(s)) return true;
+  if (no.contains(s)) return false;
+  return null;
 }
 
 final assistantControllerProvider =

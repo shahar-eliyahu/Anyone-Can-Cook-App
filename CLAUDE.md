@@ -31,7 +31,7 @@ app/        Flutter (Android/iOS). Riverpod, go_router, drift (SQLite), dio, flu
   lib/data/                    repositories over drift (recipes, plans, sessions, events, settings)
   lib/features/prepare/        recipe overview + checklist, substitutions (patch ops, local table)
   lib/features/import/         import, clarify, advanced editing (review screen)
-  lib/features/assistant/      Remy: command parser, AssistantService (interpret/execute), sheet
+  lib/features/assistant/      Remy: command parser, AssistantService (interpret/execute), sheet, voice
   lib/features/*/              other screens (kitchen, recipes, cooking, history, settings)
   lib/l10n/app_he.arb          ALL user-facing strings (Hebrew)
 backend/    FastAPI, stateless, deployed on Render Free (root dir backend/)
@@ -58,7 +58,10 @@ Key invariants:
   `AssistantService`, not in the model. Simple commands are parsed locally (no AI). Mid-cooking changes are
   `PlanPatched` events (steps not started only). Text and future speech share `AssistantInput` (DECISIONS #53–#57).
 - Remy is local-first; Gemini is a fallback interpreter with at most one call per unresolved request (no repair,
-  no retry) and its commands are re-validated in the app (DECISIONS #58–#60). Voice packages need approval.
+  no retry) and its commands are re-validated in the app (DECISIONS #58–#60).
+- Voice (`speech_to_text`, `flutter_tts`, the phone's own engines) goes through `VoiceController` →
+  `sendSpoken` → the same pipeline; listening only on a tap; every speech failure degrades to typing (DECISIONS
+  #61–#63). Tests use `FakeSpeechRecognizer` / `RecordingSpeechSynthesizer` (`h.mic`, `h.speech`).
 - The recipe overview (`/recipes/:id`) is the entry point for drafts and saved recipes; the detailed review is
   optional "עריכה מתקדמת" (DECISIONS #52).
 - Beginner UX: one main action per step ("סיימתי — לשלב הבא"), timers start only from an explicit tap, no
