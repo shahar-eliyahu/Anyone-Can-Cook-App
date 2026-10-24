@@ -197,6 +197,24 @@ class LlmSubstitution(BaseModel):
     safety_changes: list[LlmSafetyChange] = []
 
 
+class LlmAssistantTurn(BaseModel):
+    intent: Literal["cooking_question", "session_question", "change_request", "out_of_scope", "unclear"]
+    answer_he: str
+    # A short plain-text version for text-to-speech (no emoji or symbols); optional.
+    speech_he: str | None = None
+    has_off_topic_part: bool = False
+    proposal_kind: Literal["none", "extend_timer", "substitution", "step_change"] = "none"
+    proposal_summary_he: str | None = None
+    timer_id: str | None = None
+    extra_seconds: int | None = None
+    substitution_target_kind: Literal["ingredient", "equipment"] | None = None
+    substitution_target_id: str | None = None
+    substitution: LlmSubstitution | None = None
+    step_changes: list[LlmStepChange] = []
+    timer_changes: list[LlmTimerChange] = []
+    safety_note_he: str | None = None
+
+
 class LlmPlan(BaseModel):
     steps: list[LlmStep]
     prep_tasks: list[LlmPrepTask] = []

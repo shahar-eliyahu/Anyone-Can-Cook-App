@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     rate_limit_per_hour: int = 10
     rate_limit_per_day: int = 30
     ai_daily_call_cap: int = 300
+    # Remy (assistant questions) has its own per-device limit; calls still count toward the daily cap.
+    assistant_rate_limit_per_hour: int = 30
+    assistant_rate_limit_per_day: int = 100
 
     max_body_bytes: int = 3_000_000
     max_text_chars: int = 20_000

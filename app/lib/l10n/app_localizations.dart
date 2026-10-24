@@ -1659,6 +1659,312 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'זמן הבישול בשלב \"{title}\" הוא הערכה — בדקו מוכנות לפי הסימנים בשלב.'**
   String attentionSafetyEstimate(String title);
+
+  /// No description provided for @remyTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'רמי — עוזר הבישול'**
+  String get remyTitle;
+
+  /// No description provided for @remyOpen.
+  ///
+  /// In he, this message translates to:
+  /// **'רמי'**
+  String get remyOpen;
+
+  /// No description provided for @remyHint.
+  ///
+  /// In he, this message translates to:
+  /// **'שאלו את רמי או כתבו פקודה'**
+  String get remyHint;
+
+  /// No description provided for @remyGreeting.
+  ///
+  /// In he, this message translates to:
+  /// **'היי, אני רמי! אפשר לשאול אותי על הבישול, או לבקש: \"הבא\", \"חזרה\", \"כמה זמן נשאר?\", \"תוסיף 5 דקות\".'**
+  String get remyGreeting;
+
+  /// No description provided for @remyChipNow.
+  ///
+  /// In he, this message translates to:
+  /// **'מה עכשיו?'**
+  String get remyChipNow;
+
+  /// No description provided for @remyChipTime.
+  ///
+  /// In he, this message translates to:
+  /// **'כמה זמן נשאר?'**
+  String get remyChipTime;
+
+  /// No description provided for @remyChipHelp.
+  ///
+  /// In he, this message translates to:
+  /// **'עזרה בשלב'**
+  String get remyChipHelp;
+
+  /// No description provided for @remySend.
+  ///
+  /// In he, this message translates to:
+  /// **'שליחה'**
+  String get remySend;
+
+  /// No description provided for @remyApprove.
+  ///
+  /// In he, this message translates to:
+  /// **'אישור'**
+  String get remyApprove;
+
+  /// No description provided for @remyReject.
+  ///
+  /// In he, this message translates to:
+  /// **'לא, תודה'**
+  String get remyReject;
+
+  /// No description provided for @remyRejected.
+  ///
+  /// In he, this message translates to:
+  /// **'בסדר, לא שיניתי כלום.'**
+  String get remyRejected;
+
+  /// No description provided for @remyThinking.
+  ///
+  /// In he, this message translates to:
+  /// **'רמי חושב…'**
+  String get remyThinking;
+
+  /// No description provided for @remyProposalTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'הצעה של רמי'**
+  String get remyProposalTitle;
+
+  /// No description provided for @remyAllDone.
+  ///
+  /// In he, this message translates to:
+  /// **'כל השלבים הושלמו! אפשר לסיים את הבישול.'**
+  String get remyAllDone;
+
+  /// No description provided for @remyStartFirst.
+  ///
+  /// In he, this message translates to:
+  /// **'קודם צריך: \"{label}\". זה כבר קרה?'**
+  String remyStartFirst(String label);
+
+  /// No description provided for @remyFinishEarly.
+  ///
+  /// In he, this message translates to:
+  /// **'הטיימר \"{label}\" עוד רץ (נשארו {time}). לסיים את השלב כבר עכשיו?'**
+  String remyFinishEarly(String label, String time);
+
+  /// No description provided for @remySafetyCheck.
+  ///
+  /// In he, this message translates to:
+  /// **'לפני שממשיכים: {cue} בדקתם?'**
+  String remySafetyCheck(String cue);
+
+  /// No description provided for @remyConfirmAction.
+  ///
+  /// In he, this message translates to:
+  /// **'לסמן \"{label}\"?'**
+  String remyConfirmAction(String label);
+
+  /// No description provided for @remyConfirmActionTimer.
+  ///
+  /// In he, this message translates to:
+  /// **'לסמן \"{label}\" ולהפעיל טיימר של {time}?'**
+  String remyConfirmActionTimer(String label, String time);
+
+  /// No description provided for @remyConfirmExtend.
+  ///
+  /// In he, this message translates to:
+  /// **'להוסיף {time} לטיימר \"{label}\"?'**
+  String remyConfirmExtend(String time, String label);
+
+  /// No description provided for @remyNothingToUndo.
+  ///
+  /// In he, this message translates to:
+  /// **'אין עדיין מה לבטל.'**
+  String get remyNothingToUndo;
+
+  /// No description provided for @remyNoTimers.
+  ///
+  /// In he, this message translates to:
+  /// **'אין טיימר פעיל כרגע.'**
+  String get remyNoTimers;
+
+  /// No description provided for @remyTimerLeft.
+  ///
+  /// In he, this message translates to:
+  /// **'{label}: נשארו {time}.'**
+  String remyTimerLeft(String label, String time);
+
+  /// No description provided for @remyTimerDue.
+  ///
+  /// In he, this message translates to:
+  /// **'{label}: הגיע הזמן לבדוק.'**
+  String remyTimerDue(String label);
+
+  /// No description provided for @remyTimerPausedLeft.
+  ///
+  /// In he, this message translates to:
+  /// **'{label}: מושהה, נשארו {time}.'**
+  String remyTimerPausedLeft(String label, String time);
+
+  /// No description provided for @remyWhichTimer.
+  ///
+  /// In he, this message translates to:
+  /// **'לאיזה טיימר? {labels}'**
+  String remyWhichTimer(String labels);
+
+  /// No description provided for @remyTooLong.
+  ///
+  /// In he, this message translates to:
+  /// **'אפשר להוסיף עד שעה בכל פעם.'**
+  String get remyTooLong;
+
+  /// No description provided for @remyNow.
+  ///
+  /// In he, this message translates to:
+  /// **'עכשיו: {title}. {instruction}'**
+  String remyNow(String title, String instruction);
+
+  /// No description provided for @remyTellMeWhen.
+  ///
+  /// In he, this message translates to:
+  /// **'כשזה קורה, תגידו לי \"{label}\" ואפעיל את הטיימר.'**
+  String remyTellMeWhen(String label);
+
+  /// No description provided for @remyTellMeWhenGeneric.
+  ///
+  /// In he, this message translates to:
+  /// **'כשזה קורה, תגידו לי ואסמן את זה.'**
+  String get remyTellMeWhenGeneric;
+
+  /// No description provided for @remyStepDone.
+  ///
+  /// In he, this message translates to:
+  /// **'✓ סיימנו: {title}.'**
+  String remyStepDone(String title);
+
+  /// No description provided for @remyNextStep.
+  ///
+  /// In he, this message translates to:
+  /// **'עכשיו: {title}.'**
+  String remyNextStep(String title);
+
+  /// No description provided for @remyTimerStarted.
+  ///
+  /// In he, this message translates to:
+  /// **'⏱ הטיימר \"{label}\" התחיל — לבדוק בעוד {time}.'**
+  String remyTimerStarted(String label, String time);
+
+  /// No description provided for @remyMarked.
+  ///
+  /// In he, this message translates to:
+  /// **'✓ סומן: {label}.'**
+  String remyMarked(String label);
+
+  /// No description provided for @remyUndone.
+  ///
+  /// In he, this message translates to:
+  /// **'↩ חזרנו צעד אחד אחורה.'**
+  String get remyUndone;
+
+  /// No description provided for @remyExtended.
+  ///
+  /// In he, this message translates to:
+  /// **'⏱ הוספתי {added} לטיימר \"{label}\". נשארו {left}.'**
+  String remyExtended(String added, String label, String left);
+
+  /// No description provided for @remyPausedDone.
+  ///
+  /// In he, this message translates to:
+  /// **'⏸ הטיימר \"{label}\" הושהה.'**
+  String remyPausedDone(String label);
+
+  /// No description provided for @remyResumedDone.
+  ///
+  /// In he, this message translates to:
+  /// **'▶ הטיימר \"{label}\" ממשיך.'**
+  String remyResumedDone(String label);
+
+  /// No description provided for @remyPatched.
+  ///
+  /// In he, this message translates to:
+  /// **'✓ עדכנתי את השלבים הבאים: {summary}.'**
+  String remyPatched(String summary);
+
+  /// No description provided for @remyAlreadyDone.
+  ///
+  /// In he, this message translates to:
+  /// **'זה כבר בוצע.'**
+  String get remyAlreadyDone;
+
+  /// No description provided for @remyNotPossible.
+  ///
+  /// In he, this message translates to:
+  /// **'אי אפשר לעשות את זה עכשיו.'**
+  String get remyNotPossible;
+
+  /// No description provided for @remyChangeNotPossible.
+  ///
+  /// In he, this message translates to:
+  /// **'את השינוי הזה כבר אי אפשר לעשות, כי השלב כבר התחיל.'**
+  String get remyChangeNotPossible;
+
+  /// No description provided for @remyOffline.
+  ///
+  /// In he, this message translates to:
+  /// **'אין חיבור לאינטרנט, אז אני לא יכול לענות על שאלות כרגע. פקודות כמו \"הבא\", \"חזרה\" ו\"כמה זמן נשאר?\" עובדות גם בלי אינטרנט.'**
+  String get remyOffline;
+
+  /// No description provided for @remyUnavailable.
+  ///
+  /// In he, this message translates to:
+  /// **'אני לא זמין לשאלות כרגע. הבישול ממשיך כרגיל, ופקודות פשוטות עובדות.'**
+  String get remyUnavailable;
+
+  /// No description provided for @durHour.
+  ///
+  /// In he, this message translates to:
+  /// **'שעה'**
+  String get durHour;
+
+  /// No description provided for @durHours.
+  ///
+  /// In he, this message translates to:
+  /// **'{n} שעות'**
+  String durHours(int n);
+
+  /// No description provided for @durMinute.
+  ///
+  /// In he, this message translates to:
+  /// **'דקה'**
+  String get durMinute;
+
+  /// No description provided for @durMinutes.
+  ///
+  /// In he, this message translates to:
+  /// **'{n} דקות'**
+  String durMinutes(int n);
+
+  /// No description provided for @durSeconds.
+  ///
+  /// In he, this message translates to:
+  /// **'{n} שניות'**
+  String durSeconds(int n);
+
+  /// No description provided for @durAnd.
+  ///
+  /// In he, this message translates to:
+  /// **'{a} ו-{b}'**
+  String durAnd(String a, String b);
+
+  /// No description provided for @changesDuringCooking.
+  ///
+  /// In he, this message translates to:
+  /// **'שינויים בזמן הבישול'**
+  String get changesDuringCooking;
 }
 
 class _AppLocalizationsDelegate

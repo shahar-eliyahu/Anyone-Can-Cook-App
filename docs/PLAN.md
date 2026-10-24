@@ -551,19 +551,46 @@ Status: implemented locally 2026-10-24 (see `docs/PROGRESS.md`; decisions #48–
   limits/quota; app checklist, local table, apply/undo, plan versions, no stale text. Live check with approval
   (≈ 5 substitutions, ≤ 10 calls).
 
-#### Phase 3B — context-aware text assistant, validated mid-cooking adjustments
+#### Phase 3B — Remy: assistant intelligence and action execution (text now, voice in 3D)
 
-- `POST /v1/assistant/turn`: recipe + accepted substitutions + current/completed steps + active timers
-  (`engine.snapshot()`) + safety constraints + last few turns. One Gemini call per user question, never automatic.
-- Local first: step chips ("מה זה אומר?", "איך יודעים שמוכן?") answer from `help_he`, the doneness cue and a
-  local Hebrew technique glossary — zero calls.
-- Proposals only, each approved by the user, executed by the engine: extend a timer; substitute in a step not
-  yet started (`PlanPatchApplied`, replayed as plan + patches; never touches started steps or running timers).
-- Cooking-only scope and guardrails from §5.4 (redirect, false-success rewrite, length cap, injection stance).
-  Own per-device limit inside the shared daily cap.
-- Voice-ready: a UI-independent `AssistantService.ask(text) → reply + proposals`.
-- Tests: guardrails with a fake provider; proposal validation against live engine state; `PlanPatchApplied`
-  replay (old sessions unchanged); approval cards. Live evaluation with approval (≈ 15 questions, ≤ 20 calls).
+Status: implemented locally 2026-10-24 (see `docs/PROGRESS.md`; decisions #53–#57). Phase 3D (microphone, speech
+recognition, text-to-speech, wake word) not started.
+
+Requirements (user, 2026-10-24): Remy answers context-aware questions AND performs real actions; the same pipeline
+must serve typed text now and speech in Phase 3D (microphone, speech recognition, text-to-speech, wake word are 3D,
+not 3B).
+
+Design:
+- **One modality-independent pipeline** (`app/lib/features/assistant/`): `AssistantInput(text, modality)` →
+  `AssistantService.interpret` → `AssistantReply {answer_he, speech_he (plain text for future TTS), action?,
+  requires_confirmation, source local|ai}` → execution only through `CookingController` → `ActionDispatcher`.
+  Speech recognition in 3D will produce the same `AssistantInput`.
+- **Local first, no Gemini:** a deterministic Hebrew command parser for next / mark done, back / undo, how much
+  time is left, what now, help with this step, pause / resume a timer, extend a timer by a spoken duration (Hebrew
+  number words), and starting a timer when the cook reports the real-world action ("הכנסתי את העוגה לתנור"),
+  matched against the labels of the actions available right now. Intentions ("אני עומד להכניס") never confirm.
+- **Remy (one AI call, only when asked):** `POST /v1/assistant/turn` with the effective recipe, plan, engine
+  snapshot (current/completed steps, available actions, active timers), the last turns and the message. Returns a
+  Hebrew answer, speech text and at most one proposal: extend a timer, a substitution, or a change to pending
+  steps (patch operations from 3A, validated on the server, food safety recomputed). Guardrails from §5.4: cooking
+  scope with a fixed redirect, off-topic line, no success claims, length caps, data blocks are data. Own per-device
+  limit inside the shared daily cap.
+- **Execution and validation (app, deterministic):** every action is checked against the live engine state; a step
+  is completed or a timer started only when the command clearly says the real-world action happened. Auto-run:
+  clear next/undo/start/pause/resume and extensions up to 15 minutes. Confirmation card: steps that need the
+  high-risk doneness check, finishing while a timer still runs, partial matches, extensions over 15 minutes, and
+  every AI proposal. Replies after execution come from engine results (templates), never from the model.
+- **Mid-cooking changes:** new replayable event `PlanPatched(ops, summary)`; allowed only on steps not started and
+  timers not running; the effective plan is plan + patches (old sessions replay unchanged); the cooking view shows
+  the patched recipe; history lists the changes.
+- **UI:** "רמי" in the cooking screen's app bar opens a sheet: conversation, quick chips (מה עכשיו? / כמה זמן
+  נשאר? / עזרה בשלב), approval cards. Offline: local commands keep working; questions say Remy is unavailable.
+- Acceptance: simple commands work offline with zero calls; nothing executes without validation; no silent
+  completion or timer start; proposals need approval; old sessions replay identically; voice can plug in without
+  changing the pipeline.
+- Tests: parser (Hebrew phrasings, numbers, intentions), confirmation policy, execution through the dispatcher,
+  `PlanPatched` validation and replay, assistant sheet flows with a fake API; backend guardrails and proposals with a
+  fake provider. Live evaluation only with approval.
 
 #### Phase 4 and Future
 

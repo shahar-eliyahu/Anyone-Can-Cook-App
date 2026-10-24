@@ -80,6 +80,10 @@ class _DetailView extends ConsumerWidget {
           SectionTitle(l10n.notes),
           Text(session.notes!),
         ],
+        if (state.patches.isNotEmpty) ...[
+          SectionTitle(l10n.changesDuringCooking),
+          for (final p in state.patches) Text('• ${p.summaryHe}'),
+        ],
         SectionTitle(l10n.stepsCompletedTitle),
         for (final step in detail.plan.steps)
           ListTile(

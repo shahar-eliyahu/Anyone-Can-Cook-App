@@ -4,7 +4,7 @@ from fastapi import FastAPI
 
 from app import __version__
 from app.errors import install_error_handlers
-from app.routers import health, recipes
+from app.routers import assistant, health, recipes
 from app.security import BodySizeLimit
 
 # Logs carry ids, purposes, counts and error codes only — never recipe content.
@@ -15,3 +15,4 @@ app.add_middleware(BodySizeLimit)
 install_error_handlers(app)  # after BodySizeLimit: its error middleware must be outermost
 app.include_router(health.router)
 app.include_router(recipes.router)
+app.include_router(assistant.router)

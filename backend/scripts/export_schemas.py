@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 
 from app.schemas import CookingPlan, Recipe, RecipeAnalysis
+from app.schemas.assistant import AssistantTurnResponse
 from app.schemas.substitution import SubstituteResponse
 
 SCHEMA_DIR = Path(__file__).resolve().parents[2] / "shared" / "schema"
@@ -15,6 +16,7 @@ SCHEMAS = {
     "cooking_plan.schema.json": CookingPlan,
     "recipe_analysis.schema.json": RecipeAnalysis,
     "substitution_response.schema.json": SubstituteResponse,
+    "assistant_turn_response.schema.json": AssistantTurnResponse,
 }
 
 

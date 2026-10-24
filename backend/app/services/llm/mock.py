@@ -17,7 +17,7 @@ _MOCK_DATA = Path(__file__).parent / "mock_data"
 
 def sample_fixtures() -> dict[type[BaseModel], dict[str, Any]]:
     """Canned analysis and plan (the sample chicken recipe) for local development."""
-    from app.schemas.llm import LlmAnalysis, LlmPlan, LlmSubstitution
+    from app.schemas.llm import LlmAnalysis, LlmAssistantTurn, LlmPlan, LlmSubstitution
 
     def load(name: str) -> dict[str, Any]:
         return json.loads((_MOCK_DATA / name).read_text(encoding="utf-8"))
@@ -26,6 +26,7 @@ def sample_fixtures() -> dict[type[BaseModel], dict[str, Any]]:
         LlmAnalysis: load("sample_analysis.json"),
         LlmPlan: load("sample_plan.json"),
         LlmSubstitution: load("sample_substitution.json"),
+        LlmAssistantTurn: load("sample_assistant.json"),
     }
 
 

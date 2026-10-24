@@ -50,6 +50,13 @@ sealed class CookingEvent {
         TimerRechecked(at: utc, timerId: p['timer_id'] as String),
       'TimerDismissed' =>
         TimerDismissed(at: utc, timerId: p['timer_id'] as String),
+      'PlanPatched' => PlanPatched(
+          at: utc,
+          ops: [for (final o in p['ops'] as List) Map<String, dynamic>.from(o as Map)],
+          summaryHe: p['summary_he'] as String,
+          source: ActionSource.values.byName(p['source'] as String),
+          proposalId: p['proposal_id'] as String?,
+        ),
       _ => throw FormatException('Unknown cooking event type: $type'),
     };
   }
@@ -194,4 +201,32 @@ class TimerDismissed extends CookingEvent {
   String get type => 'TimerDismissed';
   @override
   Map<String, Object?> toPayload() => {'timer_id': timerId};
+}
+
+/// An approved change to steps not started yet (Phase 3B: a substitution or a step
+/// change proposed by Remy). The operations are the same patch operations as before
+/// cooking (`features/prepare/patch.dart`), stored in the event so replay is exact.
+class PlanPatched extends CookingEvent {
+  const PlanPatched({
+    required DateTime at,
+    required this.ops,
+    required this.summaryHe,
+    this.source = ActionSource.agent,
+    this.proposalId,
+  }) : super(at);
+
+  final List<Map<String, dynamic>> ops;
+  final String summaryHe;
+  final ActionSource source;
+  final String? proposalId;
+
+  @override
+  String get type => 'PlanPatched';
+  @override
+  Map<String, Object?> toPayload() => {
+        'ops': ops,
+        'summary_he': summaryHe,
+        'source': source.name,
+        if (proposalId != null) 'proposal_id': proposalId,
+      };
 }

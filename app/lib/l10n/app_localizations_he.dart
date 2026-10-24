@@ -900,4 +900,209 @@ class AppLocalizationsHe extends AppLocalizations {
   String attentionSafetyEstimate(String title) {
     return 'זמן הבישול בשלב \"$title\" הוא הערכה — בדקו מוכנות לפי הסימנים בשלב.';
   }
+
+  @override
+  String get remyTitle => 'רמי — עוזר הבישול';
+
+  @override
+  String get remyOpen => 'רמי';
+
+  @override
+  String get remyHint => 'שאלו את רמי או כתבו פקודה';
+
+  @override
+  String get remyGreeting =>
+      'היי, אני רמי! אפשר לשאול אותי על הבישול, או לבקש: \"הבא\", \"חזרה\", \"כמה זמן נשאר?\", \"תוסיף 5 דקות\".';
+
+  @override
+  String get remyChipNow => 'מה עכשיו?';
+
+  @override
+  String get remyChipTime => 'כמה זמן נשאר?';
+
+  @override
+  String get remyChipHelp => 'עזרה בשלב';
+
+  @override
+  String get remySend => 'שליחה';
+
+  @override
+  String get remyApprove => 'אישור';
+
+  @override
+  String get remyReject => 'לא, תודה';
+
+  @override
+  String get remyRejected => 'בסדר, לא שיניתי כלום.';
+
+  @override
+  String get remyThinking => 'רמי חושב…';
+
+  @override
+  String get remyProposalTitle => 'הצעה של רמי';
+
+  @override
+  String get remyAllDone => 'כל השלבים הושלמו! אפשר לסיים את הבישול.';
+
+  @override
+  String remyStartFirst(String label) {
+    return 'קודם צריך: \"$label\". זה כבר קרה?';
+  }
+
+  @override
+  String remyFinishEarly(String label, String time) {
+    return 'הטיימר \"$label\" עוד רץ (נשארו $time). לסיים את השלב כבר עכשיו?';
+  }
+
+  @override
+  String remySafetyCheck(String cue) {
+    return 'לפני שממשיכים: $cue בדקתם?';
+  }
+
+  @override
+  String remyConfirmAction(String label) {
+    return 'לסמן \"$label\"?';
+  }
+
+  @override
+  String remyConfirmActionTimer(String label, String time) {
+    return 'לסמן \"$label\" ולהפעיל טיימר של $time?';
+  }
+
+  @override
+  String remyConfirmExtend(String time, String label) {
+    return 'להוסיף $time לטיימר \"$label\"?';
+  }
+
+  @override
+  String get remyNothingToUndo => 'אין עדיין מה לבטל.';
+
+  @override
+  String get remyNoTimers => 'אין טיימר פעיל כרגע.';
+
+  @override
+  String remyTimerLeft(String label, String time) {
+    return '$label: נשארו $time.';
+  }
+
+  @override
+  String remyTimerDue(String label) {
+    return '$label: הגיע הזמן לבדוק.';
+  }
+
+  @override
+  String remyTimerPausedLeft(String label, String time) {
+    return '$label: מושהה, נשארו $time.';
+  }
+
+  @override
+  String remyWhichTimer(String labels) {
+    return 'לאיזה טיימר? $labels';
+  }
+
+  @override
+  String get remyTooLong => 'אפשר להוסיף עד שעה בכל פעם.';
+
+  @override
+  String remyNow(String title, String instruction) {
+    return 'עכשיו: $title. $instruction';
+  }
+
+  @override
+  String remyTellMeWhen(String label) {
+    return 'כשזה קורה, תגידו לי \"$label\" ואפעיל את הטיימר.';
+  }
+
+  @override
+  String get remyTellMeWhenGeneric => 'כשזה קורה, תגידו לי ואסמן את זה.';
+
+  @override
+  String remyStepDone(String title) {
+    return '✓ סיימנו: $title.';
+  }
+
+  @override
+  String remyNextStep(String title) {
+    return 'עכשיו: $title.';
+  }
+
+  @override
+  String remyTimerStarted(String label, String time) {
+    return '⏱ הטיימר \"$label\" התחיל — לבדוק בעוד $time.';
+  }
+
+  @override
+  String remyMarked(String label) {
+    return '✓ סומן: $label.';
+  }
+
+  @override
+  String get remyUndone => '↩ חזרנו צעד אחד אחורה.';
+
+  @override
+  String remyExtended(String added, String label, String left) {
+    return '⏱ הוספתי $added לטיימר \"$label\". נשארו $left.';
+  }
+
+  @override
+  String remyPausedDone(String label) {
+    return '⏸ הטיימר \"$label\" הושהה.';
+  }
+
+  @override
+  String remyResumedDone(String label) {
+    return '▶ הטיימר \"$label\" ממשיך.';
+  }
+
+  @override
+  String remyPatched(String summary) {
+    return '✓ עדכנתי את השלבים הבאים: $summary.';
+  }
+
+  @override
+  String get remyAlreadyDone => 'זה כבר בוצע.';
+
+  @override
+  String get remyNotPossible => 'אי אפשר לעשות את זה עכשיו.';
+
+  @override
+  String get remyChangeNotPossible =>
+      'את השינוי הזה כבר אי אפשר לעשות, כי השלב כבר התחיל.';
+
+  @override
+  String get remyOffline =>
+      'אין חיבור לאינטרנט, אז אני לא יכול לענות על שאלות כרגע. פקודות כמו \"הבא\", \"חזרה\" ו\"כמה זמן נשאר?\" עובדות גם בלי אינטרנט.';
+
+  @override
+  String get remyUnavailable =>
+      'אני לא זמין לשאלות כרגע. הבישול ממשיך כרגיל, ופקודות פשוטות עובדות.';
+
+  @override
+  String get durHour => 'שעה';
+
+  @override
+  String durHours(int n) {
+    return '$n שעות';
+  }
+
+  @override
+  String get durMinute => 'דקה';
+
+  @override
+  String durMinutes(int n) {
+    return '$n דקות';
+  }
+
+  @override
+  String durSeconds(int n) {
+    return '$n שניות';
+  }
+
+  @override
+  String durAnd(String a, String b) {
+    return '$a ו-$b';
+  }
+
+  @override
+  String get changesDuringCooking => 'שינויים בזמן הבישול';
 }

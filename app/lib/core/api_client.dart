@@ -96,6 +96,26 @@ class ApiClient {
     return SubstitutionProposal.fromJson(data, SubstitutionSource.ai);
   }
 
+  /// Remy answers a question and may propose one change (the app validates and executes it).
+  Future<AssistantTurnResult> assistantTurn({
+    required String messageHe,
+    required String modality,
+    required Recipe recipe,
+    required CookingPlan plan,
+    required Map<String, Object?> snapshot,
+    required List<Map<String, String>> history,
+  }) async {
+    final data = await _post('/v1/assistant/turn', {
+      'message_he': messageHe,
+      'modality': modality,
+      'recipe': recipe.toJson(),
+      'plan': plan.toJson(),
+      'snapshot': snapshot,
+      'history': history,
+    });
+    return AssistantTurnResult.fromJson(data);
+  }
+
   Future<RecipeAnalysis> _analysis(String path, Map<String, Object?> body) async =>
       RecipeAnalysis.fromJson(await _post(path, body));
 
@@ -129,3 +149,39 @@ class ApiClient {
 final apiClientProvider = Provider<ApiClient>(
   (ref) => ApiClient(apiBaseUrl, appToken: appClientToken),
 );
+
+/// Response of POST /v1/assistant/turn.
+class AssistantTurnResult {
+  const AssistantTurnResult({required this.answerHe, required this.speechHe, this.proposal});
+
+  factory AssistantTurnResult.fromJson(Map<String, dynamic> j) {
+    final p = j['proposal'] as Map<String, dynamic>?;
+    return AssistantTurnResult(
+      answerHe: j['answer_he'] as String,
+      speechHe: j['speech_he'] as String? ?? j['answer_he'] as String,
+      proposal: p == null
+          ? null
+          : AssistantProposalData(
+              kind: p['kind'] as String,
+              summaryHe: p['summary_he'] as String,
+              timerId: p['timer_id'] as String?,
+              seconds: p['seconds'] as int?,
+              ops: [for (final o in p['ops'] as List? ?? const []) Map<String, dynamic>.from(o as Map)],
+            ),
+    );
+  }
+
+  final String answerHe;
+  final String speechHe;
+  final AssistantProposalData? proposal;
+}
+
+class AssistantProposalData {
+  const AssistantProposalData({required this.kind, required this.summaryHe, this.timerId, this.seconds, this.ops = const []});
+  final String kind; // extend_timer | patch
+  final String summaryHe;
+  final String? timerId;
+  final int? seconds;
+  final List<Map<String, dynamic>> ops;
+}
+

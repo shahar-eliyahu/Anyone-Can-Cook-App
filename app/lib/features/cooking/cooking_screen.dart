@@ -7,6 +7,7 @@ import '../../core/format.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/cooking_plan.dart';
+import '../assistant/assistant_sheet.dart';
 import 'cooking_controller.dart';
 import 'engine/cooking_engine.dart';
 
@@ -145,6 +146,11 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
     return AppScaffold(
       title: title,
       actions: [
+        IconButton(
+          tooltip: l10n.remyTitle,
+          icon: const Icon(Icons.assistant_outlined),
+          onPressed: () => showAssistantSheet(context, widget.sessionId),
+        ),
         PopupMenuButton<String>(
           onSelected: (_) => _abandon(),
           itemBuilder: (context) => [PopupMenuItem(value: 'abandon', child: Text(l10n.abandonCooking))],
@@ -240,7 +246,7 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
   Widget _stepCard(PlanStep step, StepPrimary? p, Map<String, WaitGuidance> guidance, {required bool emphasized}) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final ingredients = {for (final i in widget.view.recipe.ingredients) i.id: i};
+    final ingredients = {for (final i in widget.view.displayRecipe.ingredients) i.id: i};
     final timer = p?.timer;
     final g = timer == null ? null : guidance[timer.timerId];
     final checkDue = p?.kind == PrimaryKind.checkDue;

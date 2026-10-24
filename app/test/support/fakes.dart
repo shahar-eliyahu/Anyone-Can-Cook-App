@@ -108,6 +108,7 @@ class FakeApi extends ApiClient {
   final analyses = <Object>[];
   final plans = <Object>[];
   final substitutions = <Object>[];
+  final turns = <Object>[];
   final calls = <String>[];
   bool forbidCalls = false;
 
@@ -146,4 +147,19 @@ class FakeApi extends ApiClient {
   }
 
   String? lastSubstituteNote;
+
+  @override
+  Future<AssistantTurnResult> assistantTurn({
+    required String messageHe,
+    required String modality,
+    required Recipe recipe,
+    required CookingPlan plan,
+    required Map<String, Object?> snapshot,
+    required List<Map<String, String>> history,
+  }) async {
+    lastTurn = (message: messageHe, modality: modality, snapshot: snapshot, history: history);
+    return _next(turns, 'assistantTurn');
+  }
+
+  ({String message, String modality, Map<String, Object?> snapshot, List<Map<String, String>> history})? lastTurn;
 }

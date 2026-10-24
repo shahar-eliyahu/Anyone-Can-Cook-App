@@ -3,7 +3,7 @@
 Frequently changing status. Permanent rules are in `CLAUDE.md`; the approved design is `docs/PLAN.md`.
 Update this file at the end of every work step.
 
-_Last updated: 2026-10-24 (Phase 3C committed `536436c`; Phase 3A implemented, local commit)_
+_Last updated: 2026-10-24 (Phase 3C `536436c`, 3A `9e888f7`, 3B local commit; nothing pushed)_
 
 ## Phase status
 
@@ -12,7 +12,7 @@ _Last updated: 2026-10-24 (Phase 3C committed `536436c`; Phase 3A implemented, l
 | 0 — Local foundations | ✅ Complete, committed and pushed (`1196478`). Render verified: `/health` 200, `/internal/ai-check` 404. |
 | 1 — Deterministic cooking core (no AI) | ✅ Implemented, verified (automated + emulator), approved by the user, committed and pushed to `main` (see `git log`). |
 | 2 — AI recipe analysis & planning | ✅ Complete, committed and pushed (`a6bd1f3` Phase 2, `a372736` app icon, `fa87e71` quota handling). Deployed on Render; live Gemini recipe test by the user passed (details below). |
-| 3 — Beginner cooking experience + assistant | 🔄 3C and 3A implemented and verified locally (tests + emulator), committed locally, not pushed or deployed. 3B not started. |
+| 3 — Beginner cooking experience + assistant | 🔄 3C, 3A and 3B implemented and verified locally (tests + emulator), committed locally, not pushed or deployed. 3D (voice) not started. |
 | 4 — Polish & release | ⏸ Not started. |
 
 ## Phase 1 — what exists
@@ -267,7 +267,7 @@ Checked what existed, changed only what was missing.
   implemented as: beginner-friendly history summary, and a fixed bottom action bar inside the safe area (Android
   15 edge-to-edge) with wrapping rows. Adjust if something else was meant.
 
-### Phase 3A — implemented 2026-10-24 (local commit)
+### Phase 3A — implemented 2026-10-24 (local commit `9e888f7`)
 
 - **Flow:** import → (questions if needed) → **overview** (`/recipes/:id`, also for saved recipes): name, servings,
   estimated total and hands-on time (computed on the device), a short "שימו לב" card (warnings, limitations,
@@ -313,9 +313,49 @@ Checked what existed, changed only what was missing.
   ≤ 10 calls).
 - Mid-cooking substitutions are Phase 3B.
 
+### Phase 3B — Remy, implemented 2026-10-24 (local commit)
+
+- **Pipeline** (`app/lib/features/assistant/`): `AssistantInput(text, modality)` → `AssistantService.interpret`
+  (local parser first, Remy for questions) → `AssistantReply` (answer, plain `speechHe` for future TTS, optional
+  action, `requiresConfirmation`, source) → `AssistantService.execute` through `CookingActions` (the cooking
+  controller → `ActionDispatcher`, source `agent`); result texts come from engine results. `AssistantController`
+  keeps the conversation per session; `send()` is the single entry point for text now and speech in 3D.
+- **Local commands (no AI, offline):** next/done ("הבא", "סיימתי…", "next"), back/undo ("חזרה", "תבטל"), time left
+  ("כמה זמן נשאר?"), what now, help (the step's help text and cue), pause/resume, extend by a spoken duration
+  ("תוסיף שתי דקות לאורז", "רבע שעה", "דקה וחצי"), reported real-world actions ("הכנסתי את התבנית לתנור",
+  "הדלקתי את התנור") matched to available actions and prep tasks; intentions never confirm.
+- **Confirmation policy:** see decision #56 (high-risk checks, early finish, "next" before a real-world start,
+  partial matches, long extensions and all AI proposals ask first).
+- **Engine:** `PlanPatched` event (decision #53) with dispatcher validation (`patchProblem`): steps without
+  progress and timers not started only; plan + patches on replay; `displayRecipe` in the cooking view; history
+  lists "שינויים בזמן הבישול". Patch helpers split into plan-only and recipe-only variants.
+- **Server:** `POST /v1/assistant/turn` (`schemas/assistant.py`, `services/assistant.py`, `prompts/assistant.md`,
+  `LlmAssistantTurn`), guardrails and validated proposals (extend a running timer / substitution via the 3A
+  pipeline / step change on non-completed steps), one repair call, own rate limit, mock answer, exported
+  `assistant_turn_response.schema.json`.
+- **UI:** "רמי" button in the cooking screen's app bar → sheet with conversation, quick chips (מה עכשיו? / כמה זמן
+  נשאר? / עזרה בשלב), text input and approval cards ("אישור" / "לא, תודה"). No microphone (Phase 3D).
+- **Tests (fakes only, zero Gemini calls):** backend **173/173** on Python 3.14 and 3.12 (15 new: scope redirect,
+  off-topic line, claim rewriting, proposal validation incl. substitution safety and completed steps, repair,
+  limits, endpoint token and own rate limit); Flutter **181/181**, analyzer clean (29 new: parser 7, service 15,
+  `PlanPatched` 5, Remy sheet 2).
+- **Emulator (local backend `AI_PROVIDER=mock`), 2026-10-24:** cooking the sample: Remy sheet opened from the app
+  bar; "מה עכשיו?" and "עזרה בשלב" answered from the plan; "next" finished the step through the engine; "back"
+  undid it; an English test question made exactly one `/v1/assistant/turn` call (commands made none). Test session
+  abandoned afterwards. Hebrew can't be typed through adb, so Hebrew commands were covered by automated tests.
+
+### Phase 3B — limitations
+
+- Local recognition covers common phrasings; anything else goes to Remy (online). Speech-specific phrasing will be
+  tuned in 3D with real recognizer output.
+- The conversation is kept in memory per open session (not stored).
+- Remy's prompt and proposals are untested against real Gemini (needs approval; suggested ≈ 15 questions,
+  ≤ 20 calls).
+- The emulator's old sample recipe has no help texts (seeded before 3C); help falls back to the instruction.
+
 ## Next step
 
-1. User reviews 3C + 3A (commits are local only).
-2. With approval: small live checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 / ≤ 10 calls),
-   then push and deploy.
-3. Phase 3B only after approval.
+1. User reviews 3C + 3A + 3B (commits are local only).
+2. With approval: small live checks (3C plan rules ≤ 2 recipes / ≤ 6 calls; 3A substitutions ≤ 5 / ≤ 10 calls;
+   3B Remy ≈ 15 questions / ≤ 20 calls), then push and deploy.
+3. Phase 3D (voice) only after approval.

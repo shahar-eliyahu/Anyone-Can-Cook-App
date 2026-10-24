@@ -19,26 +19,42 @@ class PatchException implements Exception {
 
 /// Applies [ops] in order. Unknown ids throw [PatchException].
 (Recipe, CookingPlan) applyPatch(Recipe recipe, CookingPlan plan, List<PatchOp> ops) {
+  final (r, p) = _apply(recipe, plan, ops);
+  return (r!, p);
+}
+
+/// The plan effects of [ops] only (mid-cooking patches inside the engine, which has no recipe).
+CookingPlan applyPatchToPlan(CookingPlan plan, List<PatchOp> ops) => _apply(null, plan, ops).$2;
+
+/// The recipe effects of [ops] only (names and amounts shown while cooking).
+Recipe applyPatchToRecipe(Recipe recipe, List<PatchOp> ops) {
+  const recipeOps = {'replace_ingredient', 'omit_ingredient', 'replace_equipment', 'omit_equipment'};
+  final (r, _) = _apply(recipe, const CookingPlan(steps: []), [for (final o in ops) if (recipeOps.contains(o['op'])) o]);
+  return r!;
+}
+
+(Recipe?, CookingPlan) _apply(Recipe? recipe, CookingPlan plan, List<PatchOp> ops) {
   var r = recipe;
   var p = plan;
 
   Ingredient ingredient(String id) =>
-      r.ingredients.firstWhere((i) => i.id == id, orElse: () => throw PatchException('unknown ingredient $id'));
+      r!.ingredients.firstWhere((i) => i.id == id, orElse: () => throw PatchException('unknown ingredient $id'));
   Equipment equipment(String id) =>
-      r.equipment.firstWhere((e) => e.id == id, orElse: () => throw PatchException('unknown equipment $id'));
+      r!.equipment.firstWhere((e) => e.id == id, orElse: () => throw PatchException('unknown equipment $id'));
   PlanStep step(String id) => p.stepById(id) ?? (throw PatchException('unknown step $id'));
   Quantity? quantity(Object? json) => json == null ? null : Quantity.fromJson(json as Map<String, dynamic>);
 
   void updateIngredient(Ingredient updated) =>
-      r = r.copyWith(ingredients: [for (final i in r.ingredients) i.id == updated.id ? updated : i]);
+      r = r!.copyWith(ingredients: [for (final i in r!.ingredients) i.id == updated.id ? updated : i]);
   void updateEquipment(Equipment updated) =>
-      r = r.copyWith(equipment: [for (final e in r.equipment) e.id == updated.id ? updated : e]);
+      r = r!.copyWith(equipment: [for (final e in r!.equipment) e.id == updated.id ? updated : e]);
   void updateStep(PlanStep updated) =>
       p = p.copyWith(steps: [for (final s in p.steps) s.id == updated.id ? updated : s]);
 
   for (final op in ops) {
     switch (op['op']) {
       case 'replace_ingredient':
+        if (r == null) continue;
         final i = ingredient(op['ingredient_id'] as String);
         updateIngredient(i.copyWith(
           substitutedFor: i.substitutedFor ?? i.name,
@@ -48,7 +64,7 @@ class PatchException implements Exception {
         ));
       case 'omit_ingredient':
         final id = op['ingredient_id'] as String;
-        updateIngredient(ingredient(id).copyWith(omitted: true));
+        if (r != null) updateIngredient(ingredient(id).copyWith(omitted: true));
         p = p.copyWith(steps: [
           for (final s in p.steps)
             s.copyWith(
@@ -57,17 +73,18 @@ class PatchException implements Exception {
             ),
         ]);
       case 'replace_equipment':
+        if (r == null) continue;
         final e = equipment(op['equipment_id'] as String);
         updateEquipment(e.copyWith(substitutedFor: e.substitutedFor ?? e.name, name: op['name'] as String, omitted: false));
       case 'omit_equipment':
         final id = op['equipment_id'] as String;
-        updateEquipment(equipment(id).copyWith(omitted: true));
+        if (r != null) updateEquipment(equipment(id).copyWith(omitted: true));
         p = p.copyWith(steps: [
           for (final s in p.steps) s.copyWith(equipmentIds: [for (final e in s.equipmentIds) if (e != id) e]),
         ]);
       case 'set_ingredient_use':
         final id = op['ingredient_id'] as String;
-        ingredient(id);
+        if (r != null) ingredient(id);
         final s = step(op['step_id'] as String);
         final q = quantity(op['quantity']);
         final has = s.ingredientUses.any((u) => u.ingredientId == id);

@@ -9,6 +9,7 @@ import 'dart:math' as math;
 
 import '../../../models/cooking_plan.dart';
 import '../../../models/provenance.dart';
+import '../../prepare/patch.dart';
 import 'events.dart';
 
 enum StepStatus { locked, ready, inProgress, waitingTimer, done }
@@ -249,6 +250,7 @@ class CookingState {
     this.timers = const {},
     this.proposalIds = const {},
     this.log = const [],
+    this.patches = const [],
   });
 
   final CookingPlan plan;
@@ -265,7 +267,16 @@ class CookingState {
   /// What the cook did, in order (rebuilt by replay; nothing new is stored).
   final List<TapEntry> log;
 
+  /// Approved mid-cooking changes, in order ([plan] already includes them).
+  final List<PlanPatched> patches;
+
+  /// Every patch operation applied so far (the cooking view applies the recipe-level
+  /// ones to the recipe it shows).
+  List<Map<String, dynamic>> get patchOps => [for (final p in patches) ...p.ops];
+
   CookingState copyWith({
+    CookingPlan? plan,
+    List<PlanPatched>? patches,
     DateTime? startedAt,
     Map<String, List<String>>? confirmed,
     Set<String>? prepDone,
@@ -274,7 +285,8 @@ class CookingState {
     List<TapEntry>? log,
   }) =>
       CookingState(
-        plan: plan,
+        plan: plan ?? this.plan,
+        patches: patches ?? this.patches,
         startedAt: startedAt ?? this.startedAt,
         confirmed: confirmed ?? this.confirmed,
         prepDone: prepDone ?? this.prepDone,
@@ -828,6 +840,20 @@ abstract final class CookingEngine {
           rechecked: true,
         );
         return _withTimer(s, rechecked, _schedule(rechecked));
+
+      case PlanPatched(:final ops):
+        if (s.proposalIds.contains(event.proposalId)) return ReduceResult(s);
+        final CookingPlan patched;
+        try {
+          patched = applyPatchToPlan(plan, ops);
+        } on PatchException {
+          return ReduceResult(s); // validated before it was stored; ignore if the plan differs
+        }
+        return ReduceResult(s.copyWith(
+          plan: patched,
+          patches: [...s.patches, event],
+          proposalIds: _withProposal(s.proposalIds, event.proposalId),
+        ));
 
       case TimerDismissed(:final timerId):
         final t = s.timers[timerId];

@@ -133,6 +133,19 @@ def rate_limit_ai(
             raise ApiError(429, "rate_limited", headers={"Retry-After": str(int(wait) + 1)})
 
 
+def rate_limit_assistant(
+    request: Request,
+    settings: Settings = Depends(get_settings),
+    limiter: SlidingWindowLimiter = Depends(get_limiter),
+) -> None:
+    ip = client_ip(request, settings.trusted_proxy_hops)
+    windows = ((3600, settings.assistant_rate_limit_per_hour), (86400, settings.assistant_rate_limit_per_day))
+    for window, limit in windows:
+        wait = limiter.check(f"{ip}:assistant:{window}", limit, window)
+        if wait is not None:
+            raise ApiError(429, "rate_limited", headers={"Retry-After": str(int(wait) + 1)})
+
+
 class BodySizeLimit:
     """ASGI middleware: rejects request bodies over the cap with 413, whether the size is
     declared (Content-Length) or not (chunked). At most the cap is ever held in memory."""

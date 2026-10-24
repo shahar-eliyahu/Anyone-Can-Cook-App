@@ -535,5 +535,254 @@
         "type": "String"
       }
     }
-  }
+  },
+  "remyTitle": "רמי — עוזר הבישול",
+  "remyOpen": "רמי",
+  "remyHint": "שאלו את רמי או כתבו פקודה",
+  "remyGreeting": "היי, אני רמי! אפשר לשאול אותי על הבישול, או לבקש: \"הבא\", \"חזרה\", \"כמה זמן נשאר?\", \"תוסיף 5 דקות\".",
+  "remyChipNow": "מה עכשיו?",
+  "remyChipTime": "כמה זמן נשאר?",
+  "remyChipHelp": "עזרה בשלב",
+  "remySend": "שליחה",
+  "remyApprove": "אישור",
+  "remyReject": "לא, תודה",
+  "remyRejected": "בסדר, לא שיניתי כלום.",
+  "remyThinking": "רמי חושב…",
+  "remyProposalTitle": "הצעה של רמי",
+  "remyAllDone": "כל השלבים הושלמו! אפשר לסיים את הבישול.",
+  "remyStartFirst": "קודם צריך: \"{label}\". זה כבר קרה?",
+  "@remyStartFirst": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyFinishEarly": "הטיימר \"{label}\" עוד רץ (נשארו {time}). לסיים את השלב כבר עכשיו?",
+  "@remyFinishEarly": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "remySafetyCheck": "לפני שממשיכים: {cue} בדקתם?",
+  "@remySafetyCheck": {
+    "placeholders": {
+      "cue": {
+        "type": "String"
+      }
+    }
+  },
+  "remyConfirmAction": "לסמן \"{label}\"?",
+  "@remyConfirmAction": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyConfirmActionTimer": "לסמן \"{label}\" ולהפעיל טיימר של {time}?",
+  "@remyConfirmActionTimer": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "remyConfirmExtend": "להוסיף {time} לטיימר \"{label}\"?",
+  "@remyConfirmExtend": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyNothingToUndo": "אין עדיין מה לבטל.",
+  "remyNoTimers": "אין טיימר פעיל כרגע.",
+  "remyTimerLeft": "{label}: נשארו {time}.",
+  "@remyTimerLeft": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "remyTimerDue": "{label}: הגיע הזמן לבדוק.",
+  "@remyTimerDue": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyTimerPausedLeft": "{label}: מושהה, נשארו {time}.",
+  "@remyTimerPausedLeft": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "remyWhichTimer": "לאיזה טיימר? {labels}",
+  "@remyWhichTimer": {
+    "placeholders": {
+      "labels": {
+        "type": "String"
+      }
+    }
+  },
+  "remyTooLong": "אפשר להוסיף עד שעה בכל פעם.",
+  "remyNow": "עכשיו: {title}. {instruction}",
+  "@remyNow": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      },
+      "instruction": {
+        "type": "String"
+      }
+    }
+  },
+  "remyTellMeWhen": "כשזה קורה, תגידו לי \"{label}\" ואפעיל את הטיימר.",
+  "@remyTellMeWhen": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyTellMeWhenGeneric": "כשזה קורה, תגידו לי ואסמן את זה.",
+  "remyStepDone": "✓ סיימנו: {title}.",
+  "@remyStepDone": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "remyNextStep": "עכשיו: {title}.",
+  "@remyNextStep": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "remyTimerStarted": "⏱ הטיימר \"{label}\" התחיל — לבדוק בעוד {time}.",
+  "@remyTimerStarted": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "remyMarked": "✓ סומן: {label}.",
+  "@remyMarked": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyUndone": "↩ חזרנו צעד אחד אחורה.",
+  "remyExtended": "⏱ הוספתי {added} לטיימר \"{label}\". נשארו {left}.",
+  "@remyExtended": {
+    "placeholders": {
+      "added": {
+        "type": "String"
+      },
+      "label": {
+        "type": "String"
+      },
+      "left": {
+        "type": "String"
+      }
+    }
+  },
+  "remyPausedDone": "⏸ הטיימר \"{label}\" הושהה.",
+  "@remyPausedDone": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyResumedDone": "▶ הטיימר \"{label}\" ממשיך.",
+  "@remyResumedDone": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      }
+    }
+  },
+  "remyPatched": "✓ עדכנתי את השלבים הבאים: {summary}.",
+  "@remyPatched": {
+    "placeholders": {
+      "summary": {
+        "type": "String"
+      }
+    }
+  },
+  "remyAlreadyDone": "זה כבר בוצע.",
+  "remyNotPossible": "אי אפשר לעשות את זה עכשיו.",
+  "remyChangeNotPossible": "את השינוי הזה כבר אי אפשר לעשות, כי השלב כבר התחיל.",
+  "remyOffline": "אין חיבור לאינטרנט, אז אני לא יכול לענות על שאלות כרגע. פקודות כמו \"הבא\", \"חזרה\" ו\"כמה זמן נשאר?\" עובדות גם בלי אינטרנט.",
+  "remyUnavailable": "אני לא זמין לשאלות כרגע. הבישול ממשיך כרגיל, ופקודות פשוטות עובדות.",
+  "durHour": "שעה",
+  "durHours": "{n} שעות",
+  "@durHours": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "durMinute": "דקה",
+  "durMinutes": "{n} דקות",
+  "@durMinutes": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "durSeconds": "{n} שניות",
+  "@durSeconds": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "durAnd": "{a} ו-{b}",
+  "@durAnd": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      },
+      "b": {
+        "type": "String"
+      }
+    }
+  },
+  "changesDuringCooking": "שינויים בזמן הבישול"
 }

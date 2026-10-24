@@ -31,11 +31,12 @@ app/        Flutter (Android/iOS). Riverpod, go_router, drift (SQLite), dio, flu
   lib/data/                    repositories over drift (recipes, plans, sessions, events, settings)
   lib/features/prepare/        recipe overview + checklist, substitutions (patch ops, local table)
   lib/features/import/         import, clarify, advanced editing (review screen)
+  lib/features/assistant/      Remy: command parser, AssistantService (interpret/execute), sheet
   lib/features/*/              other screens (kitchen, recipes, cooking, history, settings)
   lib/l10n/app_he.arb          ALL user-facing strings (Hebrew)
 backend/    FastAPI, stateless, deployed on Render Free (root dir backend/)
   app/services/llm/            LLMProvider interface; MockProvider (local/tests), GeminiProvider
-  app/services/                analysis, planning, substitution (+ patching), url_fetcher, ai_calls
+  app/services/                analysis, planning, substitution (+ patching), assistant, url_fetcher, ai_calls
   app/schemas/                 Pydantic Recipe/CookingPlan — SOURCE OF TRUTH for the JSON contract
   scripts/export_schemas.py    writes shared/schema/*.json
 shared/     schema/ (exported JSON Schema), fixtures/ (sample recipe + plan used by both sides)
@@ -52,6 +53,10 @@ Key invariants:
 - Substitutions are concrete patch operations (shared semantics: `backend/app/services/patching.py` ↔
   `app/lib/features/prepare/patch.dart`, checked by `shared/fixtures/patch_example.json`). The effective recipe and
   plan are always "original + accepted operations"; never edit them ad hoc (DECISIONS #49).
+- Remy (assistant) never changes state itself: replies carry an optional action that the app validates against
+  the live engine state and executes through `ActionDispatcher` (source `agent`). The confirmation policy lives in
+  `AssistantService`, not in the model. Simple commands are parsed locally (no AI). Mid-cooking changes are
+  `PlanPatched` events (steps not started only). Text and future speech share `AssistantInput` (DECISIONS #53–#57).
 - The recipe overview (`/recipes/:id`) is the entry point for drafts and saved recipes; the detailed review is
   optional "עריכה מתקדמת" (DECISIONS #52).
 - Beginner UX: one main action per step ("סיימתי — לשלב הבא"), timers start only from an explicit tap, no

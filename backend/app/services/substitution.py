@@ -126,7 +126,7 @@ def ops_from(llm: LlmSubstitution, req: SubstituteRequest) -> list:
     return ops
 
 
-def _validated(llm: LlmSubstitution, req: SubstituteRequest) -> SubstituteResponse:
+def validated_substitution(llm: LlmSubstitution, req: SubstituteRequest) -> SubstituteResponse:
     ops = ops_from(llm, req)
     if ops:
         recipe, plan = apply_ops(req.recipe, req.plan, ops)
@@ -187,7 +187,7 @@ async def suggest_substitution(
     for attempt in (1, 2):
         try:
             llm = await call_structured(parts=parts, purpose="substitute" if attempt == 1 else "substitute_repair", **kwargs)
-            return _validated(llm, req)
+            return validated_substitution(llm, req)
         except LLMInvalidOutput as e:
             problems = e.problems
         except (ValueError, ValidationError) as e:

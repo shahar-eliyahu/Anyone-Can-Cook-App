@@ -1,7 +1,10 @@
 import 'dart:async';
 
+import '../../../models/cooking_plan.dart';
+import '../../prepare/patch.dart';
 import 'cooking_engine.dart';
 import 'events.dart';
+import 'plan_validator.dart';
 
 enum DispatchStatus { applied, alreadyDone, invalid }
 
@@ -133,6 +136,24 @@ class ActionDispatcher {
         );
         if (dependentStarted) return const DispatchResult.invalid('dependent_started');
         return [for (final _ in tap) StepUndone(at: at, stepId: stepId)];
+      });
+
+  /// An approved change to steps not started yet. Refused when it touches a step that
+  /// already has progress, a timer that already started, or leaves an invalid plan.
+  Future<DispatchResult> applyPlanPatch(
+    List<Map<String, dynamic>> ops, {
+    required String summaryHe,
+    ActionSource source = ActionSource.agent,
+    String? proposalId,
+  }) =>
+      _serialized(() {
+        if (proposalId != null && _state.proposalIds.contains(proposalId)) {
+          return const DispatchResult.alreadyDone();
+        }
+        if (ops.isEmpty) return const DispatchResult.invalid('empty_patch');
+        final reason = patchProblem(_state, ops);
+        if (reason != null) return DispatchResult.invalid(reason);
+        return PlanPatched(at: now(), ops: ops, summaryHe: summaryHe, source: source, proposalId: proposalId);
       });
 
   Future<DispatchResult> completePrepTask(
@@ -269,4 +290,26 @@ class ActionDispatcher {
     });
     return completer.future;
   }
+}
+
+/// Why [ops] can't be applied to the live session, or null when they can: only steps
+/// without progress and timers that haven't started may change (decision #53).
+String? patchProblem(CookingState state, List<Map<String, dynamic>> ops) {
+  for (final op in ops) {
+    final stepId = op['step_id'] as String?;
+    if (stepId != null) {
+      final step = state.plan.stepById(stepId);
+      if (step == null) return 'unknown_step';
+      if (state.confirmedIn(stepId).isNotEmpty || state.isStepDone(step)) return 'step_started';
+    }
+    final timerId = op['timer_id'] as String?;
+    if (timerId != null && state.timers.containsKey(timerId)) return 'timer_started';
+  }
+  final CookingPlan patched;
+  try {
+    patched = applyPatchToPlan(state.plan, ops);
+  } on PatchException {
+    return 'invalid_patch';
+  }
+  return validatePlan(patched).isEmpty ? null : 'invalid_plan';
 }
