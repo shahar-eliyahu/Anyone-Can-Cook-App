@@ -1,0 +1,159 @@
+{
+  "is_recipe": true,
+  "title": "עוף בתנור עם תפוחי אדמה ואורז",
+  "description": "מתכון לדוגמה: עוף ותפוחי אדמה בתבנית אחת, ואורז לבן לצד.",
+  "servings_amount": 4,
+  "servings_unit": "מנות",
+  "servings_stated": true,
+  "ingredients": [
+    {
+      "id": "i1",
+      "name": "כרעי עוף",
+      "quantity": {
+        "amount": 1,
+        "unit": "ק\"ג",
+        "display": "1 ק\"ג",
+        "stated_in_source": true
+      }
+    },
+    {
+      "id": "i2",
+      "name": "תפוחי אדמה בינוניים",
+      "quantity": {
+        "amount": 4,
+        "unit": null,
+        "display": "4",
+        "stated_in_source": true
+      }
+    },
+    {
+      "id": "i3",
+      "name": "שמן זית",
+      "quantity": {
+        "amount": 3,
+        "unit": "כפות",
+        "display": "3 כפות",
+        "stated_in_source": true
+      }
+    },
+    {
+      "id": "i4",
+      "name": "פפריקה מתוקה",
+      "quantity": {
+        "amount": 1,
+        "unit": "כף",
+        "display": "1 כף",
+        "stated_in_source": true
+      }
+    },
+    {
+      "id": "i5",
+      "name": "מלח",
+      "quantity": {
+        "amount": 1.5,
+        "unit": "כפיות",
+        "display": "1½ כפיות",
+        "stated_in_source": true
+      }
+    },
+    {
+      "id": "i6",
+      "name": "פלפל שחור",
+      "quantity": {
+        "amount": null,
+        "unit": null,
+        "display": "לפי הטעם",
+        "stated_in_source": true
+      }
+    },
+    {
+      "id": "i7",
+      "name": "אורז לבן",
+      "quantity": {
+        "amount": 1.5,
+        "unit": "כוסות",
+        "display": "1½ כוסות",
+        "stated_in_source": true
+      }
+    },
+    {
+      "id": "i8",
+      "name": "מים לאורז",
+      "quantity": {
+        "amount": 2.25,
+        "unit": "כוסות",
+        "display": "2¼ כוסות",
+        "stated_in_source": true
+      }
+    }
+  ],
+  "equipment": [
+    {
+      "id": "e1",
+      "name": "תבנית אפייה גדולה",
+      "stated_in_source": true
+    },
+    {
+      "id": "e2",
+      "name": "סיר בינוני עם מכסה",
+      "stated_in_source": true
+    },
+    {
+      "id": "e3",
+      "name": "סכין וקרש חיתוך",
+      "stated_in_source": false
+    },
+    {
+      "id": "e4",
+      "name": "קערה גדולה",
+      "stated_in_source": false
+    }
+  ],
+  "source_steps": [
+    {
+      "id": "src1",
+      "text": "מחממים תנור ל-200 מעלות."
+    },
+    {
+      "id": "src2",
+      "text": "חותכים את תפוחי האדמה לקוביות, מערבבים עם שמן, מלח ופפריקה ומסדרים בתבנית."
+    },
+    {
+      "id": "src3",
+      "text": "מתבלים את העוף בשמן, מלח, פפריקה ופלפל ומניחים מעל תפוחי האדמה."
+    },
+    {
+      "id": "src4",
+      "text": "אופים 45 דקות עד שהעוף שחום ועשוי."
+    },
+    {
+      "id": "src5",
+      "text": "בינתיים מבשלים את האורז: מביאים את המים לרתיחה, מוסיפים את האורז וקורט מלח, מכסים ומבשלים על אש קטנה."
+    },
+    {
+      "id": "src6",
+      "text": "מגישים חם."
+    }
+  ],
+  "transcription": "",
+  "gaps": [
+    {
+      "id": "g1",
+      "field": "rice_cook_time",
+      "category": "outcome",
+      "description_he": "המתכון לא ציין כמה זמן לבשל את האורז.",
+      "estimate_display": "כ-18 דקות",
+      "confidence": "high"
+    },
+    {
+      "id": "g2",
+      "field": "chicken_doneness",
+      "category": "safety",
+      "safety_food": "poultry",
+      "description_he": "יש לוודא שהעוף עשוי לפני ההגשה."
+    }
+  ],
+  "assumptions_he": [
+    "הנחנו תנור רגיל ולא טורבו."
+  ]
+}

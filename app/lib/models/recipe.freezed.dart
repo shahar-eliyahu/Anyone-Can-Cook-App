@@ -16,7 +16,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Quantity {
 
- double? get amount; double? get amountMax; String? get unit; String get display; Provenance get provenance;
+ double? get amount; double? get amountMax; String? get unit; String get display; Provenance get provenance; Confidence? get confidence; List<String> get sourceIds; String? get noteHe;
 /// Create a copy of Quantity
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -30,20 +30,20 @@ $QuantityCopyWith<Quantity> get copyWith => _$QuantityCopyWithImpl<Quantity>(thi
 @override
 bool operator ==(Object other) {
   final _this = this as Quantity;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Quantity&&(identical(other.amount, _this.amount) || other.amount == _this.amount)&&(identical(other.amountMax, _this.amountMax) || other.amountMax == _this.amountMax)&&(identical(other.unit, _this.unit) || other.unit == _this.unit)&&(identical(other.display, _this.display) || other.display == _this.display)&&(identical(other.provenance, _this.provenance) || other.provenance == _this.provenance));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Quantity&&(identical(other.amount, _this.amount) || other.amount == _this.amount)&&(identical(other.amountMax, _this.amountMax) || other.amountMax == _this.amountMax)&&(identical(other.unit, _this.unit) || other.unit == _this.unit)&&(identical(other.display, _this.display) || other.display == _this.display)&&(identical(other.provenance, _this.provenance) || other.provenance == _this.provenance)&&(identical(other.confidence, _this.confidence) || other.confidence == _this.confidence)&&const DeepCollectionEquality().equals(other.sourceIds, _this.sourceIds)&&(identical(other.noteHe, _this.noteHe) || other.noteHe == _this.noteHe));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
   final _this = this as Quantity;
-  return Object.hash(runtimeType,_this.amount,_this.amountMax,_this.unit,_this.display,_this.provenance);
+  return Object.hash(runtimeType,_this.amount,_this.amountMax,_this.unit,_this.display,_this.provenance,_this.confidence,const DeepCollectionEquality().hash(_this.sourceIds),_this.noteHe);
 }
 
 @override
 String toString() {
   final _this = this as Quantity;
-  return 'Quantity(amount: ${_this.amount}, amountMax: ${_this.amountMax}, unit: ${_this.unit}, display: ${_this.display}, provenance: ${_this.provenance})';
+  return 'Quantity(amount: ${_this.amount}, amountMax: ${_this.amountMax}, unit: ${_this.unit}, display: ${_this.display}, provenance: ${_this.provenance}, confidence: ${_this.confidence}, sourceIds: ${_this.sourceIds}, noteHe: ${_this.noteHe})';
 }
 
 
@@ -54,7 +54,7 @@ abstract mixin class $QuantityCopyWith<$Res>  {
   factory $QuantityCopyWith(Quantity value, $Res Function(Quantity) _then) = _$QuantityCopyWithImpl;
 @useResult
 $Res call({
- double? amount, double? amountMax, String? unit, String display, Provenance provenance
+ double? amount, double? amountMax, String? unit, String display, Provenance provenance, Confidence? confidence, List<String> sourceIds, String? noteHe
 });
 
 
@@ -71,14 +71,17 @@ class _$QuantityCopyWithImpl<$Res>
 
 /// Create a copy of Quantity
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? amount = freezed,Object? amountMax = freezed,Object? unit = freezed,Object? display = null,Object? provenance = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? amount = freezed,Object? amountMax = freezed,Object? unit = freezed,Object? display = null,Object? provenance = null,Object? confidence = freezed,Object? sourceIds = null,Object? noteHe = freezed,}) {
   return _then(Quantity(
 amount: freezed == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double?,amountMax: freezed == amountMax ? _self.amountMax : amountMax // ignore: cast_nullable_to_non_nullable
 as double?,unit: freezed == unit ? _self.unit : unit // ignore: cast_nullable_to_non_nullable
 as String?,display: null == display ? _self.display : display // ignore: cast_nullable_to_non_nullable
 as String,provenance: null == provenance ? _self.provenance : provenance // ignore: cast_nullable_to_non_nullable
-as Provenance,
+as Provenance,confidence: freezed == confidence ? _self.confidence : confidence // ignore: cast_nullable_to_non_nullable
+as Confidence?,sourceIds: null == sourceIds ? _self.sourceIds : sourceIds // ignore: cast_nullable_to_non_nullable
+as List<String>,noteHe: freezed == noteHe ? _self.noteHe : noteHe // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 
@@ -163,10 +166,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double? amount,  double? amountMax,  String? unit,  String display,  Provenance provenance)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( double? amount,  double? amountMax,  String? unit,  String display,  Provenance provenance,  Confidence? confidence,  List<String> sourceIds,  String? noteHe)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Quantity() when $default != null:
-return $default(_that.amount,_that.amountMax,_that.unit,_that.display,_that.provenance);case _:
+return $default(_that.amount,_that.amountMax,_that.unit,_that.display,_that.provenance,_that.confidence,_that.sourceIds,_that.noteHe);case _:
   return orElse();
 
 }
@@ -184,10 +187,10 @@ return $default(_that.amount,_that.amountMax,_that.unit,_that.display,_that.prov
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double? amount,  double? amountMax,  String? unit,  String display,  Provenance provenance)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( double? amount,  double? amountMax,  String? unit,  String display,  Provenance provenance,  Confidence? confidence,  List<String> sourceIds,  String? noteHe)  $default,) {final _that = this;
 switch (_that) {
 case _Quantity():
-return $default(_that.amount,_that.amountMax,_that.unit,_that.display,_that.provenance);case _:
+return $default(_that.amount,_that.amountMax,_that.unit,_that.display,_that.provenance,_that.confidence,_that.sourceIds,_that.noteHe);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +207,10 @@ return $default(_that.amount,_that.amountMax,_that.unit,_that.display,_that.prov
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double? amount,  double? amountMax,  String? unit,  String display,  Provenance provenance)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( double? amount,  double? amountMax,  String? unit,  String display,  Provenance provenance,  Confidence? confidence,  List<String> sourceIds,  String? noteHe)?  $default,) {final _that = this;
 switch (_that) {
 case _Quantity() when $default != null:
-return $default(_that.amount,_that.amountMax,_that.unit,_that.display,_that.provenance);case _:
+return $default(_that.amount,_that.amountMax,_that.unit,_that.display,_that.provenance,_that.confidence,_that.sourceIds,_that.noteHe);case _:
   return null;
 
 }
@@ -219,7 +222,7 @@ return $default(_that.amount,_that.amountMax,_that.unit,_that.display,_that.prov
 @JsonSerializable()
 
 class _Quantity implements Quantity {
-  const _Quantity({this.amount, this.amountMax, this.unit, required this.display, required this.provenance});
+  const _Quantity({this.amount, this.amountMax, this.unit, required this.display, required this.provenance, this.confidence,  List<String> sourceIds = const [], this.noteHe}): _sourceIds = sourceIds;
   factory _Quantity.fromJson(Map<String, dynamic> json) => _$QuantityFromJson(json);
 
 @override final  double? amount;
@@ -227,6 +230,15 @@ class _Quantity implements Quantity {
 @override final  String? unit;
 @override final  String display;
 @override final  Provenance provenance;
+@override final  Confidence? confidence;
+ final  List<String> _sourceIds;
+@override@JsonKey() List<String> get sourceIds {
+  if (_sourceIds is EqualUnmodifiableListView) return _sourceIds;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_sourceIds);
+}
+
+@override final  String? noteHe;
 
 /// Create a copy of Quantity
 /// with the given fields replaced by the non-null parameter values.
@@ -241,18 +253,18 @@ Map<String, dynamic> toJson() {
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Quantity&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.amountMax, amountMax) || other.amountMax == amountMax)&&(identical(other.unit, unit) || other.unit == unit)&&(identical(other.display, display) || other.display == display)&&(identical(other.provenance, provenance) || other.provenance == provenance));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _Quantity&&(identical(other.amount, amount) || other.amount == amount)&&(identical(other.amountMax, amountMax) || other.amountMax == amountMax)&&(identical(other.unit, unit) || other.unit == unit)&&(identical(other.display, display) || other.display == display)&&(identical(other.provenance, provenance) || other.provenance == provenance)&&(identical(other.confidence, confidence) || other.confidence == confidence)&&const DeepCollectionEquality().equals(other.sourceIds, _sourceIds)&&(identical(other.noteHe, noteHe) || other.noteHe == noteHe));
 }
 
 @JsonKey(includeFromJson: false, includeToJson: false)
 @override
 int get hashCode {
-    return Object.hash(runtimeType,amount,amountMax,unit,display,provenance);
+    return Object.hash(runtimeType,amount,amountMax,unit,display,provenance,confidence,const DeepCollectionEquality().hash(_sourceIds),noteHe);
 }
 
 @override
 String toString() {
-    return 'Quantity(amount: $amount, amountMax: $amountMax, unit: $unit, display: $display, provenance: $provenance)';
+    return 'Quantity(amount: $amount, amountMax: $amountMax, unit: $unit, display: $display, provenance: $provenance, confidence: $confidence, sourceIds: $sourceIds, noteHe: $noteHe)';
 }
 
 
@@ -263,7 +275,7 @@ abstract mixin class _$QuantityCopyWith<$Res> implements $QuantityCopyWith<$Res>
   factory _$QuantityCopyWith(_Quantity value, $Res Function(_Quantity) _then) = __$QuantityCopyWithImpl;
 @override @useResult
 $Res call({
- double? amount, double? amountMax, String? unit, String display, Provenance provenance
+ double? amount, double? amountMax, String? unit, String display, Provenance provenance, Confidence? confidence, List<String> sourceIds, String? noteHe
 });
 
 
@@ -280,14 +292,17 @@ class __$QuantityCopyWithImpl<$Res>
 
 /// Create a copy of Quantity
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? amount = freezed,Object? amountMax = freezed,Object? unit = freezed,Object? display = null,Object? provenance = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? amount = freezed,Object? amountMax = freezed,Object? unit = freezed,Object? display = null,Object? provenance = null,Object? confidence = freezed,Object? sourceIds = null,Object? noteHe = freezed,}) {
   return _then(_Quantity(
 amount: freezed == amount ? _self.amount : amount // ignore: cast_nullable_to_non_nullable
 as double?,amountMax: freezed == amountMax ? _self.amountMax : amountMax // ignore: cast_nullable_to_non_nullable
 as double?,unit: freezed == unit ? _self.unit : unit // ignore: cast_nullable_to_non_nullable
 as String?,display: null == display ? _self.display : display // ignore: cast_nullable_to_non_nullable
 as String,provenance: null == provenance ? _self.provenance : provenance // ignore: cast_nullable_to_non_nullable
-as Provenance,
+as Provenance,confidence: freezed == confidence ? _self.confidence : confidence // ignore: cast_nullable_to_non_nullable
+as Confidence?,sourceIds: null == sourceIds ? _self._sourceIds : sourceIds // ignore: cast_nullable_to_non_nullable
+as List<String>,noteHe: freezed == noteHe ? _self.noteHe : noteHe // ignore: cast_nullable_to_non_nullable
+as String?,
   ));
 }
 

@@ -41,6 +41,13 @@ sealed class CookingEvent {
           timerId: p['timer_id'] as String,
           seconds: p['seconds'] as int,
         ),
+      'TimerShortened' => TimerShortened(
+          at: utc,
+          timerId: p['timer_id'] as String,
+          seconds: p['seconds'] as int,
+        ),
+      'TimerRechecked' =>
+        TimerRechecked(at: utc, timerId: p['timer_id'] as String),
       'TimerDismissed' =>
         TimerDismissed(at: utc, timerId: p['timer_id'] as String),
       _ => throw FormatException('Unknown cooking event type: $type'),
@@ -153,6 +160,30 @@ class TimerExtended extends CookingEvent {
   String get type => 'TimerExtended';
   @override
   Map<String, Object?> toPayload() => {'timer_id': timerId, 'seconds': seconds};
+}
+
+class TimerShortened extends CookingEvent {
+  const TimerShortened({
+    required DateTime at,
+    required this.timerId,
+    required this.seconds,
+  }) : super(at);
+  final String timerId;
+  final int seconds;
+  @override
+  String get type => 'TimerShortened';
+  @override
+  Map<String, Object?> toPayload() => {'timer_id': timerId, 'seconds': seconds};
+}
+
+/// "Not ready — check again": the next check replaces the range end.
+class TimerRechecked extends CookingEvent {
+  const TimerRechecked({required DateTime at, required this.timerId}) : super(at);
+  final String timerId;
+  @override
+  String get type => 'TimerRechecked';
+  @override
+  Map<String, Object?> toPayload() => {'timer_id': timerId};
 }
 
 class TimerDismissed extends CookingEvent {

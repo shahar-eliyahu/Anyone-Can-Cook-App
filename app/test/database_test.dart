@@ -20,7 +20,7 @@ void main() {
       );
 
   test('schema v1 creates all tables', () async {
-    expect(db.schemaVersion, 1);
+    expect(db.schemaVersion, 2); // v2 (Phase 2): recipes.status, recipes.content_hash
     final names = db.allTables.map((t) => t.actualTableName).toSet();
     expect(names, {
       'recipes',

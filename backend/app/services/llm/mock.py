@@ -1,7 +1,9 @@
 """Offline provider that returns canned data. Used until a real API key is configured."""
 
 import asyncio
+import json
 from collections.abc import AsyncIterator
+from pathlib import Path
 from typing import Any
 
 from pydantic import BaseModel
@@ -9,6 +11,18 @@ from pydantic import BaseModel
 from app.services.llm.base import ImagePart, LLMError, Msg, T, TextPart
 
 MOCK_CHAT_ANSWER = "זוהי תשובת דמו מהשרת המקומי. חיבור ל-AI אמיתי יתווסף בהמשך."
+
+_MOCK_DATA = Path(__file__).parent / "mock_data"
+
+
+def sample_fixtures() -> dict[type[BaseModel], dict[str, Any]]:
+    """Canned analysis and plan (the sample chicken recipe) for local development."""
+    from app.schemas.llm import LlmAnalysis, LlmPlan
+
+    def load(name: str) -> dict[str, Any]:
+        return json.loads((_MOCK_DATA / name).read_text(encoding="utf-8"))
+
+    return {LlmAnalysis: load("sample_analysis.json"), LlmPlan: load("sample_plan.json")}
 
 
 class MockProvider:

@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../models/plan_response.dart';
+import '../models/recipe_analysis.dart';
 import 'config.dart';
 
 class HealthStatus {
@@ -23,16 +28,32 @@ class HealthStatus {
   bool get isOk => status == 'ok';
 }
 
+/// A backend error, or `offline` / `timeout` when the server could not be reached.
+class ApiFailure implements Exception {
+  const ApiFailure(this.code, {this.retryAfterSeconds});
+
+  final String code;
+  final int? retryAfterSeconds;
+
+  @override
+  String toString() => 'ApiFailure($code)';
+}
+
 class ApiClient {
-  ApiClient(String baseUrl)
+  ApiClient(String baseUrl, {String appToken = '', HttpClientAdapter? adapter})
       : _dio = Dio(
           BaseOptions(
             baseUrl: baseUrl,
-            // Render Free can take up to ~1 minute to wake from sleep.
+            // Render Free can take up to ~1 minute to wake from sleep, and an
+            // analysis is one or two AI calls.
             connectTimeout: const Duration(seconds: 30),
-            receiveTimeout: const Duration(seconds: 90),
+            receiveTimeout: const Duration(seconds: 120),
+            sendTimeout: const Duration(seconds: 60),
+            headers: {if (appToken.isNotEmpty) 'X-App-Token': appToken},
           ),
-        );
+        ) {
+    if (adapter != null) _dio.httpClientAdapter = adapter;
+  }
 
   final Dio _dio;
 
@@ -40,6 +61,51 @@ class ApiClient {
     final response = await _dio.get<Map<String, dynamic>>('/health');
     return HealthStatus.fromJson(response.data!);
   }
+
+  Future<RecipeAnalysis> analyzeText(String text) =>
+      _analysis('/v1/recipes/analyze', {'type': 'text', 'content': text});
+
+  Future<RecipeAnalysis> analyzeUrl(String url) =>
+      _analysis('/v1/recipes/analyze', {'type': 'url', 'content': url});
+
+  Future<RecipeAnalysis> analyzeImage(Uint8List jpeg) =>
+      _analysis('/v1/recipes/analyze-image', {'image_base64': base64Encode(jpeg)});
+
+  Future<PlanResponse> plan(RecipeAnalysis analysis) async {
+    final data = await _post('/v1/recipes/plan', {'analysis': analysis.toJson()});
+    return PlanResponse.fromJson(data);
+  }
+
+  Future<RecipeAnalysis> _analysis(String path, Map<String, Object?> body) async =>
+      RecipeAnalysis.fromJson(await _post(path, body));
+
+  Future<Map<String, dynamic>> _post(String path, Map<String, Object?> body) async {
+    try {
+      final response = await _dio.post<Map<String, dynamic>>(path, data: jsonEncode(body),
+          options: Options(contentType: Headers.jsonContentType));
+      return response.data!;
+    } on DioException catch (e) {
+      throw _failure(e);
+    }
+  }
+
+  static ApiFailure _failure(DioException e) {
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+      case DioExceptionType.sendTimeout:
+      case DioExceptionType.receiveTimeout:
+        return const ApiFailure('timeout');
+      case DioExceptionType.connectionError:
+        return const ApiFailure('offline');
+      default:
+        final data = e.response?.data;
+        final code = data is Map && data['error_code'] is String ? data['error_code'] as String : 'server_error';
+        final retry = int.tryParse(e.response?.headers.value('retry-after') ?? '');
+        return ApiFailure(code, retryAfterSeconds: retry);
+    }
+  }
 }
 
-final apiClientProvider = Provider<ApiClient>((ref) => ApiClient(apiBaseUrl));
+final apiClientProvider = Provider<ApiClient>(
+  (ref) => ApiClient(apiBaseUrl, appToken: appClientToken),
+);

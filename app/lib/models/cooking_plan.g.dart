@@ -12,6 +12,27 @@ _PlanTimer _$PlanTimerFromJson(Map<String, dynamic> json) => _PlanTimer(
   seconds: (json['seconds'] as num).toInt(),
   provenance: $enumDecode(_$ProvenanceEnumMap, json['provenance']),
   noteHe: json['note_he'] as String?,
+  confidence: $enumDecodeNullable(_$ConfidenceEnumMap, json['confidence']),
+  sourceIds:
+      (json['source_ids'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  waitKind: $enumDecodeNullable(_$WaitKindEnumMap, json['wait_kind']),
+  maxSeconds: (json['max_seconds'] as num?)?.toInt(),
+  waitInfoHe: json['wait_info_he'] as String?,
+  checkCueHe: json['check_cue_he'] as String?,
+  suggestDuring:
+      (json['suggest_during'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  meanwhileTipsHe:
+      (json['meanwhile_tips_he'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  recheckSeconds: (json['recheck_seconds'] as num?)?.toInt(),
 );
 
 Map<String, dynamic> _$PlanTimerToJson(_PlanTimer instance) =>
@@ -21,6 +42,15 @@ Map<String, dynamic> _$PlanTimerToJson(_PlanTimer instance) =>
       'seconds': instance.seconds,
       'provenance': _$ProvenanceEnumMap[instance.provenance]!,
       'note_he': instance.noteHe,
+      'confidence': _$ConfidenceEnumMap[instance.confidence],
+      'source_ids': instance.sourceIds,
+      'wait_kind': _$WaitKindEnumMap[instance.waitKind],
+      'max_seconds': instance.maxSeconds,
+      'wait_info_he': instance.waitInfoHe,
+      'check_cue_he': instance.checkCueHe,
+      'suggest_during': instance.suggestDuring,
+      'meanwhile_tips_he': instance.meanwhileTipsHe,
+      'recheck_seconds': instance.recheckSeconds,
     };
 
 const _$ProvenanceEnumMap = {
@@ -28,6 +58,25 @@ const _$ProvenanceEnumMap = {
   Provenance.inferred: 'inferred',
   Provenance.answered: 'answered',
   Provenance.user: 'user',
+  Provenance.reference: 'reference',
+};
+
+const _$ConfidenceEnumMap = {
+  Confidence.high: 'high',
+  Confidence.medium: 'medium',
+  Confidence.low: 'low',
+};
+
+const _$WaitKindEnumMap = {
+  WaitKind.cook: 'cook',
+  WaitKind.bake: 'bake',
+  WaitKind.rest: 'rest',
+  WaitKind.chill: 'chill',
+  WaitKind.freeze: 'freeze',
+  WaitKind.proof: 'proof',
+  WaitKind.soak: 'soak',
+  WaitKind.marinate: 'marinate',
+  WaitKind.other: 'other',
 };
 
 _StepAction _$StepActionFromJson(Map<String, dynamic> json) => _StepAction(
@@ -70,6 +119,12 @@ _Temperature _$TemperatureFromJson(Map<String, dynamic> json) => _Temperature(
       $enumDecodeNullable(_$TemperatureUnitEnumMap, json['unit']) ??
       TemperatureUnit.celsius,
   provenance: $enumDecode(_$ProvenanceEnumMap, json['provenance']),
+  confidence: $enumDecodeNullable(_$ConfidenceEnumMap, json['confidence']),
+  sourceIds:
+      (json['source_ids'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
 );
 
 Map<String, dynamic> _$TemperatureToJson(_Temperature instance) =>
@@ -77,6 +132,8 @@ Map<String, dynamic> _$TemperatureToJson(_Temperature instance) =>
       'value': instance.value,
       'unit': _$TemperatureUnitEnumMap[instance.unit]!,
       'provenance': _$ProvenanceEnumMap[instance.provenance]!,
+      'confidence': _$ConfidenceEnumMap[instance.confidence],
+      'source_ids': instance.sourceIds,
     };
 
 const _$TemperatureUnitEnumMap = {
@@ -88,13 +145,31 @@ _Minutes _$MinutesFromJson(Map<String, dynamic> json) => _Minutes(
   value: (json['value'] as num).toInt(),
   provenance: $enumDecode(_$ProvenanceEnumMap, json['provenance']),
   noteHe: json['note_he'] as String?,
+  confidence: $enumDecodeNullable(_$ConfidenceEnumMap, json['confidence']),
 );
 
 Map<String, dynamic> _$MinutesToJson(_Minutes instance) => <String, dynamic>{
   'value': instance.value,
   'provenance': _$ProvenanceEnumMap[instance.provenance]!,
   'note_he': instance.noteHe,
+  'confidence': _$ConfidenceEnumMap[instance.confidence],
 };
+
+_IngredientUse _$IngredientUseFromJson(Map<String, dynamic> json) =>
+    _IngredientUse(
+      ingredientId: json['ingredient_id'] as String,
+      quantity: json['quantity'] == null
+          ? null
+          : Quantity.fromJson(json['quantity'] as Map<String, dynamic>),
+      noteHe: json['note_he'] as String?,
+    );
+
+Map<String, dynamic> _$IngredientUseToJson(_IngredientUse instance) =>
+    <String, dynamic>{
+      'ingredient_id': instance.ingredientId,
+      'quantity': instance.quantity?.toJson(),
+      'note_he': instance.noteHe,
+    };
 
 _PlanStep _$PlanStepFromJson(Map<String, dynamic> json) => _PlanStep(
   id: json['id'] as String,
@@ -108,6 +183,11 @@ _PlanStep _$PlanStepFromJson(Map<String, dynamic> json) => _PlanStep(
   ingredientIds:
       (json['ingredient_ids'] as List<dynamic>?)
           ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  ingredientUses:
+      (json['ingredient_uses'] as List<dynamic>?)
+          ?.map((e) => IngredientUse.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
   equipmentIds:
@@ -139,6 +219,11 @@ _PlanStep _$PlanStepFromJson(Map<String, dynamic> json) => _PlanStep(
           ?.map((e) => e as String)
           .toList() ??
       const [],
+  estimatedActiveMinutes: json['estimated_active_minutes'] == null
+      ? null
+      : Minutes.fromJson(
+          json['estimated_active_minutes'] as Map<String, dynamic>,
+        ),
 );
 
 Map<String, dynamic> _$PlanStepToJson(_PlanStep instance) => <String, dynamic>{
@@ -147,6 +232,7 @@ Map<String, dynamic> _$PlanStepToJson(_PlanStep instance) => <String, dynamic>{
   'instruction_he': instance.instructionHe,
   'source_refs': instance.sourceRefs,
   'ingredient_ids': instance.ingredientIds,
+  'ingredient_uses': instance.ingredientUses.map((e) => e.toJson()).toList(),
   'equipment_ids': instance.equipmentIds,
   'depends_on': instance.dependsOn,
   'kind': _$StepKindEnumMap[instance.kind]!,
@@ -156,6 +242,7 @@ Map<String, dynamic> _$PlanStepToJson(_PlanStep instance) => <String, dynamic>{
   'temperature': instance.temperature?.toJson(),
   'doneness_cue_he': instance.donenessCueHe,
   'warnings_he': instance.warningsHe,
+  'estimated_active_minutes': instance.estimatedActiveMinutes?.toJson(),
 };
 
 const _$StepKindEnumMap = {
@@ -191,6 +278,7 @@ _PrepTask _$PrepTaskFromJson(Map<String, dynamic> json) => _PrepTask(
   confirmPolicy:
       $enumDecodeNullable(_$ConfirmPolicyEnumMap, json['confirm_policy']) ??
       ConfirmPolicy.autoOk,
+  remindBeforeNeeded: json['remind_before_needed'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$PrepTaskToJson(_PrepTask instance) => <String, dynamic>{
@@ -202,6 +290,7 @@ Map<String, dynamic> _$PrepTaskToJson(_PrepTask instance) => <String, dynamic>{
   'surface': instance.surface.toJson(),
   'timer': instance.timer?.toJson(),
   'confirm_policy': _$ConfirmPolicyEnumMap[instance.confirmPolicy]!,
+  'remind_before_needed': instance.remindBeforeNeeded,
 };
 
 const _$PrepKindEnumMap = {
@@ -222,6 +311,7 @@ _CookingPlan _$CookingPlanFromJson(Map<String, dynamic> json) => _CookingPlan(
           ?.map((e) => PrepTask.fromJson(e as Map<String, dynamic>))
           .toList() ??
       const [],
+  advanceNoticeHe: json['advance_notice_he'] as String?,
 );
 
 Map<String, dynamic> _$CookingPlanToJson(_CookingPlan instance) =>
@@ -229,4 +319,5 @@ Map<String, dynamic> _$CookingPlanToJson(_CookingPlan instance) =>
       'schema_version': instance.schemaVersion,
       'steps': instance.steps.map((e) => e.toJson()).toList(),
       'prep_tasks': instance.prepTasks.map((e) => e.toJson()).toList(),
+      'advance_notice_he': instance.advanceNoticeHe,
     };

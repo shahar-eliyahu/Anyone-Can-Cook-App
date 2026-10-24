@@ -34,6 +34,23 @@ class LLMError(Exception):
     """Raised when a provider can't produce a usable response."""
 
 
+class LLMRateLimited(LLMError):
+    """The provider refused because of quota or rate limits. Never retried."""
+
+
+class LLMUnavailable(LLMError):
+    """A temporary provider or network failure. Retried once."""
+
+
+class LLMInvalidOutput(LLMError):
+    """The response did not match the requested schema; carries it for a repair call."""
+
+    def __init__(self, raw: str, problems: str) -> None:
+        super().__init__(problems)
+        self.raw = raw
+        self.problems = problems
+
+
 class LLMProvider(Protocol):
     name: str
 

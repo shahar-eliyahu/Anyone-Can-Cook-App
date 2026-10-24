@@ -39,3 +39,16 @@ def test_mock_stream_chat_yields_text():
         return "".join([c async for c in MockProvider().stream_chat("sys", "ctx", [])])
 
     assert "דמו" in asyncio.run(collect())
+
+
+def test_guard_blocks_gemini_client_and_outside_network():
+    import socket
+
+    from google import genai
+
+    from tests.conftest import RealNetworkUsed
+
+    with pytest.raises(RealNetworkUsed):
+        genai.Client(api_key="not-a-key")
+    with pytest.raises(RealNetworkUsed):
+        socket.create_connection(("93.184.216.34", 443), timeout=1)

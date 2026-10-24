@@ -4,6 +4,9 @@ import '../features/cooking/cooking_screen.dart';
 import '../features/cooking/finish_screen.dart';
 import '../features/history/history_detail_screen.dart';
 import '../features/history/history_screen.dart';
+import '../features/import/clarify_screen.dart';
+import '../features/import/import_screen.dart';
+import '../features/import/review_screen.dart';
 import '../features/kitchen/kitchen_screen.dart';
 import '../features/recipes/plan_review_screen.dart';
 import '../features/recipes/recipe_detail_screen.dart';
@@ -26,6 +29,19 @@ GoRouter createRouter({String initialLocation = '/'}) => GoRouter(
         GoRoute(
           path: '/recipes/:id/plan',
           builder: (context, state) => PlanReviewScreen(recipeId: state.pathParameters['id']!),
+        ),
+        GoRoute(
+          path: '/recipes/:id/edit',
+          builder: (context, state) => ReviewScreen(recipeId: state.pathParameters['id']!, editing: true),
+        ),
+        GoRoute(path: '/import', builder: (context, state) => const ImportScreen()),
+        GoRoute(
+          path: '/drafts/:id/clarify',
+          builder: (context, state) => ClarifyScreen(draftId: state.pathParameters['id']!),
+        ),
+        GoRoute(
+          path: '/drafts/:id/review',
+          builder: (context, state) => ReviewScreen(recipeId: state.pathParameters['id']!),
         ),
         GoRoute(
           path: '/cook/:id',

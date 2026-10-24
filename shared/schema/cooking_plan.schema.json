@@ -1,8 +1,63 @@
 {
   "$defs": {
+    "IngredientUse": {
+      "additionalProperties": false,
+      "description": "The amount of a recipe ingredient used in one step.",
+      "properties": {
+        "ingredient_id": {
+          "title": "Ingredient Id",
+          "type": "string"
+        },
+        "note_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note He"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Quantity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "ingredient_id"
+      ],
+      "title": "IngredientUse",
+      "type": "object"
+    },
     "Minutes": {
       "additionalProperties": false,
       "properties": {
+        "confidence": {
+          "anyOf": [
+            {
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
         "note_he": {
           "anyOf": [
             {
@@ -20,7 +75,8 @@
             "original",
             "inferred",
             "answered",
-            "user"
+            "user",
+            "reference"
           ],
           "title": "Provenance",
           "type": "string"
@@ -77,6 +133,17 @@
           "title": "Equipment Ids",
           "type": "array"
         },
+        "estimated_active_minutes": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Minutes"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "id": {
           "title": "Id",
           "type": "string"
@@ -87,6 +154,14 @@
             "type": "string"
           },
           "title": "Ingredient Ids",
+          "type": "array"
+        },
+        "ingredient_uses": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/IngredientUse"
+          },
+          "title": "Ingredient Uses",
           "type": "array"
         },
         "instruction_he": {
@@ -159,6 +234,35 @@
     "PlanTimer": {
       "additionalProperties": false,
       "properties": {
+        "check_cue_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Check Cue He"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
         "id": {
           "title": "Id",
           "type": "string"
@@ -166,6 +270,29 @@
         "label_he": {
           "title": "Label He",
           "type": "string"
+        },
+        "max_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 259200,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Seconds"
+        },
+        "meanwhile_tips_he": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 3,
+          "title": "Meanwhile Tips He",
+          "type": "array"
         },
         "note_he": {
           "anyOf": [
@@ -184,16 +311,82 @@
             "original",
             "inferred",
             "answered",
-            "user"
+            "user",
+            "reference"
           ],
           "title": "Provenance",
           "type": "string"
         },
+        "recheck_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "maximum": 21600,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Recheck Seconds"
+        },
         "seconds": {
           "exclusiveMinimum": 0,
-          "maximum": 86400,
+          "maximum": 259200,
           "title": "Seconds",
           "type": "integer"
+        },
+        "source_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "suggest_during": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Suggest During",
+          "type": "array"
+        },
+        "wait_info_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Wait Info He"
+        },
+        "wait_kind": {
+          "anyOf": [
+            {
+              "enum": [
+                "cook",
+                "bake",
+                "rest",
+                "chill",
+                "freeze",
+                "proof",
+                "soak",
+                "marinate",
+                "other"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Wait Kind"
         }
       },
       "required": [
@@ -279,6 +472,11 @@
           "default": null,
           "title": "Needed By Step"
         },
+        "remind_before_needed": {
+          "default": false,
+          "title": "Remind Before Needed",
+          "type": "boolean"
+        },
         "surface": {
           "$ref": "#/$defs/PrepSurface",
           "default": {
@@ -308,6 +506,105 @@
         "text_he"
       ],
       "title": "PrepTask",
+      "type": "object"
+    },
+    "Quantity": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Amount"
+        },
+        "amount_max": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Amount Max"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "display": {
+          "title": "Display",
+          "type": "string"
+        },
+        "note_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note He"
+        },
+        "provenance": {
+          "enum": [
+            "original",
+            "inferred",
+            "answered",
+            "user",
+            "reference"
+          ],
+          "title": "Provenance",
+          "type": "string"
+        },
+        "source_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "unit": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Unit"
+        }
+      },
+      "required": [
+        "display",
+        "provenance"
+      ],
+      "title": "Quantity",
       "type": "object"
     },
     "StepAction": {
@@ -370,15 +667,41 @@
     "Temperature": {
       "additionalProperties": false,
       "properties": {
+        "confidence": {
+          "anyOf": [
+            {
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
         "provenance": {
           "enum": [
             "original",
             "inferred",
             "answered",
-            "user"
+            "user",
+            "reference"
           ],
           "title": "Provenance",
           "type": "string"
+        },
+        "source_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
         },
         "unit": {
           "default": "C",
@@ -404,6 +727,18 @@
   },
   "additionalProperties": false,
   "properties": {
+    "advance_notice_he": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Advance Notice He"
+    },
     "prep_tasks": {
       "default": [],
       "items": {

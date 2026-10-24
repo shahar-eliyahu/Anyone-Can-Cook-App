@@ -2,8 +2,10 @@
 ///
 /// State is rebuilt by replaying the session's events over the approved plan.
 /// Timer durations always come from the plan; callers never pass durations
-/// except an explicit user "+1 minute" extension.
+/// except explicit user adjustments ("+1 minute", "check again").
 library;
+
+import 'dart:math' as math;
 
 import '../../../models/cooking_plan.dart';
 import '../../../models/provenance.dart';
@@ -22,6 +24,9 @@ class TimerState {
     required this.status,
     this.endsAt,
     this.pausedRemaining,
+    this.rangeEndsAt,
+    this.pausedRangeRemaining,
+    this.rechecked = false,
     this.stepId,
     this.prepTaskId,
   });
@@ -30,11 +35,20 @@ class TimerState {
   final String labelHe;
   final Provenance provenance;
 
-  /// Plan duration plus any user extensions.
+  /// Plan duration plus any user adjustments.
   final int totalSeconds;
   final TimerStatus status;
+
+  /// When to check (the "time to check" moment).
   final DateTime? endsAt;
   final Duration? pausedRemaining;
+
+  /// End of the plan's time range (`max_seconds`), if any.
+  final DateTime? rangeEndsAt;
+  final Duration? pausedRangeRemaining;
+
+  /// "Not ready — check again" was used; the next check replaces the range end.
+  final bool rechecked;
 
   /// Owner: the step or prep task whose action started the timer.
   final String? stepId;
@@ -62,6 +76,9 @@ class TimerState {
     TimerStatus? status,
     DateTime? endsAt,
     Duration? pausedRemaining,
+    DateTime? rangeEndsAt,
+    Duration? pausedRangeRemaining,
+    bool? rechecked,
   }) =>
       TimerState(
         timerId: timerId,
@@ -71,6 +88,9 @@ class TimerState {
         status: status ?? this.status,
         endsAt: endsAt ?? this.endsAt,
         pausedRemaining: pausedRemaining ?? this.pausedRemaining,
+        rangeEndsAt: rangeEndsAt ?? this.rangeEndsAt,
+        pausedRangeRemaining: pausedRangeRemaining ?? this.pausedRangeRemaining,
+        rechecked: rechecked ?? this.rechecked,
         stepId: stepId,
         prepTaskId: prepTaskId,
       );
@@ -111,8 +131,72 @@ class PrepTaskView {
   const PrepTaskView(this.task, {required this.urgent});
   final PrepTask task;
 
-  /// The step that needs this task is already unlocked.
+  /// Needed now: the step that needs it is unlocked, or will be within the
+  /// task's lead time.
   final bool urgent;
+}
+
+enum NotificationKind { check, rangeEnd, prepReminder }
+
+/// A notification that should be scheduled for the current state.
+class PlannedNotification {
+  const PlannedNotification({
+    required this.key,
+    required this.at,
+    required this.kind,
+    required this.labelHe,
+    this.cueHe,
+    this.timerId,
+    this.prepTaskId,
+    this.leadMinutes,
+  });
+
+  /// Stable per session: the timer id, `{timer}#end`, or `prep:{task}`.
+  final String key;
+  final DateTime at;
+  final NotificationKind kind;
+  final String labelHe;
+  final String? cueHe;
+  final String? timerId;
+  final String? prepTaskId;
+  final int? leadMinutes;
+
+  @override
+  bool operator ==(Object other) =>
+      other is PlannedNotification && other.key == key && other.at == at;
+
+  @override
+  int get hashCode => Object.hash(key, at);
+}
+
+/// Guidance for one wait: what is happening, when to check, what to do meanwhile.
+class WaitGuidance {
+  const WaitGuidance({
+    required this.timer,
+    required this.planTimer,
+    required this.step,
+    required this.checkDue,
+    required this.suggestedActions,
+    required this.suggestedPrep,
+    required this.tips,
+    required this.nextSteps,
+  });
+
+  final TimerState timer;
+  final PlanTimer? planTimer;
+  final PlanStep? step;
+
+  /// The check time has been reached.
+  final bool checkDue;
+  final List<AvailableAction> suggestedActions;
+  final List<PrepTask> suggestedPrep;
+  final List<String> tips;
+
+  /// Not-yet-done steps that depend on this wait's step.
+  final List<PlanStep> nextSteps;
+
+  String? get waitInfoHe => planTimer?.waitInfoHe;
+  String? get checkCueHe => planTimer?.checkCueHe ?? step?.donenessCueHe;
 }
 
 class CookingState {
@@ -209,36 +293,85 @@ class CookingState {
     return null;
   }
 
-  /// Steps that can be done while the focus step waits on a timer.
+  /// Steps that can be done while the focus step waits on a timer: the plan's
+  /// suggestions for that wait first, then other steps marked `parallel_ok`.
   List<PlanStep> meanwhile(DateTime now) {
     final focus = focusStep(now);
     if (focus == null || statusOf(focus, now) != StepStatus.waitingTimer) {
       return const [];
     }
-    return [
-      for (final step in plan.steps)
-        if (step.id != focus.id &&
-            step.parallelOk &&
-            statusOf(step, now) != StepStatus.done &&
-            statusOf(step, now) != StepStatus.locked)
-          step,
+    bool doable(PlanStep s) =>
+        s.id != focus.id &&
+        statusOf(s, now) != StepStatus.done &&
+        statusOf(s, now) != StepStatus.locked;
+    final suggested = <String>[
+      for (final t in timers.values)
+        if (t.stepId == focus.id && t.isPending(now))
+          ...?plan.timersById[t.timerId]?.suggestDuring,
     ];
+    final result = <PlanStep>[];
+    for (final id in suggested) {
+      final s = plan.stepById(id);
+      if (s != null && doable(s) && !result.contains(s)) result.add(s);
+    }
+    for (final s in plan.steps) {
+      if (s.parallelOk && doable(s) && !result.contains(s)) result.add(s);
+    }
+    return result;
   }
 
   List<PrepTask> pendingPrepTasks() =>
       [for (final p in plan.prepTasks) if (!prepDone.contains(p.id)) p];
 
-  /// Prep tasks to show now: not done and their surface condition is met.
+  /// Pending timers whose step must finish before [stepId] can start.
+  List<TimerState> _gatingTimers(String stepId, DateTime now) {
+    final step = plan.stepById(stepId);
+    if (step == null) return const [];
+    return [
+      for (final t in timers.values)
+        if (t.stepId != null && step.dependsOn.contains(t.stepId) && t.isPending(now)) t,
+    ];
+  }
+
+  /// Time until [stepId] is expected to unlock, if it can be estimated: the
+  /// longest gating timer, or the estimated active minutes of unfinished
+  /// dependencies (only when every one of them has an estimate).
+  Duration? _timeUntilNeeded(String stepId, DateTime now) {
+    final step = plan.stepById(stepId);
+    if (step == null) return null;
+    final gating = _gatingTimers(stepId, now);
+    if (gating.isNotEmpty) {
+      return gating.map((t) => t.remaining(now)).reduce((a, b) => a > b ? a : b);
+    }
+    final open = [
+      for (final dep in step.dependsOn)
+        if (plan.stepById(dep) case final d? when !isStepDone(d)) d,
+    ];
+    if (open.isEmpty || open.any((d) => d.estimatedActiveMinutes == null)) return null;
+    final minutes = open.map((d) => d.estimatedActiveMinutes!.value).fold(0, math.max);
+    return Duration(minutes: minutes);
+  }
+
+  /// Prep tasks to show now: not done, and their surface condition is met or
+  /// they are needed now.
   List<PrepTaskView> prepTasksToShow(DateTime now) {
     bool unlocked(String? stepId) {
       final step = stepId == null ? null : plan.stepById(stepId);
       return step != null && statusOf(step, now) != StepStatus.locked;
     }
 
+    bool dueByTime(PrepTask p) {
+      final lead = p.leadMinutes?.value;
+      final needed = p.neededByStep;
+      if (lead == null || needed == null) return false;
+      final until = _timeUntilNeeded(needed, now);
+      return until != null && until <= Duration(minutes: lead);
+    }
+
     return [
       for (final p in pendingPrepTasks())
-        if (p.surface.atStart || unlocked(p.surface.withStep))
-          PrepTaskView(p, urgent: unlocked(p.neededByStep)),
+        if (p.surface.atStart || unlocked(p.surface.withStep) || dueByTime(p))
+          PrepTaskView(p, urgent: unlocked(p.neededByStep) || dueByTime(p)),
     ];
   }
 
@@ -251,6 +384,95 @@ class CookingState {
       return a.remaining(now).compareTo(b.remaining(now));
     });
     return list;
+  }
+
+  /// Guidance for each active step timer: what is happening, when to check,
+  /// what to do meanwhile (filtered by the live state) and what comes next.
+  List<WaitGuidance> waitGuidance(DateTime now) {
+    final result = <WaitGuidance>[];
+    for (final t in activeTimers(now)) {
+      final planTimer = plan.timersById[t.timerId];
+      final step = t.stepId == null ? null : plan.stepById(t.stepId!);
+      if (step == null) continue;
+      final actions = <AvailableAction>[];
+      final prep = <PrepTask>[];
+      for (final id in planTimer?.suggestDuring ?? const <String>[]) {
+        if (availableActionFor(id, now) case final a? when id != step.id) {
+          actions.add(a);
+        } else if (plan.prepTaskById(id) case final p? when !prepDone.contains(p.id)) {
+          prep.add(p);
+        }
+      }
+      result.add(WaitGuidance(
+        timer: t,
+        planTimer: planTimer,
+        step: step,
+        checkDue: t.isFinished(now),
+        suggestedActions: actions,
+        suggestedPrep: prep,
+        tips: planTimer?.meanwhileTipsHe ?? const [],
+        nextSteps: [
+          for (final s in plan.steps)
+            if (s.dependsOn.contains(step.id) && !isStepDone(s)) s,
+        ],
+      ));
+    }
+    return result;
+  }
+
+  /// Every notification that should exist for this state. At most: one check
+  /// per running timer, one end-of-range per range timer (until "check again"
+  /// is used), and one reminder per prep task. Past times are left out.
+  List<PlannedNotification> desiredNotifications(DateTime now) {
+    final result = <PlannedNotification>[];
+    for (final t in timers.values) {
+      if (t.status != TimerStatus.running) continue;
+      final planTimer = plan.timersById[t.timerId];
+      final step = t.stepId == null ? null : plan.stepById(t.stepId!);
+      final cue = planTimer?.checkCueHe ?? step?.donenessCueHe;
+      if (t.endsAt!.isAfter(now)) {
+        result.add(PlannedNotification(
+          key: t.timerId,
+          at: t.endsAt!,
+          kind: NotificationKind.check,
+          labelHe: t.labelHe,
+          cueHe: cue,
+          timerId: t.timerId,
+          prepTaskId: t.prepTaskId,
+        ));
+      }
+      final rangeEnd = t.rangeEndsAt;
+      if (!t.rechecked && rangeEnd != null && rangeEnd.isAfter(t.endsAt!) && rangeEnd.isAfter(now)) {
+        result.add(PlannedNotification(
+          key: '${t.timerId}#end',
+          at: rangeEnd,
+          kind: NotificationKind.rangeEnd,
+          labelHe: t.labelHe,
+          cueHe: cue,
+          timerId: t.timerId,
+        ));
+      }
+    }
+    for (final p in pendingPrepTasks()) {
+      final lead = p.leadMinutes?.value;
+      final needed = p.neededByStep;
+      if (!p.remindBeforeNeeded || lead == null || needed == null) continue;
+      final gating = _gatingTimers(needed, now).where((t) => t.status == TimerStatus.running);
+      if (gating.isEmpty) continue;
+      final gateEnd = gating.map((t) => t.endsAt!).reduce((a, b) => a.isAfter(b) ? a : b);
+      final at = gateEnd.subtract(Duration(minutes: lead));
+      if (at.isAfter(now)) {
+        result.add(PlannedNotification(
+          key: 'prep:${p.id}',
+          at: at,
+          kind: NotificationKind.prepReminder,
+          labelHe: p.textHe,
+          prepTaskId: p.id,
+          leadMinutes: lead,
+        ));
+      }
+    }
+    return result;
   }
 
   int get doneStepCount => plan.steps.where(isStepDone).length;
@@ -291,7 +513,7 @@ class CookingState {
           {
             'id': t.timerId,
             'label_he': t.labelHe,
-            'status': t.isFinished(now) ? 'finished' : t.status.name,
+            'status': t.isFinished(now) ? 'check_due' : t.status.name,
             'remaining_seconds': t.remaining(now).inSeconds,
           },
       ],
@@ -408,9 +630,15 @@ abstract final class CookingEngine {
         if (t == null || t.status != TimerStatus.running || t.isFinished(at)) {
           return ReduceResult(s);
         }
+        final rangeEnd = t.rangeEndsAt;
         return _withTimer(
           s,
-          t.copyWith(status: TimerStatus.paused, pausedRemaining: t.remaining(at)),
+          t.copyWith(
+            status: TimerStatus.paused,
+            pausedRemaining: t.remaining(at),
+            pausedRangeRemaining:
+                rangeEnd != null && rangeEnd.isAfter(at) ? rangeEnd.difference(at) : null,
+          ),
           CancelTimerNotification(timerId),
         );
 
@@ -420,6 +648,7 @@ abstract final class CookingEngine {
         final resumed = t.copyWith(
           status: TimerStatus.running,
           endsAt: at.add(t.pausedRemaining!),
+          rangeEndsAt: t.pausedRangeRemaining == null ? null : at.add(t.pausedRangeRemaining!),
         );
         return _withTimer(s, resumed, _schedule(resumed));
 
@@ -433,15 +662,66 @@ abstract final class CookingEngine {
             t.copyWith(
               totalSeconds: t.totalSeconds + seconds,
               pausedRemaining: t.pausedRemaining! + extra,
+              pausedRangeRemaining: t.pausedRangeRemaining == null ? null : t.pausedRangeRemaining! + extra,
             ),
           );
         }
-        final base = t.isFinished(at) ? at : t.endsAt!;
+        final finished = t.isFinished(at);
+        final newEnd = (finished ? at : t.endsAt!).add(extra);
+        final range = t.rangeEndsAt;
         final extended = t.copyWith(
           totalSeconds: t.totalSeconds + seconds,
-          endsAt: base.add(extra),
+          endsAt: newEnd,
+          // The range keeps its width when extended early; it never ends before the check.
+          rangeEndsAt: range == null
+              ? null
+              : finished
+                  ? (range.isAfter(newEnd) ? range : newEnd)
+                  : range.add(extra),
         );
         return _withTimer(s, extended, _schedule(extended));
+
+      case TimerShortened(:final at, :final timerId, :final seconds):
+        final t = s.timers[timerId];
+        if (t == null || !t.isActive || seconds <= 0) return ReduceResult(s);
+        final less = Duration(seconds: seconds);
+        if (t.status == TimerStatus.paused) {
+          final left = t.pausedRemaining! - less;
+          final pausedLeft = left.isNegative ? Duration.zero : left;
+          final rangeLeft = t.pausedRangeRemaining == null ? null : t.pausedRangeRemaining! - less;
+          return _withTimer(
+            s,
+            t.copyWith(
+              totalSeconds: math.max(1, t.totalSeconds - seconds),
+              pausedRemaining: pausedLeft,
+              pausedRangeRemaining: rangeLeft == null || rangeLeft < pausedLeft ? null : rangeLeft,
+            ),
+          );
+        }
+        if (t.isFinished(at)) return ReduceResult(s);
+        final candidate = t.endsAt!.subtract(less);
+        final newEnd = candidate.isBefore(at) ? at : candidate;
+        final range = t.rangeEndsAt?.subtract(less);
+        final shortened = t.copyWith(
+          totalSeconds: math.max(1, t.totalSeconds - seconds),
+          endsAt: newEnd,
+          rangeEndsAt: range == null || !range.isAfter(newEnd) ? newEnd : range,
+        );
+        return _withTimer(s, shortened, _schedule(shortened));
+
+      case TimerRechecked(:final at, :final timerId):
+        final t = s.timers[timerId];
+        if (t == null || !t.isFinished(at)) return ReduceResult(s);
+        final planTimer = plan.timersById[timerId];
+        var next = at.add(Duration(seconds: planTimer?.recheckSeconds ?? defaultRecheckSeconds));
+        final range = t.rangeEndsAt;
+        if (range != null && range.isAfter(at) && range.isBefore(next)) next = range;
+        final rechecked = t.copyWith(
+          totalSeconds: t.totalSeconds + next.difference(t.endsAt!).inSeconds,
+          endsAt: next,
+          rechecked: true,
+        );
+        return _withTimer(s, rechecked, _schedule(rechecked));
 
       case TimerDismissed(:final timerId):
         final t = s.timers[timerId];
@@ -453,6 +733,9 @@ abstract final class CookingEngine {
         );
     }
   }
+
+  /// Used when the plan gives no `recheck_seconds`.
+  static const defaultRecheckSeconds = 300;
 
   static TimerState _start(
     PlanTimer t,
@@ -467,6 +750,7 @@ abstract final class CookingEngine {
         totalSeconds: t.seconds,
         status: TimerStatus.running,
         endsAt: at.add(Duration(seconds: t.seconds)),
+        rangeEndsAt: t.maxSeconds == null ? null : at.add(Duration(seconds: t.maxSeconds!)),
         stepId: stepId,
         prepTaskId: prepTaskId,
       );

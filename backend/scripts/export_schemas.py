@@ -6,10 +6,14 @@ Run from backend/:  .venv/Scripts/python -m scripts.export_schemas
 import json
 from pathlib import Path
 
-from app.schemas import CookingPlan, Recipe
+from app.schemas import CookingPlan, Recipe, RecipeAnalysis
 
 SCHEMA_DIR = Path(__file__).resolve().parents[2] / "shared" / "schema"
-SCHEMAS = {"recipe.schema.json": Recipe, "cooking_plan.schema.json": CookingPlan}
+SCHEMAS = {
+    "recipe.schema.json": Recipe,
+    "cooking_plan.schema.json": CookingPlan,
+    "recipe_analysis.schema.json": RecipeAnalysis,
+}
 
 
 def render(model) -> str:

@@ -74,7 +74,15 @@
           { "id": "a2", "type": "out_of_oven", "label_he": "הוצאתי מהתנור", "completes_step": true, "confirm_policy": "always_ask" }
         ],
         "timers": [
-          { "id": "t1", "label_he": "עוף בתנור", "seconds": 2700, "provenance": "original" }
+          {
+            "id": "t1", "label_he": "עוף בתנור", "seconds": 2700, "provenance": "original",
+            "wait_kind": "bake",
+            "wait_info_he": "העוף ותפוחי האדמה נצלים בתנור ומשחימים.",
+            "check_cue_he": "העוף שחום, ובחיתוך ליד העצם הנוזלים שקופים ולא ורודים.",
+            "suggest_during": ["s4", "p2"],
+            "meanwhile_tips_he": ["שטפו את הקערה ואת קרש החיתוך"],
+            "recheck_seconds": 300
+          }
         ],
         "temperature": { "value": 200, "unit": "C", "provenance": "original" },
         "doneness_cue_he": "העוף שחום, ובחיתוך ליד העצם הנוזלים שקופים ולא ורודים.",
@@ -95,7 +103,14 @@
           { "id": "a2", "type": "done", "label_he": "האורז מוכן", "completes_step": true }
         ],
         "timers": [
-          { "id": "t2", "label_he": "אורז", "seconds": 1080, "provenance": "inferred", "note_he": "המתכון לא ציין זמן בישול. זה זמן מקובל לאורז לבן." }
+          {
+            "id": "t2", "label_he": "אורז", "seconds": 1080, "provenance": "inferred", "confidence": "high",
+            "note_he": "המתכון לא ציין זמן בישול. זה זמן מקובל לאורז לבן.",
+            "wait_kind": "cook",
+            "wait_info_he": "האורז מתבשל בסיר מכוסה וסופג את המים.",
+            "check_cue_he": "המים נספגו והאורז רך.",
+            "recheck_seconds": 180
+          }
         ],
         "doneness_cue_he": "המים נספגו והאורז רך."
       },

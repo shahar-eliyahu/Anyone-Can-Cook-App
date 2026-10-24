@@ -148,12 +148,6 @@ abstract class AppLocalizations {
   /// **'אין בישול פעיל כרגע'**
   String get noActiveSession;
 
-  /// No description provided for @importComingSoon.
-  ///
-  /// In he, this message translates to:
-  /// **'ייבוא מתכונים חדשים (טקסט, תמונה וקישור) יתווסף בשלב הבא'**
-  String get importComingSoon;
-
   /// No description provided for @backendConnecting.
   ///
   /// In he, this message translates to:
@@ -592,11 +586,137 @@ abstract class AppLocalizations {
   /// **'טיימרים'**
   String get timersTitle;
 
-  /// No description provided for @timerFinished.
+  /// No description provided for @timerCheckDue.
   ///
   /// In he, this message translates to:
-  /// **'הזמן נגמר!'**
-  String get timerFinished;
+  /// **'זמן לבדוק!'**
+  String get timerCheckDue;
+
+  /// No description provided for @checkAtLabel.
+  ///
+  /// In he, this message translates to:
+  /// **'לבדוק בערך ב-{time}'**
+  String checkAtLabel(String time);
+
+  /// No description provided for @rangeUntil.
+  ///
+  /// In he, this message translates to:
+  /// **'טווח הזמן: עד {time}'**
+  String rangeUntil(String time);
+
+  /// No description provided for @recheckIn.
+  ///
+  /// In he, this message translates to:
+  /// **'עוד לא — לבדוק שוב בעוד {minutes} דק\''**
+  String recheckIn(int minutes);
+
+  /// No description provided for @removeMinute.
+  ///
+  /// In he, this message translates to:
+  /// **'− דקה'**
+  String get removeMinute;
+
+  /// No description provided for @nextStepPreview.
+  ///
+  /// In he, this message translates to:
+  /// **'אחרי זה: {title}'**
+  String nextStepPreview(String title);
+
+  /// No description provided for @tomorrowAt.
+  ///
+  /// In he, this message translates to:
+  /// **'מחר ב-{time}'**
+  String tomorrowAt(String time);
+
+  /// No description provided for @dateAt.
+  ///
+  /// In he, this message translates to:
+  /// **'{date} ב-{time}'**
+  String dateAt(String date, String time);
+
+  /// No description provided for @notifCheckTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'⏰ {label}: זמן לבדוק'**
+  String notifCheckTitle(String label);
+
+  /// No description provided for @notifCheckBody.
+  ///
+  /// In he, this message translates to:
+  /// **'בדקו: {cue}'**
+  String notifCheckBody(String cue);
+
+  /// No description provided for @notifCheckBodyDefault.
+  ///
+  /// In he, this message translates to:
+  /// **'לבשל כל אחד יכול · לחצו כדי לחזור לבישול'**
+  String get notifCheckBodyDefault;
+
+  /// No description provided for @notifPreheatBody.
+  ///
+  /// In he, this message translates to:
+  /// **'בדקו שהתנור הגיע לחום'**
+  String get notifPreheatBody;
+
+  /// No description provided for @notifRangeEndTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'⏰ {label}: סוף טווח הזמן'**
+  String notifRangeEndTitle(String label);
+
+  /// No description provided for @notifRangeEndBodyDefault.
+  ///
+  /// In he, this message translates to:
+  /// **'זה הזמן לבדוק שוב'**
+  String get notifRangeEndBodyDefault;
+
+  /// No description provided for @notifPrepTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'⏳ {task}'**
+  String notifPrepTitle(String task);
+
+  /// No description provided for @notifPrepBody.
+  ///
+  /// In he, this message translates to:
+  /// **'בעוד כ-{minutes} דקות תצטרכו את זה'**
+  String notifPrepBody(int minutes);
+
+  /// No description provided for @notifTestTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'⏰ התראת בדיקה'**
+  String get notifTestTitle;
+
+  /// No description provided for @notifTestBody.
+  ///
+  /// In he, this message translates to:
+  /// **'לבשל כל אחד יכול · ההתראות של הטיימרים עובדות'**
+  String get notifTestBody;
+
+  /// No description provided for @channelTimersName.
+  ///
+  /// In he, this message translates to:
+  /// **'טיימרים לבישול'**
+  String get channelTimersName;
+
+  /// No description provided for @channelTimersDescription.
+  ///
+  /// In he, this message translates to:
+  /// **'התראה כשהגיע הזמן לבדוק משהו שמתבשל'**
+  String get channelTimersDescription;
+
+  /// No description provided for @channelPrepName.
+  ///
+  /// In he, this message translates to:
+  /// **'תזכורות הכנה'**
+  String get channelPrepName;
+
+  /// No description provided for @channelPrepDescription.
+  ///
+  /// In he, this message translates to:
+  /// **'תזכורות שקטות להכנות לקראת השלב הבא'**
+  String get channelPrepDescription;
 
   /// No description provided for @pause.
   ///
@@ -891,6 +1011,486 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'רענון'**
   String get refresh;
+
+  /// No description provided for @importTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'ייבוא מתכון'**
+  String get importTitle;
+
+  /// No description provided for @importTabText.
+  ///
+  /// In he, this message translates to:
+  /// **'טקסט'**
+  String get importTabText;
+
+  /// No description provided for @importTabPhoto.
+  ///
+  /// In he, this message translates to:
+  /// **'תמונה'**
+  String get importTabPhoto;
+
+  /// No description provided for @importTabUrl.
+  ///
+  /// In he, this message translates to:
+  /// **'קישור'**
+  String get importTabUrl;
+
+  /// No description provided for @importTextHint.
+  ///
+  /// In he, this message translates to:
+  /// **'הדביקו או הקלידו כאן את המתכון'**
+  String get importTextHint;
+
+  /// No description provided for @importUrlHint.
+  ///
+  /// In he, this message translates to:
+  /// **'https://…'**
+  String get importUrlHint;
+
+  /// No description provided for @importTakePhoto.
+  ///
+  /// In he, this message translates to:
+  /// **'צילום'**
+  String get importTakePhoto;
+
+  /// No description provided for @importPickPhoto.
+  ///
+  /// In he, this message translates to:
+  /// **'מהגלריה'**
+  String get importPickPhoto;
+
+  /// No description provided for @importPhotoNote.
+  ///
+  /// In he, this message translates to:
+  /// **'התמונה נשמרת רק עד שתאשרו את התוכנית.'**
+  String get importPhotoNote;
+
+  /// No description provided for @importAnalyze.
+  ///
+  /// In he, this message translates to:
+  /// **'ניתוח המתכון'**
+  String get importAnalyze;
+
+  /// No description provided for @importStageReading.
+  ///
+  /// In he, this message translates to:
+  /// **'קוראים את המתכון…'**
+  String get importStageReading;
+
+  /// No description provided for @importStagePlanning.
+  ///
+  /// In he, this message translates to:
+  /// **'בונים תוכנית בישול…'**
+  String get importStagePlanning;
+
+  /// No description provided for @importStageSlow.
+  ///
+  /// In he, this message translates to:
+  /// **'זה לוקח קצת זמן — ייתכן שהשרת מתעורר.'**
+  String get importStageSlow;
+
+  /// No description provided for @importDuplicateTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'המתכון כבר יובא'**
+  String get importDuplicateTitle;
+
+  /// No description provided for @importDuplicateBody.
+  ///
+  /// In he, this message translates to:
+  /// **'כבר ייבאתם את המתכון הזה: {title}. לפתוח אותו במקום לייבא שוב?'**
+  String importDuplicateBody(String title);
+
+  /// No description provided for @importOpenExisting.
+  ///
+  /// In he, this message translates to:
+  /// **'פתיחת הקיים'**
+  String get importOpenExisting;
+
+  /// No description provided for @importAgain.
+  ///
+  /// In he, this message translates to:
+  /// **'ייבוא מחדש'**
+  String get importAgain;
+
+  /// No description provided for @importNotRecipe.
+  ///
+  /// In he, this message translates to:
+  /// **'לא זיהינו כאן מתכון.'**
+  String get importNotRecipe;
+
+  /// No description provided for @privacyTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'לפני הייבוא הראשון'**
+  String get privacyTitle;
+
+  /// No description provided for @privacyBody.
+  ///
+  /// In he, this message translates to:
+  /// **'כדי לנתח את המתכון, הטקסט, הקישור או התמונה נשלחים לשירות בינה מלאכותית (Gemini של Google). בגרסה החינמית של השירות Google עשויה להשתמש במידע לשיפור המוצרים שלה. אל תשלחו מידע אישי. התמונה נשמרת במכשיר רק עד שתאשרו את התוכנית.'**
+  String get privacyBody;
+
+  /// No description provided for @privacyAccept.
+  ///
+  /// In he, this message translates to:
+  /// **'הבנתי, להמשיך'**
+  String get privacyAccept;
+
+  /// No description provided for @draftsTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'ייבואים שלא הושלמו'**
+  String get draftsTitle;
+
+  /// No description provided for @draftResume.
+  ///
+  /// In he, this message translates to:
+  /// **'להמשיך'**
+  String get draftResume;
+
+  /// No description provided for @draftDiscard.
+  ///
+  /// In he, this message translates to:
+  /// **'מחיקה'**
+  String get draftDiscard;
+
+  /// No description provided for @clarifyTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'כמה שאלות קצרות'**
+  String get clarifyTitle;
+
+  /// No description provided for @clarifyIntro.
+  ///
+  /// In he, this message translates to:
+  /// **'חסר במתכון מידע שחשוב לתוכנית. ענו על מה שאתם יודעים.'**
+  String get clarifyIntro;
+
+  /// No description provided for @clarifyRequired.
+  ///
+  /// In he, this message translates to:
+  /// **'חשוב לבטיחות'**
+  String get clarifyRequired;
+
+  /// No description provided for @clarifyDontKnow.
+  ///
+  /// In he, this message translates to:
+  /// **'לא יודע/ת'**
+  String get clarifyDontKnow;
+
+  /// No description provided for @clarifyContinue.
+  ///
+  /// In he, this message translates to:
+  /// **'בניית התוכנית'**
+  String get clarifyContinue;
+
+  /// No description provided for @clarifyAnswerHint.
+  ///
+  /// In he, this message translates to:
+  /// **'התשובה שלכם'**
+  String get clarifyAnswerHint;
+
+  /// No description provided for @reviewTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'בדיקת התוכנית'**
+  String get reviewTitle;
+
+  /// No description provided for @reviewIntro.
+  ///
+  /// In he, this message translates to:
+  /// **'בדקו את המצרכים, הזמנים והטמפרטורות. אפשר לתקן כל ערך לפני האישור.'**
+  String get reviewIntro;
+
+  /// No description provided for @reviewEstimatesTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מה הוערך'**
+  String get reviewEstimatesTitle;
+
+  /// No description provided for @reviewNoEstimates.
+  ///
+  /// In he, this message translates to:
+  /// **'כל הערכים מופיעים במתכון המקורי.'**
+  String get reviewNoEstimates;
+
+  /// No description provided for @reviewAssumptions.
+  ///
+  /// In he, this message translates to:
+  /// **'הנחות'**
+  String get reviewAssumptions;
+
+  /// No description provided for @reviewLimitations.
+  ///
+  /// In he, this message translates to:
+  /// **'מה לא הצלחנו לקבוע בבטחה'**
+  String get reviewLimitations;
+
+  /// No description provided for @reviewWarnings.
+  ///
+  /// In he, this message translates to:
+  /// **'שימו לב'**
+  String get reviewWarnings;
+
+  /// No description provided for @reviewSources.
+  ///
+  /// In he, this message translates to:
+  /// **'מקורות'**
+  String get reviewSources;
+
+  /// No description provided for @reviewOriginalSource.
+  ///
+  /// In he, this message translates to:
+  /// **'המתכון המקורי'**
+  String get reviewOriginalSource;
+
+  /// No description provided for @reviewFromSource.
+  ///
+  /// In he, this message translates to:
+  /// **'מהמתכון המקורי: {text}'**
+  String reviewFromSource(String text);
+
+  /// No description provided for @reviewPhotoCheck.
+  ///
+  /// In he, this message translates to:
+  /// **'התוכנית נבנתה מתמונה — בדקו שהכמויות והזמנים נקראו נכון.'**
+  String get reviewPhotoCheck;
+
+  /// No description provided for @reviewSafetyCheckbox.
+  ///
+  /// In he, this message translates to:
+  /// **'בדקתי את הערכים המסומנים'**
+  String get reviewSafetyCheckbox;
+
+  /// No description provided for @reviewApprove.
+  ///
+  /// In he, this message translates to:
+  /// **'אישור התוכנית'**
+  String get reviewApprove;
+
+  /// No description provided for @reviewCancelImport.
+  ///
+  /// In he, this message translates to:
+  /// **'ביטול הייבוא'**
+  String get reviewCancelImport;
+
+  /// No description provided for @reviewSave.
+  ///
+  /// In he, this message translates to:
+  /// **'שמירת השינויים'**
+  String get reviewSave;
+
+  /// No description provided for @reviewOutdatedTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'התוכנית לא מעודכנת לשינויים במתכון'**
+  String get reviewOutdatedTitle;
+
+  /// No description provided for @reviewOutdatedBody.
+  ///
+  /// In he, this message translates to:
+  /// **'שיניתם מצרכים או הוראות. צרו את התוכנית מחדש, או אשרו שבדקתם שהיא עדיין נכונה.'**
+  String get reviewOutdatedBody;
+
+  /// No description provided for @reviewRegenerate.
+  ///
+  /// In he, this message translates to:
+  /// **'יצירת התוכנית מחדש'**
+  String get reviewRegenerate;
+
+  /// No description provided for @reviewStillCorrect.
+  ///
+  /// In he, this message translates to:
+  /// **'בדקתי — התוכנית נכונה'**
+  String get reviewStillCorrect;
+
+  /// No description provided for @provenanceInferred.
+  ///
+  /// In he, this message translates to:
+  /// **'הערכה'**
+  String get provenanceInferred;
+
+  /// No description provided for @provenanceAnswered.
+  ///
+  /// In he, this message translates to:
+  /// **'לפי תשובתך'**
+  String get provenanceAnswered;
+
+  /// No description provided for @provenanceReference.
+  ///
+  /// In he, this message translates to:
+  /// **'לפי מקור בטיחות מזון'**
+  String get provenanceReference;
+
+  /// No description provided for @provenanceUser.
+  ///
+  /// In he, this message translates to:
+  /// **'ערך שלך'**
+  String get provenanceUser;
+
+  /// No description provided for @editIngredient.
+  ///
+  /// In he, this message translates to:
+  /// **'עריכת מצרך'**
+  String get editIngredient;
+
+  /// No description provided for @editName.
+  ///
+  /// In he, this message translates to:
+  /// **'שם'**
+  String get editName;
+
+  /// No description provided for @editAmount.
+  ///
+  /// In he, this message translates to:
+  /// **'כמות (כפי שתוצג)'**
+  String get editAmount;
+
+  /// No description provided for @editStep.
+  ///
+  /// In he, this message translates to:
+  /// **'עריכת הוראה'**
+  String get editStep;
+
+  /// No description provided for @editTimer.
+  ///
+  /// In he, this message translates to:
+  /// **'עריכת זמן'**
+  String get editTimer;
+
+  /// No description provided for @editTimerMinutes.
+  ///
+  /// In he, this message translates to:
+  /// **'לבדוק אחרי (דקות)'**
+  String get editTimerMinutes;
+
+  /// No description provided for @editTimerMaxMinutes.
+  ///
+  /// In he, this message translates to:
+  /// **'סוף הטווח (דקות, לא חובה)'**
+  String get editTimerMaxMinutes;
+
+  /// No description provided for @editTemperature.
+  ///
+  /// In he, this message translates to:
+  /// **'עריכת טמפרטורה (°C)'**
+  String get editTemperature;
+
+  /// No description provided for @editRecipe.
+  ///
+  /// In he, this message translates to:
+  /// **'עריכת המתכון והתוכנית'**
+  String get editRecipe;
+
+  /// No description provided for @recipeOutdatedBanner.
+  ///
+  /// In he, this message translates to:
+  /// **'התוכנית לא מעודכנת לשינויים במתכון. ערכו אותה או צרו אותה מחדש לפני הבישול.'**
+  String get recipeOutdatedBanner;
+
+  /// No description provided for @rangeMinutes.
+  ///
+  /// In he, this message translates to:
+  /// **'{from}–{to} דק\''**
+  String rangeMinutes(int from, int to);
+
+  /// No description provided for @minutesValue.
+  ///
+  /// In he, this message translates to:
+  /// **'{minutes} דק\''**
+  String minutesValue(int minutes);
+
+  /// No description provided for @errOffline.
+  ///
+  /// In he, this message translates to:
+  /// **'אין חיבור לאינטרנט. ייבוא מתכון חדש דורש חיבור; בישול של מתכון שמור עובד גם בלי.'**
+  String get errOffline;
+
+  /// No description provided for @errTimeout.
+  ///
+  /// In he, this message translates to:
+  /// **'השרת לא הגיב בזמן. נסו שוב בעוד רגע.'**
+  String get errTimeout;
+
+  /// No description provided for @errRateLimited.
+  ///
+  /// In he, this message translates to:
+  /// **'הגעתם למגבלת הייבוא לשעה. נסו שוב מאוחר יותר.'**
+  String get errRateLimited;
+
+  /// No description provided for @errAiBusy.
+  ///
+  /// In he, this message translates to:
+  /// **'שירות הבינה המלאכותית עמוס כרגע. נסו שוב בעוד דקה.'**
+  String get errAiBusy;
+
+  /// No description provided for @errDailyLimit.
+  ///
+  /// In he, this message translates to:
+  /// **'הגענו למגבלת הייבוא היומית. נסו שוב מחר.'**
+  String get errDailyLimit;
+
+  /// No description provided for @errTooLarge.
+  ///
+  /// In he, this message translates to:
+  /// **'התוכן גדול מדי. נסו מתכון קצר יותר או תמונה קטנה יותר.'**
+  String get errTooLarge;
+
+  /// No description provided for @errUnsupportedImage.
+  ///
+  /// In he, this message translates to:
+  /// **'סוג התמונה לא נתמך. נסו תמונת JPEG או PNG.'**
+  String get errUnsupportedImage;
+
+  /// No description provided for @errInvalidUrl.
+  ///
+  /// In he, this message translates to:
+  /// **'הקישור לא תקין או לא נתמך.'**
+  String get errInvalidUrl;
+
+  /// No description provided for @errFetchFailed.
+  ///
+  /// In he, this message translates to:
+  /// **'לא הצלחנו לפתוח את הדף. נסו להדביק את טקסט המתכון במקום.'**
+  String get errFetchFailed;
+
+  /// No description provided for @errSiteBlocked.
+  ///
+  /// In he, this message translates to:
+  /// **'האתר לא מאפשר לקרוא את הדף. העתיקו את טקסט המתכון והדביקו אותו בלשונית \"טקסט\".'**
+  String get errSiteBlocked;
+
+  /// No description provided for @errNoRecipeFound.
+  ///
+  /// In he, this message translates to:
+  /// **'לא מצאנו מתכון בדף. נסו להדביק את טקסט המתכון במקום.'**
+  String get errNoRecipeFound;
+
+  /// No description provided for @errUnsafeToPlan.
+  ///
+  /// In he, this message translates to:
+  /// **'המתכון כולל שימורים ביתיים, שדורשים מתכון בדוק ומאומת. לא נבנה עבורם תוכנית על סמך הערכה.'**
+  String get errUnsafeToPlan;
+
+  /// No description provided for @errInvalidAiOutput.
+  ///
+  /// In he, this message translates to:
+  /// **'לא הצלחנו לבנות תוכנית אמינה מהמתכון הזה. נסו שוב, או נסחו את המתכון בבירור.'**
+  String get errInvalidAiOutput;
+
+  /// No description provided for @errNotConfigured.
+  ///
+  /// In he, this message translates to:
+  /// **'השרת עדיין לא מוגדר לייבוא מתכונים.'**
+  String get errNotConfigured;
+
+  /// No description provided for @errGeneric.
+  ///
+  /// In he, this message translates to:
+  /// **'משהו השתבש בייבוא. נסו שוב.'**
+  String get errGeneric;
 }
 
 class _AppLocalizationsDelegate

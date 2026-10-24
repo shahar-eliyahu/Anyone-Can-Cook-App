@@ -31,6 +31,12 @@ class Recipes extends Table with SyncColumns {
   TextColumn get analysisJson => text().nullable()();
   IntColumn get analysisSchemaVersion => integer().nullable()();
   BoolColumn get planStale => boolean().withDefault(const Constant(false))();
+
+  /// `draft` until the user approves a plan; only `ready` recipes are listed. (v2)
+  TextColumn get status => text().withDefault(const Constant('ready'))();
+
+  /// Hash of the imported source, to offer reopening instead of re-importing. (v2)
+  TextColumn get contentHash => text().nullable()();
 }
 
 /// Approved cooking plans, stored separately from the recipe and versioned.
@@ -39,7 +45,7 @@ class Plans extends Table with SyncColumns {
   TextColumn get recipeId => text().references(Recipes, #id)();
   TextColumn get planJson => text()();
   IntColumn get planSchemaVersion => integer()();
-  TextColumn get status => text()(); // approved | superseded
+  TextColumn get status => text()(); // draft | approved | superseded
   DateTimeColumn get approvedAt => dateTime().nullable()();
   TextColumn get basedOnPlanId => text().nullable()();
 }
@@ -95,13 +101,17 @@ class AppDatabase extends _$AppDatabase {
             ));
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) => m.createAll(),
         onUpgrade: (m, from, to) async {
-          // Add a step per schema version here when the schema changes.
+          if (from < 2) {
+            // Phase 2: drafts and duplicate detection. Existing recipes become 'ready'.
+            await m.addColumn(recipes, recipes.status);
+            await m.addColumn(recipes, recipes.contentHash);
+          }
         },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');

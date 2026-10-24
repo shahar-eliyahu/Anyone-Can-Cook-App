@@ -17,7 +17,8 @@
             "original",
             "inferred",
             "answered",
-            "user"
+            "user",
+            "reference"
           ],
           "title": "Provenance",
           "type": "string"
@@ -116,19 +117,57 @@
           "default": null,
           "title": "Amount Max"
         },
+        "confidence": {
+          "anyOf": [
+            {
+              "enum": [
+                "high",
+                "medium",
+                "low"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
         "display": {
           "title": "Display",
           "type": "string"
+        },
+        "note_he": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note He"
         },
         "provenance": {
           "enum": [
             "original",
             "inferred",
             "answered",
-            "user"
+            "user",
+            "reference"
           ],
           "title": "Provenance",
           "type": "string"
+        },
+        "source_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
         },
         "unit": {
           "anyOf": [
@@ -163,7 +202,8 @@
             "original",
             "inferred",
             "answered",
-            "user"
+            "user",
+            "reference"
           ],
           "title": "Provenance",
           "type": "string"

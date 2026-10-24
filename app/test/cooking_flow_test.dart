@@ -6,35 +6,7 @@ import 'package:flutter/material.dart' hide ActionDispatcher;
 import 'package:flutter_test/flutter_test.dart';
 
 import 'support/app_harness.dart';
-
-Finder button(String label) => find.widgetWithText(FilledButton, label);
-
-Future<void> tapButton(WidgetTester tester, String label) async {
-  // A SnackBar from the previous action can cover buttons near the bottom.
-  tester.state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger)).removeCurrentSnackBar();
-  await tester.pumpAndSettle();
-  await expectSeen(tester, button(label));
-  final finder = button(label).first;
-  await Scrollable.ensureVisible(tester.element(finder), alignment: 0.5);
-  await tester.pumpAndSettle();
-  await tester.tap(finder);
-  await tester.pumpAndSettle();
-}
-
-/// Expects [finder] somewhere in the screen's lazy list: scrolls to the top,
-/// then down until it is built (off-screen list items are not built).
-Future<void> expectSeen(WidgetTester tester, Finder finder) async {
-  if (finder.evaluate().isEmpty) {
-    final list = find.byType(Scrollable).first;
-    await tester.drag(list, const Offset(0, 10000));
-    await tester.pumpAndSettle();
-    for (var i = 0; i < 30 && finder.evaluate().isEmpty; i++) {
-      await tester.drag(list, const Offset(0, -300));
-      await tester.pumpAndSettle();
-    }
-  }
-  expect(finder, findsWidgets);
-}
+import 'support/ui_helpers.dart';
 
 void main() {
   testApp('complete cooking flow on the sample recipe, fully offline', (tester, h) async {
@@ -73,9 +45,9 @@ void main() {
     expect(h.notifier.scheduled.containsKey('${session.id}/t2'), isTrue);
     await expectSeen(tester, find.text('18:00'));
 
-    // Rice finishes first.
+    // Rice reaches its check time first ("time to check", never "ready").
     await h.advance(tester, const Duration(minutes: 18));
-    await expectSeen(tester, find.text('הזמן נגמר!'));
+    await expectSeen(tester, find.text('זמן לבדוק!'));
     await expectSeen(tester, find.text('27:00'));
     await tapButton(tester, 'האורז מוכן');
     expect(h.notifier.scheduled.containsKey('${session.id}/t2'), isFalse);

@@ -12,6 +12,13 @@ _Quantity _$QuantityFromJson(Map<String, dynamic> json) => _Quantity(
   unit: json['unit'] as String?,
   display: json['display'] as String,
   provenance: $enumDecode(_$ProvenanceEnumMap, json['provenance']),
+  confidence: $enumDecodeNullable(_$ConfidenceEnumMap, json['confidence']),
+  sourceIds:
+      (json['source_ids'] as List<dynamic>?)
+          ?.map((e) => e as String)
+          .toList() ??
+      const [],
+  noteHe: json['note_he'] as String?,
 );
 
 Map<String, dynamic> _$QuantityToJson(_Quantity instance) => <String, dynamic>{
@@ -20,6 +27,9 @@ Map<String, dynamic> _$QuantityToJson(_Quantity instance) => <String, dynamic>{
   'unit': instance.unit,
   'display': instance.display,
   'provenance': _$ProvenanceEnumMap[instance.provenance]!,
+  'confidence': _$ConfidenceEnumMap[instance.confidence],
+  'source_ids': instance.sourceIds,
+  'note_he': instance.noteHe,
 };
 
 const _$ProvenanceEnumMap = {
@@ -27,6 +37,13 @@ const _$ProvenanceEnumMap = {
   Provenance.inferred: 'inferred',
   Provenance.answered: 'answered',
   Provenance.user: 'user',
+  Provenance.reference: 'reference',
+};
+
+const _$ConfidenceEnumMap = {
+  Confidence.high: 'high',
+  Confidence.medium: 'medium',
+  Confidence.low: 'low',
 };
 
 _Ingredient _$IngredientFromJson(Map<String, dynamic> json) => _Ingredient(

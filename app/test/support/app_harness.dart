@@ -10,8 +10,10 @@ import 'package:anyone_can_cook/data/recipe_repository.dart';
 import 'package:anyone_can_cook/data/sample_seeder.dart';
 import 'package:anyone_can_cook/data/session_repository.dart';
 import 'package:anyone_can_cook/data/settings_repository.dart';
+import 'package:anyone_can_cook/features/import/image_store.dart';
 import 'package:anyone_can_cook/features/kitchen/backend_status.dart';
 import 'package:anyone_can_cook/features/timers/timer_notifier.dart';
+import 'package:anyone_can_cook/models/recipe_bundle.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -30,6 +32,13 @@ class AppHarness {
   final AppDatabase db;
   final FakeClock clock;
   final notifier = RecordingTimerNotifier();
+
+  /// The backend double: queue responses; every call is recorded in `api.calls`.
+  final api = FakeApi();
+  final images = FakeImageStore();
+
+  /// What the camera/gallery picker returns (null: the user cancelled).
+  String? pickedPhoto;
   final _ticks = StreamController<DateTime>.broadcast();
 
   RecipeRepository get recipes => RecipeRepository(db, clock.call);
@@ -42,6 +51,12 @@ class AppHarness {
         loadAsset: (path) async => File(path).readAsStringSync(),
       ))!;
 
+  /// Saves `shared/fixtures/<name>.json` as a recipe with its approved plan.
+  Future<String> saveFixture(String name) => recipes.saveBundle(
+        RecipeBundle.decode(File('../shared/fixtures/$name.json').readAsStringSync()),
+        sourceType: 'sample',
+      );
+
   Widget build({
     String initialLocation = '/',
     Future<HealthStatus> Function()? health,
@@ -53,6 +68,9 @@ class AppHarness {
           clockProvider.overrideWithValue(clock.call),
           tickerProvider.overrideWith((ref) => _ticks.stream),
           timerNotifierProvider.overrideWithValue(notifier),
+          apiClientProvider.overrideWithValue(api),
+          imageStoreProvider.overrideWithValue(images),
+          photoPickerProvider.overrideWithValue(({required bool camera}) async => pickedPhoto),
           healthProvider.overrideWith(
             (ref) => (health ??
                 () async => const HealthStatus(status: 'ok', version: '0.1.0', aiProvider: 'mock'))(),

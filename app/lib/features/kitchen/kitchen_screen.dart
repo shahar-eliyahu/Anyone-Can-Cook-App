@@ -6,6 +6,7 @@ import '../../core/widgets/app_scaffold.dart';
 import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
 import '../../l10n/app_localizations.dart';
+import '../import/drafts_card.dart';
 import 'backend_status.dart';
 
 /// Home screen: "המטבח שלי".
@@ -19,9 +20,7 @@ class KitchenScreen extends ConsumerWidget {
     return AppScaffold(
       title: l10n.kitchenTitle,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(SnackBar(content: Text(l10n.importComingSoon))),
+        onPressed: () => context.push('/import'),
         icon: const Icon(Icons.add),
         label: Text(l10n.newRecipe),
       ),
@@ -29,6 +28,7 @@ class KitchenScreen extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
         children: [
           const _ContinueCookingCard(),
+          const DraftsCard(),
           const SizedBox(height: 8),
           for (final (icon, label, path) in [
             (Icons.menu_book_outlined, l10n.myRecipes, '/recipes'),

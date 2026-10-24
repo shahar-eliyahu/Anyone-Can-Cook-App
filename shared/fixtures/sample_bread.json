@@ -1,0 +1,172 @@
+{
+  "recipe": {
+    "schema_version": 1,
+    "title": "לחם כפרי בתבנית",
+    "description": "מתכון לבדיקות: התפחה בטווח זמן, התפחה שנייה, אפייה וצינון.",
+    "servings": { "amount": 1, "unit": "כיכר", "provenance": "original" },
+    "ingredients": [
+      { "id": "i1", "name": "קמח לבן", "quantity": { "amount": 500, "unit": "גרם", "display": "500 גרם", "provenance": "original" } },
+      { "id": "i2", "name": "מים פושרים", "quantity": { "amount": 350, "unit": "מ\"ל", "display": "350 מ\"ל", "provenance": "original" } },
+      { "id": "i3", "name": "שמרים יבשים", "quantity": { "amount": 7, "unit": "גרם", "display": "7 גרם", "provenance": "original" } },
+      { "id": "i4", "name": "מלח", "quantity": { "amount": 10, "unit": "גרם", "display": "10 גרם", "provenance": "original" } },
+      { "id": "i5", "name": "שמן זית", "quantity": { "amount": 2, "unit": "כפות", "display": "2 כפות", "provenance": "original" } }
+    ],
+    "equipment": [
+      { "id": "e1", "name": "קערה גדולה", "provenance": "original" },
+      { "id": "e2", "name": "תבנית אינגליש קייק", "provenance": "original" },
+      { "id": "e3", "name": "רשת צינון", "provenance": "original" }
+    ],
+    "source_steps": [
+      { "id": "src1", "text": "מערבבים קמח, שמרים ומלח, מוסיפים את המים וכף שמן ולשים 10 דקות לבצק חלק." },
+      { "id": "src2", "text": "מכסים ומתפיחים עד שהבצק מכפיל את נפחו, שעה עד שעה וחצי." },
+      { "id": "src3", "text": "מעצבים, מניחים בתבנית משומנת ומתפיחים שוב 30 דקות." },
+      { "id": "src4", "text": "אופים בתנור שחומם ל-220 מעלות 35 דקות." },
+      { "id": "src5", "text": "מצננים על רשת לפחות שעה לפני שפורסים." }
+    ]
+  },
+  "plan": {
+    "schema_version": 1,
+    "advance_notice_he": "כל התהליך לוקח כ-4 שעות, רובן המתנה (התפחות וצינון).",
+    "steps": [
+      {
+        "id": "s1",
+        "title": "לישת הבצק",
+        "instruction_he": "ערבבו בקערה את הקמח, השמרים והמלח. הוסיפו את המים וכף שמן, ולושו עד שמתקבל בצק חלק.",
+        "source_refs": ["src1"],
+        "ingredient_ids": ["i1", "i2", "i3", "i4", "i5"],
+        "ingredient_uses": [
+          { "ingredient_id": "i1", "quantity": { "amount": 500, "unit": "גרם", "display": "500 גרם", "provenance": "original" } },
+          { "ingredient_id": "i2", "quantity": { "amount": 350, "unit": "מ\"ל", "display": "350 מ\"ל", "provenance": "original" } },
+          { "ingredient_id": "i3", "quantity": { "amount": 7, "unit": "גרם", "display": "7 גרם", "provenance": "original" } },
+          { "ingredient_id": "i4", "quantity": { "amount": 10, "unit": "גרם", "display": "10 גרם", "provenance": "original" } },
+          { "ingredient_id": "i5", "quantity": { "amount": 1, "unit": "כף", "display": "1 כף", "provenance": "original" } }
+        ],
+        "equipment_ids": ["e1"],
+        "kind": "active",
+        "estimated_active_minutes": { "value": 15, "provenance": "inferred", "confidence": "medium" },
+        "actions": [
+          { "id": "a1", "type": "start", "label_he": "התחלתי ללוש", "starts_timer": "t1" },
+          { "id": "a2", "type": "done", "label_he": "הבצק חלק", "completes_step": true }
+        ],
+        "timers": [
+          { "id": "t1", "label_he": "לישה", "seconds": 600, "provenance": "original", "wait_kind": "other",
+            "check_cue_he": "הבצק חלק, גמיש ולא נדבק לידיים." }
+        ]
+      },
+      {
+        "id": "s2",
+        "title": "התפחה ראשונה",
+        "instruction_he": "כסו את הקערה והניחו במקום חמים עד שהבצק מכפיל את נפחו.",
+        "source_refs": ["src2"],
+        "equipment_ids": ["e1"],
+        "depends_on": ["s1"],
+        "kind": "passive",
+        "actions": [
+          { "id": "a1", "type": "start", "label_he": "כיסיתי את הבצק", "starts_timer": "t2" },
+          { "id": "a2", "type": "done", "label_he": "הבצק תפח", "completes_step": true }
+        ],
+        "timers": [
+          {
+            "id": "t2", "label_he": "התפחה ראשונה", "seconds": 3600, "max_seconds": 5400, "provenance": "original",
+            "wait_kind": "proof",
+            "wait_info_he": "השמרים מייצרים גז והבצק תופח. במקום קר זה לוקח יותר זמן.",
+            "check_cue_he": "הבצק הכפיל את נפחו, ולחיצה קלה באצבע חוזרת לאט.",
+            "suggest_during": ["p2"],
+            "meanwhile_tips_he": ["נקו את משטח העבודה", "הכינו את רשת הצינון"],
+            "recheck_seconds": 600
+          }
+        ]
+      },
+      {
+        "id": "s3",
+        "title": "עיצוב והתפחה שנייה",
+        "instruction_he": "עצבו את הבצק לכיכר, הניחו בתבנית המשומנת והתפיחו שוב.",
+        "source_refs": ["src3"],
+        "ingredient_uses": [
+          { "ingredient_id": "i5", "quantity": { "amount": 1, "unit": "כף", "display": "1 כף", "provenance": "inferred", "note_he": "שאר השמן, לשימון התבנית." } }
+        ],
+        "equipment_ids": ["e2"],
+        "depends_on": ["s2"],
+        "kind": "passive",
+        "estimated_active_minutes": { "value": 5, "provenance": "inferred", "confidence": "medium" },
+        "actions": [
+          { "id": "a1", "type": "start", "label_he": "הנחתי בתבנית", "starts_timer": "t3" },
+          { "id": "a2", "type": "done", "label_he": "הבצק מוכן לאפייה", "completes_step": true }
+        ],
+        "timers": [
+          {
+            "id": "t3", "label_he": "התפחה שנייה", "seconds": 1800, "provenance": "original",
+            "wait_kind": "proof",
+            "wait_info_he": "הבצק תופח שוב בתבנית.",
+            "check_cue_he": "הבצק עלה מעט מעל שפת התבנית.",
+            "recheck_seconds": 300
+          }
+        ]
+      },
+      {
+        "id": "s4",
+        "title": "אפייה",
+        "instruction_he": "הכניסו את התבנית לתנור החם ואפו.",
+        "source_refs": ["src4"],
+        "equipment_ids": ["e2"],
+        "depends_on": ["s3"],
+        "kind": "passive",
+        "temperature": { "value": 220, "unit": "C", "provenance": "original" },
+        "actions": [
+          { "id": "a1", "type": "in_oven", "label_he": "הכנסתי לתנור", "starts_timer": "t4" },
+          { "id": "a2", "type": "out_of_oven", "label_he": "הוצאתי מהתנור", "completes_step": true }
+        ],
+        "timers": [
+          {
+            "id": "t4", "label_he": "לחם בתנור", "seconds": 2100, "provenance": "original",
+            "wait_kind": "bake",
+            "wait_info_he": "הלחם נאפה ומקבל קרום.",
+            "check_cue_he": "הלחם שחום, והקשה על תחתיתו נשמעת חלולה.",
+            "recheck_seconds": 300
+          }
+        ],
+        "doneness_cue_he": "הלחם שחום, והקשה על תחתיתו נשמעת חלולה."
+      },
+      {
+        "id": "s5",
+        "title": "צינון",
+        "instruction_he": "הוציאו את הלחם מהתבנית וצננו על רשת לפני שפורסים.",
+        "source_refs": ["src5"],
+        "equipment_ids": ["e3"],
+        "depends_on": ["s4"],
+        "kind": "passive",
+        "actions": [
+          { "id": "a1", "type": "start", "label_he": "העברתי לרשת", "starts_timer": "t5" },
+          { "id": "a2", "type": "done", "label_he": "פרסתי", "completes_step": true }
+        ],
+        "timers": [
+          {
+            "id": "t5", "label_he": "צינון", "seconds": 3600, "provenance": "original",
+            "wait_kind": "rest",
+            "wait_info_he": "הלחם ממשיך להתייצב מבפנים. פריסה מוקדמת תשאיר אותו דביק.",
+            "check_cue_he": "הלחם כמעט לא חם למגע."
+          }
+        ]
+      }
+    ],
+    "prep_tasks": [
+      {
+        "id": "p1",
+        "kind": "preheat_oven",
+        "text_he": "הדליקו את התנור על 220 מעלות",
+        "needed_by_step": "s4",
+        "lead_minutes": { "value": 20, "provenance": "inferred", "confidence": "high" },
+        "surface": { "with_step": "s3" },
+        "timer": { "id": "tp1", "label_he": "חימום תנור", "seconds": 1200, "provenance": "inferred" },
+        "remind_before_needed": true
+      },
+      {
+        "id": "p2",
+        "kind": "mise_en_place",
+        "text_he": "שמנו את התבנית",
+        "needed_by_step": "s3",
+        "surface": { "with_step": "s2" }
+      }
+    ]
+  }
+}

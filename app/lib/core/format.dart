@@ -1,3 +1,5 @@
+import '../l10n/app_localizations.dart';
+
 String _two(int n) => n.toString().padLeft(2, '0');
 
 /// 45:00, or 1:05:00 for an hour or more.
@@ -13,6 +15,18 @@ String formatSeconds(int seconds) => formatDuration(Duration(seconds: seconds));
 String formatDateTime(DateTime t) {
   final l = t.toLocal();
   return '${l.day}.${l.month}.${l.year} ${_two(l.hour)}:${_two(l.minute)}';
+}
+
+/// "18:40", "מחר ב-07:30", or "26.10 ב-07:30" relative to [now] (local time).
+String formatWhen(DateTime at, DateTime now, AppLocalizations l10n) {
+  final a = at.toLocal(), n = now.toLocal();
+  final days = DateTime(a.year, a.month, a.day).difference(DateTime(n.year, n.month, n.day)).inDays;
+  final time = formatTime(at);
+  return switch (days) {
+    0 => time,
+    1 => l10n.tomorrowAt(time),
+    _ => l10n.dateAt('${a.day}.${a.month}', time),
+  };
 }
 
 String formatTime(DateTime t) {

@@ -13,6 +13,9 @@ abstract class Quantity with _$Quantity {
     String? unit,
     required String display,
     required Provenance provenance,
+    Confidence? confidence,
+    @Default([]) List<String> sourceIds,
+    String? noteHe,
   }) = _Quantity;
 
   factory Quantity.fromJson(Map<String, dynamic> json) =>

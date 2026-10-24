@@ -3,7 +3,7 @@
 Frequently changing status. Permanent rules are in `CLAUDE.md`; the approved design is `docs/PLAN.md`.
 Update this file at the end of every work step.
 
-_Last updated: 2026-10-24_
+_Last updated: 2026-10-24 (Phase 2 security hardening)_
 
 ## Phase status
 
@@ -11,7 +11,7 @@ _Last updated: 2026-10-24_
 |---|---|
 | 0 — Local foundations | ✅ Complete, committed and pushed (`1196478`). Render verified: `/health` 200, `/internal/ai-check` 404. |
 | 1 — Deterministic cooking core (no AI) | ✅ Implemented, verified (automated + emulator), approved by the user, committed and pushed to `main` (see `git log`). |
-| 2 — AI recipe analysis & planning | ⏸ Not started. Needs user approval. |
+| 2 — AI recipe analysis & planning | 🔄 Implemented with mock/fake providers and verified on the emulator against a local mock backend. Not committed. Live Gemini evaluation not run (needs approval). |
 | 3 — Cooking AI Agent | ⏸ Not started. |
 | 4 — Polish & release | ⏸ Not started. |
 
@@ -36,7 +36,7 @@ _Last updated: 2026-10-24_
 
 ## Verification so far
 
-Automated (latest run): backend **17/17**, Flutter **57/57**, `flutter analyze` clean.
+Automated at the end of Phase 1: backend **17/17**, Flutter **57/57**, `flutter analyze` clean (Phase 2 numbers below).
 
 Emulator `emulator-5554` (Android 15), app built in debug, **network disabled** for the cooking flow:
 
@@ -71,7 +71,93 @@ Emulator `emulator-5554` (Android 15), app built in debug, **network disabled** 
 - The "הערכה" badge explanation is on long-press only (not discoverable); revisit in Phase 4.
 - Screen-on during cooking (wakelock) not implemented; avoided an extra package. Revisit if users need it.
 
+## Phase 2 progress
+
+- **2.0 contract + engine — done.** Additive optional fields (`ingredient_uses`, wait guidance, range timers,
+  `estimated_active_minutes`, `advance_notice_he`, `remind_before_needed`, provenance `reference`,
+  `confidence`, `source_ids`), `RecipeAnalysis` contract, bread fixture. Engine: `waitGuidance`,
+  `desiredNotifications`, `TimerShortened`, `TimerRechecked`, time-based prep urgency; the coordinator
+  synchronizes notifications after every event. Cooking screen shows wait info, check time, range end,
+  tips, next-step preview, the step's own action at check time and "עוד לא — לבדוק שוב".
+  Tests: backend 22/22, Flutter 77/77 (57 Phase 1 + 20 new).
+  **Only Phase 1 test change:** the flow test now expects "זמן לבדוק!" instead of "הזמן נגמר!" (user
+  requirement: never imply food is ready); UI test helpers moved to `test/support/ui_helpers.dart`.
+
+- **2.1–2.3 backend — done.** Error shape, `X-App-Token` deterrent, per-IP and daily limits (in memory),
+  size caps, Gemini timeout/one retry/no retry on 429, repair call, number and provenance checks, gap
+  resolution ladder, curated food-safety table (FSIS + Israeli guidance), home-preserving refusal, URL fetcher
+  with SSRF guard (JSON-LD, then trafilatura), `/v1/recipes/analyze`, `/analyze-image`, `/plan`. Backend 99/99.
+- **2.4–2.6 app — done.** Drafts (DB v2 migration), duplicate detection, import service, API client.
+  Screens: ייבוא מתכון (text / photo / link, one-time privacy notice, duplicate prompt, progress stages,
+  Hebrew errors per error code), clarify questions with "לא יודע/ת", editable review ("מה הוערך" with
+  provenance badges, ingredient / instruction / timer / temperature corrections, source excerpts, photo
+  preview, warnings and limitations, required check box, approve / cancel), drafts on the home screen,
+  "עריכת המתכון והתוכנית" for saved recipes, out-of-date plan blocks cooking (regenerate with one /plan
+  call, or "בדקתי — התוכנית נכונה"). Startup cleanup of old drafts and orphan photos. iOS camera/photo strings.
+- **2.7 security hardening before deployment — done (2026-10-24).**
+  - URL fetching: DNS rebinding fixed. The connection layer (`_PinnedBackend` in
+    `backend/app/services/url_fetcher.py`) resolves each host once, refuses the host if any answer is
+    non-public, connects to that checked IP itself (TLS still verifies the hostname), and then checks the
+    socket's real peer address. Every redirect hop is a new origin and goes through the same check.
+    Environment proxies are ignored. Also blocked now: IPv4-mapped IPv6, NAT64 (`64:ff9b::/96`), carrier-grade
+    NAT, `0.0.0.0`/`::`. A total deadline (2 × `URL_FETCH_TIMEOUT_SECONDS`) stops slow-drip pages.
+  - Request bodies: the size cap now also applies to bodies without `Content-Length` (chunked); at most the
+    cap is held in memory (pure ASGI middleware `BodySizeLimit`).
+  - Rate limiter: idle client entries are swept, so memory stays bounded.
+  - Logs and errors: unexpected exceptions return `server_error` and are logged by type only (their messages
+    can quote recipe content); AI error and plan-validation details sent to the app are generic.
+  - Test guard: `backend/tests/conftest.py` makes creating a real Gemini client, or any network connection
+    other than loopback, fail every test (with a self-test).
+  - New tests (real sockets on 127.0.0.1 only): rebinding (public answer, then internal) never connects;
+    the connection goes to the checked IP with the original `Host` header; redirects to internal and metadata
+    addresses blocked on the real stack; a peer that differs from the checked IP is refused; mixed public/
+    private answers refused; mapped/NAT64/CGNAT forms; slow drip; proxy variables ignored; chunked body over
+    the cap; limiter sweep; content-free 500. A mutation check (connecting to the hostname instead of the
+    checked IP) makes 4 of these tests fail.
+- **Tests (zero real Gemini calls):** backend **122/122** on Python 3.14 and 3.12 (Render runs 3.12.9);
+  Flutter **105/105**, `flutter analyze` clean. Earlier in Phase 2: backend 99/99; Flutter 105/105 (includes the Phase 1 tests), `flutter
+  analyze` clean. New Flutter tests: edit rules, import service, import flows (text, questions, photo, offline,
+  stale-plan block, reopen and cook with the fake API set to fail on any call).
+- **Emulator (2026-10-24, local backend `AI_PROVIDER=mock` on 127.0.0.1, no token):** existing v1 database
+  migrated to v2 with the active session kept; privacy notice shown once; text import → review with
+  estimates; timer corrected to 50 min ("ערך שלך"); approval gated by the check box; backend log: the app made
+  exactly 1 analyze + 1 plan call; with the backend stopped the saved plan reopened and cooking ran; the oven
+  step used the corrected 50:00 timer with the 74°C food-safety check; one exact alarm (window 0).
+  Found and fixed: an edited timer kept the AI's "estimated" note.
+
+## Phase 2 — needs live testing (after deploy, with approval)
+
+- Gemini accepts our structured-output schemas, `PLAN_MODEL`/`AI_MODEL` and the optional thinking level
+  (unverified until a live call). First evaluation: ≤ 5 recipes, ≤ 15 calls, stop on quota or rate-limit errors.
+- Plan quality on real Hebrew and English recipes: step grouping, labeled estimates, questions only when needed,
+  food-safety warnings.
+- URL import against real sites, over HTTPS through the pinned connection (TLS SNI/certificate with an IP
+  connection is covered by httpcore's design, not by an automated test), and how often sites block it.
+- Photo import with a real camera and a real recipe photo (the emulator run used text only).
+- Render specifics: the client IP for per-device limits comes from the rightmost `X-Forwarded-For` hop
+  (`TRUSTED_PROXY_HOPS=1`); confirm that two devices get separate limits. If Render's proxy chain differs,
+  all users may share one limit (stricter, not a bypass).
+- Cold start: the app's "server waking up" message during a real Render wake-up.
+
+## Phase 2 — remaining limitations (accepted for private testing; revisit before a public launch)
+
+- `X-App-Token` ships inside the app and can be extracted; it only deters casual use. Real per-user
+  protection needs accounts or App Check (Phase 4).
+- Rate limits and the daily AI cap live in memory: they reset when Render restarts or wakes the service.
+  The worst case is spending the free Gemini quota (requests then fail with "busy"); no money is at risk
+  while the Google project has no billing.
+- Clients behind one IP (shared Wi-Fi, mobile carrier NAT) share the per-IP limit.
+- Free Gemini tier: Google may use prompts to improve its products (the app's privacy notice says so).
+- Prompt injection inside a recipe can only produce a wrong plan, which the user reviews; it can't reach
+  secrets or server tools. Output is schema-checked, numbers are checked against the source.
+- `/docs` and `/openapi.json` are public (they list endpoints, no data). Optional to disable later.
+- Page text extraction runs on the request thread (CPU for up to 2 MB of HTML); fine at the current limits.
+- iOS not built or tested.
+
 ## Next step
 
-The user is reviewing and testing the Phase 1 app themselves. Do **not** start Phase 2 (AI recipe analysis &
-planning, `docs/PLAN.md` §7) until the user explicitly approves it. Address any issues the user reports first.
+1. User review of the hardening; approval to commit locally (no push, no deploy yet).
+2. Before any Render deploy, the user (not Claude): set `APP_CLIENT_TOKEN` and check the variables listed in
+   the hand-over; the app is then built with the same `--dart-define=APP_CLIENT_TOKEN=…`.
+3. With approval: first live evaluation (≤ 5 recipes, ≤ 15 Gemini calls, stop on quota errors), after
+   checking the model's limits and remaining usage with the user.

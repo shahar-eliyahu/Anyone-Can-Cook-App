@@ -61,7 +61,8 @@ class CookingController extends AsyncNotifier<CookingView> {
     _dispatcher = ActionDispatcher(
       state: state,
       store: sessions.eventStoreFor(sessionId),
-      onEffects: (effects) => coordinator.apply(sessionId, effects),
+      // Notifications are derived from the new state after every event.
+      onEffects: (_) => coordinator.sync(sessionId, _dispatcher.state),
       clock: ref.read(clockProvider),
     );
     return CookingView(
@@ -92,6 +93,8 @@ class CookingController extends AsyncNotifier<CookingView> {
   Future<DispatchResult> resumeTimer(String id) => _run((d) => d.resumeTimer(id));
   Future<DispatchResult> extendTimer(String id) => _run((d) => d.extendTimer(id));
   Future<DispatchResult> dismissTimer(String id) => _run((d) => d.dismissTimer(id));
+  Future<DispatchResult> shortenTimer(String id) => _run((d) => d.shortenTimer(id));
+  Future<DispatchResult> recheckTimer(String id) => _run((d) => d.recheckTimer(id));
 
   Future<void> finish({String? notes}) async {
     await ref.read(sessionRepositoryProvider).complete(sessionId, notes: notes);

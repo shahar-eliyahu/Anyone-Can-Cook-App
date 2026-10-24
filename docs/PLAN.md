@@ -409,6 +409,59 @@ Recipe detail has these actions: התחל בישול, ערוך, שנה שם, ⭐
 5. Add image import, then URL import.
 6. An evaluation set: about 15 real Hebrew and English recipes, run on demand against Gemini to check plan quality. The check is manual and kept small to save quota. Automated tests always use the mock.
 
+#### Phase 2 — approved detailed design (2026-10-24)
+
+This refines the list above; where they differ, this section wins. Decisions are logged in `docs/DECISIONS.md` #19–#30.
+
+**Imports and storage**
+- Three inputs: typed/pasted text, a camera/gallery photo, a user-provided URL. URL fetching is safe (http/https only,
+  private/loopback/link-local addresses blocked, re-checked redirects, size and time limits) and extracts only the
+  recipe (schema.org JSON-LD first, then main-text extraction).
+- Photos: compressed on the device with metadata removed, the extracted text and structure are kept; the photo
+  itself is kept **only temporarily** for review and deleted after approval or when the draft is cleaned up.
+- Stored locally: extracted source text, source URL/site/title, the structured recipe, questions/answers/gaps, and
+  the approved plan. Reopening never calls Gemini. Drafts (`recipes.status = draft`) expire after 7 days.
+- `url_fetcher.fetch_recipe_page()` and `analysis.analyze_source()` are plain functions usable without their
+  endpoints, so future recipe discovery can reuse them (see "Later").
+
+**Accuracy and corrections**
+- Original amounts, units and instructions are preserved; plan steps may carry per-step amounts
+  (`ingredient_uses`) and link to source excerpts (`source_refs`).
+- Before approval the user may correct ingredient names, amounts, units, original instructions, temperatures and
+  timers. Corrections become provenance `user`. After a recipe correction the plan is marked out of date and
+  **cannot be cooked** until the user edits plan values by hand or regenerates it (one `/plan` call).
+
+**Missing information (resolution ladder)**
+1. Recipe context → 2. curated food-safety reference (USDA FSIS, and Israeli guidance where available; cited) →
+3. model estimate (`inferred` with confidence; range timers with check cues) → 4. a question only when genuinely
+needed (equipment that changes the plan, preferences that change steps, unresolved safety, high-impact
+low-confidence gaps). No fixed question limit. "לא יודע/ת" never repeats the question. Unresolvable
+safety-critical values are never invented: that part is not scheduled and the limitation is explained.
+Review shows every estimate and assumption ("מה הוערך"); a confirmation checkbox appears only when a
+safety-related value is an estimate.
+
+**Waiting-period guidance (in the approved plan; no Gemini calls while cooking)**
+- Timer fields: `wait_kind` (bake, proof, chill, freeze, rest, soak, marinate, cook, other), `wait_info_he`,
+  `max_seconds` (range end), `check_cue_he`, `suggest_during` (ids of real steps/prep tasks), up to 3
+  `meanwhile_tips_he`, `recheck_seconds`. Limit raised to 72 h. Plan-level `advance_notice_he`; step-level
+  `estimated_active_minutes`; `PrepTask.remind_before_needed`.
+- Notifications are computed from state by one function and synchronized after every event: one "check time"
+  notification per timer, one optional end-of-range notification, one optional prep reminder per prep task
+  (quiet channel). Extending, shortening, pausing, resuming, re-checking or completing recalculates all of them.
+  "עוד לא — לבדוק שוב" leaves exactly one pending notification for that timer.
+- Wording never implies food is ready: "⏰ {label}: זמן לבדוק" / "זמן לבדוק!".
+
+**Gemini usage**
+- `gemini-3.5-flash-lite`, minimal thinking, separate LLM-facing schemas, backend validation + one repair call.
+  Typical cost 2 calls per recipe (3 with repair). Automated tests use fakes only (zero real calls).
+- Live evaluation only with the user's approval: first batch ≤ 5 recipes and ≤ 15 real calls including retries;
+  stop on any quota/rate-limit error; report calls, failures and results.
+
+**Backend security**
+- `GEMINI_API_KEY` only on Render. `X-App-Token` (`APP_CLIENT_TOKEN`, set by the user) is an abuse deterrent, not
+  authentication. Per-IP limits and an app-wide daily cap (in memory: reset on restart, shared IPs share limits),
+  request-size caps, SSRF protection, no recipe content in logs. A Hebrew privacy notice before the first import.
+
 ### Phase 3 — Cooking AI Agent
 1. **Backend:**
    - `POST /v1/agent/turn`, the `AgentTurn` schema, the agent system prompt in `backend/app/prompts/agent.md`
@@ -465,6 +518,20 @@ Servings scaling, Hebrew text-to-speech and voice confirmations ("סיימתי")
 
 ### Later (not planned yet): accounts and cloud sync
 Optional sign-in, then a sync service built on the existing UUIDs, `updated_at` and `deleted_at` tombstones, and `owner_id`, plus cloud image storage and sharing (§6.4). Nothing in Phases 0–4 depends on it.
+
+### Later (product requirement, not scheduled): recipe discovery and online research
+Requested by the user on 2026-10-24; deliberately postponed (see `docs/DECISIONS.md` #18).
+- **"Find me a recipe for X"** using online search.
+- Show recipe **options with their original sources** (site name, title, link).
+- The user **selects** a recipe, which then goes through the **existing URL import → analysis → plan** flow.
+- **Research missing recipe information** when appropriate, with researched values clearly labeled and kept
+  separate from original recipe facts and AI estimates.
+
+Constraints found when this was evaluated (2026-10-24): Google Search grounding is free only on Gemini 2.5
+Flash / Flash-Lite (shared daily limit), not on `gemini-3.5-flash-lite`; JSON output together with search works
+only on Gemini 3 models (preview); the Gemini API terms require grounded results to be shown with Google's
+Search Suggestions and not modified or cached. Re-check pricing, limits and terms before designing this.
+Phase 2 keeps URL fetching and recipe analysis callable on their own so a future search step can reuse them.
 
 ### Build order: what to develop when
 | Area | When | Why |

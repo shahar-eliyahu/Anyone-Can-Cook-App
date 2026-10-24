@@ -1,0 +1,284 @@
+{
+  "steps": [
+    {
+      "id": "s1",
+      "title": "הכנת תפוחי האדמה",
+      "instruction_he": "חתכו את תפוחי האדמה לקוביות בינוניות. ערבבו אותם בקערה עם חלק מהשמן, המלח והפפריקה, ופזרו בתבנית.",
+      "source_refs": [
+        "src2"
+      ],
+      "equipment_ids": [
+        "e1",
+        "e3",
+        "e4"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "parallel_ok": false,
+      "ingredient_uses": [
+        {
+          "ingredient_id": "i2"
+        },
+        {
+          "ingredient_id": "i3"
+        },
+        {
+          "ingredient_id": "i4"
+        },
+        {
+          "ingredient_id": "i5"
+        }
+      ],
+      "actions": [
+        {
+          "id": "a1",
+          "type": "start",
+          "label_he": "התחלתי"
+        },
+        {
+          "id": "a2",
+          "type": "done",
+          "label_he": "סיימתי",
+          "completes_step": true
+        }
+      ],
+      "timers": [],
+      "safety_food": "none"
+    },
+    {
+      "id": "s2",
+      "title": "תיבול העוף",
+      "instruction_he": "שפשפו את העוף בשאר השמן, המלח, הפפריקה והפלפל, והניחו אותו מעל תפוחי האדמה בתבנית.",
+      "source_refs": [
+        "src3"
+      ],
+      "equipment_ids": [
+        "e1"
+      ],
+      "depends_on": [
+        "s1"
+      ],
+      "kind": "active",
+      "warnings_he": [
+        "אחרי נגיעה בעוף נא לשטוף ידיים וכלים במים חמים וסבון."
+      ],
+      "ingredient_uses": [
+        {
+          "ingredient_id": "i1"
+        },
+        {
+          "ingredient_id": "i3"
+        },
+        {
+          "ingredient_id": "i4"
+        },
+        {
+          "ingredient_id": "i5"
+        },
+        {
+          "ingredient_id": "i6"
+        }
+      ],
+      "actions": [
+        {
+          "id": "a1",
+          "type": "done",
+          "label_he": "סיימתי",
+          "completes_step": true
+        }
+      ],
+      "timers": [],
+      "safety_food": "none"
+    },
+    {
+      "id": "s3",
+      "title": "אפיית העוף ותפוחי האדמה",
+      "instruction_he": "הכניסו את התבנית לתנור החם ואפו עד שהעוף שחום ועשוי.",
+      "source_refs": [
+        "src1",
+        "src4"
+      ],
+      "equipment_ids": [
+        "e1"
+      ],
+      "depends_on": [
+        "s1",
+        "s2"
+      ],
+      "kind": "passive",
+      "temperature": {
+        "value": 200,
+        "unit": "C",
+        "provenance": "original"
+      },
+      "doneness_cue_he": "העוף שחום, ובחיתוך ליד העצם הנוזלים שקופים ולא ורודים.",
+      "warnings_he": [
+        "ודאו שהעוף עשוי היטב לפני ההגשה."
+      ],
+      "ingredient_uses": [],
+      "actions": [
+        {
+          "id": "a1",
+          "type": "in_oven",
+          "label_he": "הכנסתי לתנור",
+          "starts_timer": "t1"
+        },
+        {
+          "id": "a2",
+          "type": "out_of_oven",
+          "label_he": "הוצאתי מהתנור",
+          "completes_step": true
+        }
+      ],
+      "timers": [
+        {
+          "id": "t1",
+          "label_he": "עוף בתנור",
+          "seconds": 2700,
+          "provenance": "original",
+          "wait_kind": "bake",
+          "wait_info_he": "העוף ותפוחי האדמה נצלים בתנור ומשחימים.",
+          "check_cue_he": "העוף שחום, ובחיתוך ליד העצם הנוזלים שקופים ולא ורודים.",
+          "suggest_during": [
+            "s4",
+            "p2"
+          ],
+          "meanwhile_tips_he": [
+            "שטפו את הקערה ואת קרש החיתוך"
+          ],
+          "recheck_seconds": 300
+        }
+      ],
+      "safety_food": "poultry"
+    },
+    {
+      "id": "s4",
+      "title": "בישול האורז",
+      "instruction_he": "הוסיפו את האורז וקורט מלח למים הרותחים, כסו ובשלו על אש קטנה.",
+      "source_refs": [
+        "src5"
+      ],
+      "equipment_ids": [
+        "e2"
+      ],
+      "depends_on": [
+        "s2"
+      ],
+      "kind": "passive",
+      "parallel_ok": true,
+      "doneness_cue_he": "המים נספגו והאורז רך.",
+      "ingredient_uses": [
+        {
+          "ingredient_id": "i7"
+        },
+        {
+          "ingredient_id": "i8"
+        },
+        {
+          "ingredient_id": "i5"
+        }
+      ],
+      "actions": [
+        {
+          "id": "a1",
+          "type": "start",
+          "label_he": "הוספתי את האורז",
+          "starts_timer": "t2"
+        },
+        {
+          "id": "a2",
+          "type": "done",
+          "label_he": "האורז מוכן",
+          "completes_step": true
+        }
+      ],
+      "timers": [
+        {
+          "id": "t2",
+          "label_he": "אורז",
+          "seconds": 1080,
+          "provenance": "inferred",
+          "confidence": "high",
+          "note_he": "המתכון לא ציין זמן בישול. זה זמן מקובל לאורז לבן.",
+          "wait_kind": "cook",
+          "wait_info_he": "האורז מתבשל בסיר מכוסה וסופג את המים.",
+          "check_cue_he": "המים נספגו והאורז רך.",
+          "recheck_seconds": 180
+        }
+      ],
+      "safety_food": "none"
+    },
+    {
+      "id": "s5",
+      "title": "מנוחה והגשה",
+      "instruction_he": "תנו לעוף לנוח כמה דקות מחוץ לתנור, ואז הגישו חם עם האורז.",
+      "source_refs": [
+        "src6"
+      ],
+      "depends_on": [
+        "s3",
+        "s4"
+      ],
+      "kind": "active",
+      "ingredient_uses": [],
+      "actions": [
+        {
+          "id": "a1",
+          "type": "start",
+          "label_he": "התחלתי מנוחה",
+          "starts_timer": "t3"
+        },
+        {
+          "id": "a2",
+          "type": "done",
+          "label_he": "הגשתי",
+          "completes_step": true
+        }
+      ],
+      "timers": [
+        {
+          "id": "t3",
+          "label_he": "מנוחת העוף",
+          "seconds": 300,
+          "provenance": "inferred",
+          "note_he": "המתכון לא ציין מנוחה. מנוחה קצרה שומרת על העוף עסיסי."
+        }
+      ],
+      "safety_food": "none"
+    }
+  ],
+  "prep_tasks": [
+    {
+      "id": "p1",
+      "kind": "preheat_oven",
+      "text_he": "הדליקו את התנור על 200 מעלות",
+      "needed_by_step": "s3",
+      "lead_minutes": {
+        "value": 15,
+        "provenance": "inferred",
+        "note_he": "זמן חימום מקובל לתנור ביתי."
+      },
+      "surface_at_start": true,
+      "surface_with_step": null,
+      "timer": {
+        "id": "tp1",
+        "label_he": "חימום תנור",
+        "seconds": 900,
+        "provenance": "inferred"
+      }
+    },
+    {
+      "id": "p2",
+      "kind": "boil_water",
+      "text_he": "הרתיחו 2¼ כוסות מים בסיר",
+      "needed_by_step": "s4",
+      "lead_minutes": {
+        "value": 10,
+        "provenance": "inferred"
+      },
+      "surface_at_start": false,
+      "surface_with_step": "s4"
+    }
+  ],
+  "advance_notice_he": null
+}

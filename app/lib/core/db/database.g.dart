@@ -176,6 +176,27 @@ class $RecipesTable extends Recipes with TableInfo<$RecipesTable, RecipeRow> {
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _statusMeta = const VerificationMeta('status');
+  @override
+  late final GeneratedColumn<String> status = GeneratedColumn<String>(
+    'status',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('ready'),
+  );
+  static const VerificationMeta _contentHashMeta = const VerificationMeta(
+    'contentHash',
+  );
+  @override
+  late final GeneratedColumn<String> contentHash = GeneratedColumn<String>(
+    'content_hash',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -193,6 +214,8 @@ class $RecipesTable extends Recipes with TableInfo<$RecipesTable, RecipeRow> {
     analysisJson,
     analysisSchemaVersion,
     planStale,
+    status,
+    contentHash,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -315,6 +338,21 @@ class $RecipesTable extends Recipes with TableInfo<$RecipesTable, RecipeRow> {
         planStale.isAcceptableOrUnknown(data['plan_stale']!, _planStaleMeta),
       );
     }
+    if (data.containsKey('status')) {
+      context.handle(
+        _statusMeta,
+        status.isAcceptableOrUnknown(data['status']!, _statusMeta),
+      );
+    }
+    if (data.containsKey('content_hash')) {
+      context.handle(
+        _contentHashMeta,
+        contentHash.isAcceptableOrUnknown(
+          data['content_hash']!,
+          _contentHashMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -384,6 +422,14 @@ class $RecipesTable extends Recipes with TableInfo<$RecipesTable, RecipeRow> {
         DriftSqlType.bool,
         data['${effectivePrefix}plan_stale'],
       )!,
+      status: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}status'],
+      )!,
+      contentHash: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}content_hash'],
+      ),
     );
   }
 
@@ -409,6 +455,12 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
   final String? analysisJson;
   final int? analysisSchemaVersion;
   final bool planStale;
+
+  /// `draft` until the user approves a plan; only `ready` recipes are listed. (v2)
+  final String status;
+
+  /// Hash of the imported source, to offer reopening instead of re-importing. (v2)
+  final String? contentHash;
   const RecipeRow({
     required this.id,
     this.ownerId,
@@ -425,6 +477,8 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
     this.analysisJson,
     this.analysisSchemaVersion,
     required this.planStale,
+    required this.status,
+    this.contentHash,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -460,6 +514,10 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
       map['analysis_schema_version'] = Variable<int>(analysisSchemaVersion);
     }
     map['plan_stale'] = Variable<bool>(planStale);
+    map['status'] = Variable<String>(status);
+    if (!nullToAbsent || contentHash != null) {
+      map['content_hash'] = Variable<String>(contentHash);
+    }
     return map;
   }
 
@@ -496,6 +554,10 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
           ? const Value.absent()
           : Value(analysisSchemaVersion),
       planStale: Value(planStale),
+      status: Value(status),
+      contentHash: contentHash == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contentHash),
     );
   }
 
@@ -522,6 +584,8 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
         json['analysisSchemaVersion'],
       ),
       planStale: serializer.fromJson<bool>(json['planStale']),
+      status: serializer.fromJson<String>(json['status']),
+      contentHash: serializer.fromJson<String?>(json['contentHash']),
     );
   }
   @override
@@ -543,6 +607,8 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
       'analysisJson': serializer.toJson<String?>(analysisJson),
       'analysisSchemaVersion': serializer.toJson<int?>(analysisSchemaVersion),
       'planStale': serializer.toJson<bool>(planStale),
+      'status': serializer.toJson<String>(status),
+      'contentHash': serializer.toJson<String?>(contentHash),
     };
   }
 
@@ -562,6 +628,8 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
     Value<String?> analysisJson = const Value.absent(),
     Value<int?> analysisSchemaVersion = const Value.absent(),
     bool? planStale,
+    String? status,
+    Value<String?> contentHash = const Value.absent(),
   }) => RecipeRow(
     id: id ?? this.id,
     ownerId: ownerId.present ? ownerId.value : this.ownerId,
@@ -582,6 +650,8 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
         ? analysisSchemaVersion.value
         : this.analysisSchemaVersion,
     planStale: planStale ?? this.planStale,
+    status: status ?? this.status,
+    contentHash: contentHash.present ? contentHash.value : this.contentHash,
   );
   RecipeRow copyWithCompanion(RecipesCompanion data) {
     return RecipeRow(
@@ -614,6 +684,10 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
           ? data.analysisSchemaVersion.value
           : this.analysisSchemaVersion,
       planStale: data.planStale.present ? data.planStale.value : this.planStale,
+      status: data.status.present ? data.status.value : this.status,
+      contentHash: data.contentHash.present
+          ? data.contentHash.value
+          : this.contentHash,
     );
   }
 
@@ -634,7 +708,9 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
           ..write('sourceImagePath: $sourceImagePath, ')
           ..write('analysisJson: $analysisJson, ')
           ..write('analysisSchemaVersion: $analysisSchemaVersion, ')
-          ..write('planStale: $planStale')
+          ..write('planStale: $planStale, ')
+          ..write('status: $status, ')
+          ..write('contentHash: $contentHash')
           ..write(')'))
         .toString();
   }
@@ -656,6 +732,8 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
     analysisJson,
     analysisSchemaVersion,
     planStale,
+    status,
+    contentHash,
   );
   @override
   bool operator ==(Object other) =>
@@ -675,7 +753,9 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
           other.sourceImagePath == this.sourceImagePath &&
           other.analysisJson == this.analysisJson &&
           other.analysisSchemaVersion == this.analysisSchemaVersion &&
-          other.planStale == this.planStale);
+          other.planStale == this.planStale &&
+          other.status == this.status &&
+          other.contentHash == this.contentHash);
 }
 
 class RecipesCompanion extends UpdateCompanion<RecipeRow> {
@@ -694,6 +774,8 @@ class RecipesCompanion extends UpdateCompanion<RecipeRow> {
   final Value<String?> analysisJson;
   final Value<int?> analysisSchemaVersion;
   final Value<bool> planStale;
+  final Value<String> status;
+  final Value<String?> contentHash;
   final Value<int> rowid;
   const RecipesCompanion({
     this.id = const Value.absent(),
@@ -711,6 +793,8 @@ class RecipesCompanion extends UpdateCompanion<RecipeRow> {
     this.analysisJson = const Value.absent(),
     this.analysisSchemaVersion = const Value.absent(),
     this.planStale = const Value.absent(),
+    this.status = const Value.absent(),
+    this.contentHash = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   RecipesCompanion.insert({
@@ -729,6 +813,8 @@ class RecipesCompanion extends UpdateCompanion<RecipeRow> {
     this.analysisJson = const Value.absent(),
     this.analysisSchemaVersion = const Value.absent(),
     this.planStale = const Value.absent(),
+    this.status = const Value.absent(),
+    this.contentHash = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        createdAt = Value(createdAt),
@@ -751,6 +837,8 @@ class RecipesCompanion extends UpdateCompanion<RecipeRow> {
     Expression<String>? analysisJson,
     Expression<int>? analysisSchemaVersion,
     Expression<bool>? planStale,
+    Expression<String>? status,
+    Expression<String>? contentHash,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -770,6 +858,8 @@ class RecipesCompanion extends UpdateCompanion<RecipeRow> {
       if (analysisSchemaVersion != null)
         'analysis_schema_version': analysisSchemaVersion,
       if (planStale != null) 'plan_stale': planStale,
+      if (status != null) 'status': status,
+      if (contentHash != null) 'content_hash': contentHash,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -790,6 +880,8 @@ class RecipesCompanion extends UpdateCompanion<RecipeRow> {
     Value<String?>? analysisJson,
     Value<int?>? analysisSchemaVersion,
     Value<bool>? planStale,
+    Value<String>? status,
+    Value<String?>? contentHash,
     Value<int>? rowid,
   }) {
     return RecipesCompanion(
@@ -809,6 +901,8 @@ class RecipesCompanion extends UpdateCompanion<RecipeRow> {
       analysisSchemaVersion:
           analysisSchemaVersion ?? this.analysisSchemaVersion,
       planStale: planStale ?? this.planStale,
+      status: status ?? this.status,
+      contentHash: contentHash ?? this.contentHash,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -863,6 +957,12 @@ class RecipesCompanion extends UpdateCompanion<RecipeRow> {
     if (planStale.present) {
       map['plan_stale'] = Variable<bool>(planStale.value);
     }
+    if (status.present) {
+      map['status'] = Variable<String>(status.value);
+    }
+    if (contentHash.present) {
+      map['content_hash'] = Variable<String>(contentHash.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -887,6 +987,8 @@ class RecipesCompanion extends UpdateCompanion<RecipeRow> {
           ..write('analysisJson: $analysisJson, ')
           ..write('analysisSchemaVersion: $analysisSchemaVersion, ')
           ..write('planStale: $planStale, ')
+          ..write('status: $status, ')
+          ..write('contentHash: $contentHash, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -3196,6 +3298,8 @@ typedef $$RecipesTableCreateCompanionBuilder = RecipesCompanion Function({
   Value<String?> analysisJson,
   Value<int?> analysisSchemaVersion,
   Value<bool> planStale,
+  Value<String> status,
+  Value<String?> contentHash,
   Value<int> rowid,
 });
 typedef $$RecipesTableUpdateCompanionBuilder = RecipesCompanion Function({
@@ -3214,6 +3318,8 @@ typedef $$RecipesTableUpdateCompanionBuilder = RecipesCompanion Function({
   Value<String?> analysisJson,
   Value<int?> analysisSchemaVersion,
   Value<bool> planStale,
+  Value<String> status,
+  Value<String?> contentHash,
   Value<int> rowid,
 });
 
@@ -3342,6 +3448,16 @@ class $$RecipesTableFilterComposer
 
   ColumnFilters<bool> get planStale => $composableBuilder(
     column: $table.planStale,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get contentHash => $composableBuilder(
+    column: $table.contentHash,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3479,6 +3595,16 @@ class $$RecipesTableOrderingComposer
     column: $table.planStale,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get status => $composableBuilder(
+    column: $table.status,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get contentHash => $composableBuilder(
+    column: $table.contentHash,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$RecipesTableAnnotationComposer
@@ -3548,6 +3674,14 @@ class $$RecipesTableAnnotationComposer
 
   GeneratedColumn<bool> get planStale =>
       $composableBuilder(column: $table.planStale, builder: (column) => column);
+
+  GeneratedColumn<String> get status =>
+      $composableBuilder(column: $table.status, builder: (column) => column);
+
+  GeneratedColumn<String> get contentHash => $composableBuilder(
+    column: $table.contentHash,
+    builder: (column) => column,
+  );
 
   Expression<T> plansRefs<T extends Object>(
     Expression<T> Function($$PlansTableAnnotationComposer a) f,
@@ -3643,6 +3777,8 @@ class $$RecipesTableTableManager
                 Value<String?> analysisJson = const Value.absent(),
                 Value<int?> analysisSchemaVersion = const Value.absent(),
                 Value<bool> planStale = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> contentHash = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => RecipesCompanion(
                 id: id,
@@ -3660,6 +3796,8 @@ class $$RecipesTableTableManager
                 analysisJson: analysisJson,
                 analysisSchemaVersion: analysisSchemaVersion,
                 planStale: planStale,
+                status: status,
+                contentHash: contentHash,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -3679,6 +3817,8 @@ class $$RecipesTableTableManager
                 Value<String?> analysisJson = const Value.absent(),
                 Value<int?> analysisSchemaVersion = const Value.absent(),
                 Value<bool> planStale = const Value.absent(),
+                Value<String> status = const Value.absent(),
+                Value<String?> contentHash = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => RecipesCompanion.insert(
                 id: id,
@@ -3696,6 +3836,8 @@ class $$RecipesTableTableManager
                 analysisJson: analysisJson,
                 analysisSchemaVersion: analysisSchemaVersion,
                 planStale: planStale,
+                status: status,
+                contentHash: contentHash,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

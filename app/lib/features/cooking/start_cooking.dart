@@ -20,6 +20,10 @@ Future<void> startCooking(BuildContext context, WidgetRef ref, String recipeId) 
   final recipes = ref.read(recipeRepositoryProvider);
   final sessions = ref.read(sessionRepositoryProvider);
 
+  if ((await recipes.getRecipe(recipeId))?.planStale ?? false) {
+    messenger.showSnackBar(SnackBar(content: Text(l10n.recipeOutdatedBanner)));
+    return;
+  }
   final plan = await recipes.latestApprovedPlan(recipeId);
   if (plan == null) {
     messenger.showSnackBar(SnackBar(content: Text(l10n.noPlan)));

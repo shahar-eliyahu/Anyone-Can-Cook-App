@@ -70,7 +70,15 @@ class _CookingBody extends ConsumerWidget {
     final focus = state.focusStep(now);
     final meanwhile = state.meanwhile(now);
     final timers = state.activeTimers(now);
-    final prep = state.prepTasksToShow(now);
+    final guidance = {for (final g in state.waitGuidance(now)) g.timer.timerId: g};
+    // Prep tasks shown by rule, plus those a running wait suggests doing now.
+    final prep = [
+      ...state.prepTasksToShow(now),
+      for (final g in guidance.values)
+        for (final task in g.suggestedPrep) PrepTaskView(task, urgent: false),
+    ];
+    final prepIds = <String>{};
+    prep.retainWhere((v) => prepIds.add(v.task.id));
 
     return AppScaffold(
       title: view.recipeRow.customTitle ?? view.recipe.title,
@@ -88,9 +96,19 @@ class _CookingBody extends ConsumerWidget {
           Text(l10n.cookingProgress(state.doneStepCount, plan.steps.length)),
           const SizedBox(height: 4),
           LinearProgressIndicator(value: state.doneStepCount / plan.steps.length),
+          if (plan.advanceNoticeHe case final notice? when state.doneStepCount == 0)
+            Padding(padding: const EdgeInsets.only(top: 8), child: Text('🕒 $notice')),
           if (timers.isNotEmpty) ...[
             SectionTitle(l10n.timersTitle),
-            for (final t in timers) _TimerCard(timer: t, now: now, controller: _controller(ref)),
+            for (final t in timers)
+              _TimerCard(
+                timer: t,
+                now: now,
+                controller: _controller(ref),
+                guidance: guidance[t.timerId],
+                nextAction: t.stepId == null ? null : state.availableActionFor(t.stepId!, now),
+                onAction: (a) => _confirm(context, ref, a),
+              ),
           ],
           if (prep.isNotEmpty) ...[
             SectionTitle(l10n.prepTasks),
@@ -224,36 +242,68 @@ class _CookingBody extends ConsumerWidget {
 }
 
 class _TimerCard extends StatelessWidget {
-  const _TimerCard({required this.timer, required this.now, required this.controller});
+  const _TimerCard({
+    required this.timer,
+    required this.now,
+    required this.controller,
+    required this.onAction,
+    this.guidance,
+    this.nextAction,
+  });
 
   final TimerState timer;
   final DateTime now;
   final CookingController controller;
+  final WaitGuidance? guidance;
+
+  /// The owning step's next action ("הבצק תפח", "הוצאתי מהתנור"), if any.
+  final AvailableAction? nextAction;
+  final void Function(AvailableAction) onAction;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final scheme = Theme.of(context).colorScheme;
-    final finished = timer.isFinished(now);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final checkDue = timer.isFinished(now);
     final paused = timer.status == TimerStatus.paused;
+    final g = guidance;
+    final cue = g?.checkCueHe;
+    final recheckMinutes =
+        ((g?.planTimer?.recheckSeconds ?? CookingEngine.defaultRecheckSeconds) / 60).ceil();
+    final rangeEnd = timer.rangeEndsAt;
 
     return Card(
-      color: finished ? scheme.errorContainer : null,
+      color: checkDue ? scheme.errorContainer : null,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          spacing: 4,
           children: [
-            ProvenancedText(timer.labelHe, timer.provenance, style: Theme.of(context).textTheme.titleSmall),
+            ProvenancedText(timer.labelHe, timer.provenance, style: theme.textTheme.titleSmall),
             Text(
-              finished ? l10n.timerFinished : formatDuration(timer.remaining(now)),
-              textDirection: TextDirection.ltr,
-              style: Theme.of(context).textTheme.displaySmall,
+              checkDue ? l10n.timerCheckDue : formatDuration(timer.remaining(now)),
+              textDirection: checkDue ? null : TextDirection.ltr,
+              style: theme.textTheme.displaySmall,
             ),
+            if (!checkDue && !paused)
+              Text(l10n.checkAtLabel(formatWhen(timer.endsAt!, now, l10n))),
+            if (rangeEnd != null && !timer.rechecked && rangeEnd.isAfter(now))
+              Text(l10n.rangeUntil(formatWhen(rangeEnd, now, l10n)), style: theme.textTheme.bodySmall),
+            if (g?.waitInfoHe case final info? when !checkDue) Text(info),
+            if (cue != null && checkDue) Text('👀 $cue', style: theme.textTheme.titleSmall),
+            if (checkDue && nextAction != null) ...[
+              FilledButton(onPressed: () => onAction(nextAction!), child: Text(nextAction!.action.labelHe)),
+              OutlinedButton(
+                onPressed: () => controller.recheckTimer(timer.timerId),
+                child: Text(l10n.recheckIn(recheckMinutes)),
+              ),
+            ],
             Wrap(
               spacing: 8,
               children: [
-                if (!finished)
+                if (!checkDue)
                   OutlinedButton(
                     onPressed: () => paused ? controller.resumeTimer(timer.timerId) : controller.pauseTimer(timer.timerId),
                     child: Text(paused ? l10n.resume : l10n.pause),
@@ -262,12 +312,22 @@ class _TimerCard extends StatelessWidget {
                   onPressed: () => controller.extendTimer(timer.timerId),
                   child: Text(l10n.addMinute),
                 ),
+                if (!checkDue)
+                  OutlinedButton(
+                    onPressed: () => controller.shortenTimer(timer.timerId),
+                    child: Text(l10n.removeMinute),
+                  ),
                 TextButton(
                   onPressed: () => controller.dismissTimer(timer.timerId),
                   child: Text(l10n.dismissTimer),
                 ),
               ],
             ),
+            if (!checkDue) ...[
+              for (final tip in g?.tips ?? const <String>[]) Text('💡 $tip'),
+              for (final next in g?.nextSteps ?? const <PlanStep>[])
+                Text(l10n.nextStepPreview(next.title), style: theme.textTheme.bodySmall),
+            ],
           ],
         ),
       ),
@@ -346,7 +406,17 @@ class _StepCard extends StatelessWidget {
             Text(step.instructionHe, style: emphasized ? theme.textTheme.bodyLarge : null),
             if (step.temperature case final t?)
               ProvenancedText(l10n.temperatureLabel(t.value), t.provenance),
-            if (step.ingredientIds.isNotEmpty)
+            if (step.ingredientUses.isNotEmpty)
+              for (final use in step.ingredientUses)
+                if (ingredients[use.ingredientId] case final i?)
+                  use.quantity == null
+                      ? Text('• ${i.name}')
+                      : ProvenancedText(
+                          '• ${i.name} — ${use.quantity!.display}',
+                          use.quantity!.provenance,
+                          note: use.quantity!.noteHe ?? use.noteHe,
+                        )
+            else if (step.ingredientIds.isNotEmpty)
               Text(
                 [
                   for (final id in step.ingredientIds)

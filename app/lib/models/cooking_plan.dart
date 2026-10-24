@@ -1,6 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 import 'provenance.dart';
+import 'recipe.dart';
 
 part 'cooking_plan.freezed.dart';
 part 'cooking_plan.g.dart';
@@ -17,6 +18,9 @@ enum StepKind { active, passive }
 @JsonEnum(fieldRename: FieldRename.snake)
 enum PrepKind { preheatOven, boilWater, miseEnPlace, thaw, other }
 
+@JsonEnum(fieldRename: FieldRename.snake)
+enum WaitKind { cook, bake, rest, chill, freeze, proof, soak, marinate, other }
+
 enum TemperatureUnit {
   @JsonValue('C')
   celsius,
@@ -29,9 +33,25 @@ abstract class PlanTimer with _$PlanTimer {
   const factory PlanTimer({
     required String id,
     required String labelHe,
+    /// When to check (the notification time).
     required int seconds,
     required Provenance provenance,
     String? noteHe,
+    Confidence? confidence,
+    @Default([]) List<String> sourceIds,
+    WaitKind? waitKind,
+
+    /// Optional end of a range ("60–90 minutes").
+    int? maxSeconds,
+    String? waitInfoHe,
+    String? checkCueHe,
+
+    /// Ids of real steps or prep tasks worth doing during this wait.
+    @Default([]) List<String> suggestDuring,
+    @Default([]) List<String> meanwhileTipsHe,
+
+    /// How long "not ready — check again" waits.
+    int? recheckSeconds,
   }) = _PlanTimer;
 
   factory PlanTimer.fromJson(Map<String, dynamic> json) =>
@@ -59,6 +79,8 @@ abstract class Temperature with _$Temperature {
     required int value,
     @Default(TemperatureUnit.celsius) TemperatureUnit unit,
     required Provenance provenance,
+    Confidence? confidence,
+    @Default([]) List<String> sourceIds,
   }) = _Temperature;
 
   factory Temperature.fromJson(Map<String, dynamic> json) =>
@@ -71,10 +93,24 @@ abstract class Minutes with _$Minutes {
     required int value,
     required Provenance provenance,
     String? noteHe,
+    Confidence? confidence,
   }) = _Minutes;
 
   factory Minutes.fromJson(Map<String, dynamic> json) =>
       _$MinutesFromJson(json);
+}
+
+/// The amount of a recipe ingredient used in one step.
+@freezed
+abstract class IngredientUse with _$IngredientUse {
+  const factory IngredientUse({
+    required String ingredientId,
+    Quantity? quantity,
+    String? noteHe,
+  }) = _IngredientUse;
+
+  factory IngredientUse.fromJson(Map<String, dynamic> json) =>
+      _$IngredientUseFromJson(json);
 }
 
 @freezed
@@ -87,6 +123,7 @@ abstract class PlanStep with _$PlanStep {
     required String instructionHe,
     @Default([]) List<String> sourceRefs,
     @Default([]) List<String> ingredientIds,
+    @Default([]) List<IngredientUse> ingredientUses,
     @Default([]) List<String> equipmentIds,
     @Default([]) List<String> dependsOn,
     @Default(StepKind.active) StepKind kind,
@@ -96,6 +133,7 @@ abstract class PlanStep with _$PlanStep {
     Temperature? temperature,
     String? donenessCueHe,
     @Default([]) List<String> warningsHe,
+    Minutes? estimatedActiveMinutes,
   }) = _PlanStep;
 
   factory PlanStep.fromJson(Map<String, dynamic> json) =>
@@ -129,6 +167,9 @@ abstract class PrepTask with _$PrepTask {
     @Default(PrepSurface(atStart: true)) PrepSurface surface,
     PlanTimer? timer,
     @Default(ConfirmPolicy.autoOk) ConfirmPolicy confirmPolicy,
+
+    /// One reminder `leadMinutes` before a wait gating [neededByStep] ends.
+    @Default(false) bool remindBeforeNeeded,
   }) = _PrepTask;
 
   factory PrepTask.fromJson(Map<String, dynamic> json) =>
@@ -143,6 +184,7 @@ abstract class CookingPlan with _$CookingPlan {
     @Default(1) int schemaVersion,
     required List<PlanStep> steps,
     @Default([]) List<PrepTask> prepTasks,
+    String? advanceNoticeHe,
   }) = _CookingPlan;
 
   factory CookingPlan.fromJson(Map<String, dynamic> json) =>

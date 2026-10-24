@@ -161,6 +161,27 @@ class ActionDispatcher {
         return TimerExtended(at: now(), timerId: timerId, seconds: seconds);
       });
 
+  Future<DispatchResult> shortenTimer(String timerId, {int seconds = 60}) =>
+      _serialized(() {
+        final t = _state.timers[timerId];
+        if (t == null || !t.isActive || t.isFinished(now())) {
+          return const DispatchResult.invalid('not_pending');
+        }
+        if (seconds <= 0 || seconds > 3600) {
+          return const DispatchResult.invalid('bad_duration');
+        }
+        return TimerShortened(at: now(), timerId: timerId, seconds: seconds);
+      });
+
+  /// "Not ready — check again": only once the check time has been reached.
+  Future<DispatchResult> recheckTimer(String timerId) => _serialized(() {
+        final at = now();
+        if (!(_state.timers[timerId]?.isFinished(at) ?? false)) {
+          return const DispatchResult.invalid('not_due');
+        }
+        return TimerRechecked(at: at, timerId: timerId);
+      });
+
   Future<DispatchResult> dismissTimer(String timerId) => _serialized(() {
         if (!(_state.timers[timerId]?.isActive ?? false)) {
           return const DispatchResult.alreadyDone();

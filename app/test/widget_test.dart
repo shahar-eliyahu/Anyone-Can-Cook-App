@@ -21,7 +21,7 @@ void main() {
       expect(find.text(tile), findsOneWidget);
     }
     expect(find.text('השרת מחובר ✓ · מצב הדגמה (ללא בינה מלאכותית)'), findsOneWidget);
-    expect(find.text('מסד הנתונים מוכן (גרסה 1)'), findsOneWidget);
+    expect(find.text('מסד הנתונים מוכן (גרסה 2)'), findsOneWidget); // schema v2 (Phase 2)
 
     final context = tester.element(find.byType(KitchenScreen));
     expect(Directionality.of(context), TextDirection.rtl);

@@ -44,6 +44,24 @@ List<String> validatePlan(CookingPlan plan, {Recipe? recipe}) {
 
   if (_hasCycle(plan)) errors.add('dependency cycle');
 
+  final prepTaskIds = {for (final p in plan.prepTasks) p.id};
+  for (final step in plan.steps) {
+    for (final t in step.timers) {
+      if (t.maxSeconds != null && t.maxSeconds! <= t.seconds) {
+        errors.add('${t.id}: max_seconds must be after seconds');
+      }
+      if (t.meanwhileTipsHe.length > 3) errors.add('${t.id}: more than 3 tips');
+      for (final id in t.suggestDuring) {
+        if (prepTaskIds.contains(id)) continue;
+        if (!stepIds.contains(id)) {
+          errors.add('${t.id}: suggests unknown $id');
+        } else if (id == step.id || _dependsOn(plan, id, step.id)) {
+          errors.add('${t.id}: suggests $id, which waits for ${step.id}');
+        }
+      }
+    }
+  }
+
   final prepIds = <String>{};
   for (final p in plan.prepTasks) {
     if (!prepIds.add(p.id)) errors.add('duplicate prep task id ${p.id}');
@@ -63,6 +81,11 @@ List<String> validatePlan(CookingPlan plan, {Recipe? recipe}) {
       for (final id in step.ingredientIds) {
         if (!ingredientIds.contains(id)) errors.add('${step.id}: unknown ingredient $id');
       }
+      for (final use in step.ingredientUses) {
+        if (!ingredientIds.contains(use.ingredientId)) {
+          errors.add('${step.id}: unknown ingredient ${use.ingredientId}');
+        }
+      }
       for (final id in step.equipmentIds) {
         if (!equipmentIds.contains(id)) errors.add('${step.id}: unknown equipment $id');
       }
@@ -72,6 +95,21 @@ List<String> validatePlan(CookingPlan plan, {Recipe? recipe}) {
     }
   }
   return errors;
+}
+
+/// Whether step [from] depends, directly or transitively, on step [on].
+bool _dependsOn(CookingPlan plan, String from, String on) {
+  final seen = <String>{};
+  final stack = [from];
+  while (stack.isNotEmpty) {
+    final id = stack.removeLast();
+    if (!seen.add(id)) continue;
+    for (final dep in plan.stepById(id)?.dependsOn ?? const <String>[]) {
+      if (dep == on) return true;
+      stack.add(dep);
+    }
+  }
+  return false;
 }
 
 bool _hasCycle(CookingPlan plan) {

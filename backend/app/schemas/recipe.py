@@ -4,7 +4,7 @@ from typing import Literal
 
 from pydantic import Field
 
-from app.schemas.common import ContractModel, Provenance
+from app.schemas.common import Confidence, ContractModel, Provenance
 
 
 class Quantity(ContractModel):
@@ -13,6 +13,9 @@ class Quantity(ContractModel):
     unit: str | None = None
     display: str
     provenance: Provenance
+    confidence: Confidence | None = None
+    source_ids: list[str] = []
+    note_he: str | None = None
 
 
 class Ingredient(ContractModel):

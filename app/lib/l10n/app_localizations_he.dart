@@ -37,10 +37,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get noActiveSession => 'אין בישול פעיל כרגע';
 
   @override
-  String get importComingSoon =>
-      'ייבוא מתכונים חדשים (טקסט, תמונה וקישור) יתווסף בשלב הבא';
-
-  @override
   String get backendConnecting => 'מתחבר לשרת…';
 
   @override
@@ -287,7 +283,93 @@ class AppLocalizationsHe extends AppLocalizations {
   String get timersTitle => 'טיימרים';
 
   @override
-  String get timerFinished => 'הזמן נגמר!';
+  String get timerCheckDue => 'זמן לבדוק!';
+
+  @override
+  String checkAtLabel(String time) {
+    return 'לבדוק בערך ב-$time';
+  }
+
+  @override
+  String rangeUntil(String time) {
+    return 'טווח הזמן: עד $time';
+  }
+
+  @override
+  String recheckIn(int minutes) {
+    return 'עוד לא — לבדוק שוב בעוד $minutes דק\'';
+  }
+
+  @override
+  String get removeMinute => '− דקה';
+
+  @override
+  String nextStepPreview(String title) {
+    return 'אחרי זה: $title';
+  }
+
+  @override
+  String tomorrowAt(String time) {
+    return 'מחר ב-$time';
+  }
+
+  @override
+  String dateAt(String date, String time) {
+    return '$date ב-$time';
+  }
+
+  @override
+  String notifCheckTitle(String label) {
+    return '⏰ $label: זמן לבדוק';
+  }
+
+  @override
+  String notifCheckBody(String cue) {
+    return 'בדקו: $cue';
+  }
+
+  @override
+  String get notifCheckBodyDefault =>
+      'לבשל כל אחד יכול · לחצו כדי לחזור לבישול';
+
+  @override
+  String get notifPreheatBody => 'בדקו שהתנור הגיע לחום';
+
+  @override
+  String notifRangeEndTitle(String label) {
+    return '⏰ $label: סוף טווח הזמן';
+  }
+
+  @override
+  String get notifRangeEndBodyDefault => 'זה הזמן לבדוק שוב';
+
+  @override
+  String notifPrepTitle(String task) {
+    return '⏳ $task';
+  }
+
+  @override
+  String notifPrepBody(int minutes) {
+    return 'בעוד כ-$minutes דקות תצטרכו את זה';
+  }
+
+  @override
+  String get notifTestTitle => '⏰ התראת בדיקה';
+
+  @override
+  String get notifTestBody => 'לבשל כל אחד יכול · ההתראות של הטיימרים עובדות';
+
+  @override
+  String get channelTimersName => 'טיימרים לבישול';
+
+  @override
+  String get channelTimersDescription => 'התראה כשהגיע הזמן לבדוק משהו שמתבשל';
+
+  @override
+  String get channelPrepName => 'תזכורות הכנה';
+
+  @override
+  String get channelPrepDescription => 'תזכורות שקטות להכנות לקראת השלב הבא';
 
   @override
   String get pause => 'השהיה';
@@ -455,4 +537,266 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get refresh => 'רענון';
+
+  @override
+  String get importTitle => 'ייבוא מתכון';
+
+  @override
+  String get importTabText => 'טקסט';
+
+  @override
+  String get importTabPhoto => 'תמונה';
+
+  @override
+  String get importTabUrl => 'קישור';
+
+  @override
+  String get importTextHint => 'הדביקו או הקלידו כאן את המתכון';
+
+  @override
+  String get importUrlHint => 'https://…';
+
+  @override
+  String get importTakePhoto => 'צילום';
+
+  @override
+  String get importPickPhoto => 'מהגלריה';
+
+  @override
+  String get importPhotoNote => 'התמונה נשמרת רק עד שתאשרו את התוכנית.';
+
+  @override
+  String get importAnalyze => 'ניתוח המתכון';
+
+  @override
+  String get importStageReading => 'קוראים את המתכון…';
+
+  @override
+  String get importStagePlanning => 'בונים תוכנית בישול…';
+
+  @override
+  String get importStageSlow => 'זה לוקח קצת זמן — ייתכן שהשרת מתעורר.';
+
+  @override
+  String get importDuplicateTitle => 'המתכון כבר יובא';
+
+  @override
+  String importDuplicateBody(String title) {
+    return 'כבר ייבאתם את המתכון הזה: $title. לפתוח אותו במקום לייבא שוב?';
+  }
+
+  @override
+  String get importOpenExisting => 'פתיחת הקיים';
+
+  @override
+  String get importAgain => 'ייבוא מחדש';
+
+  @override
+  String get importNotRecipe => 'לא זיהינו כאן מתכון.';
+
+  @override
+  String get privacyTitle => 'לפני הייבוא הראשון';
+
+  @override
+  String get privacyBody =>
+      'כדי לנתח את המתכון, הטקסט, הקישור או התמונה נשלחים לשירות בינה מלאכותית (Gemini של Google). בגרסה החינמית של השירות Google עשויה להשתמש במידע לשיפור המוצרים שלה. אל תשלחו מידע אישי. התמונה נשמרת במכשיר רק עד שתאשרו את התוכנית.';
+
+  @override
+  String get privacyAccept => 'הבנתי, להמשיך';
+
+  @override
+  String get draftsTitle => 'ייבואים שלא הושלמו';
+
+  @override
+  String get draftResume => 'להמשיך';
+
+  @override
+  String get draftDiscard => 'מחיקה';
+
+  @override
+  String get clarifyTitle => 'כמה שאלות קצרות';
+
+  @override
+  String get clarifyIntro =>
+      'חסר במתכון מידע שחשוב לתוכנית. ענו על מה שאתם יודעים.';
+
+  @override
+  String get clarifyRequired => 'חשוב לבטיחות';
+
+  @override
+  String get clarifyDontKnow => 'לא יודע/ת';
+
+  @override
+  String get clarifyContinue => 'בניית התוכנית';
+
+  @override
+  String get clarifyAnswerHint => 'התשובה שלכם';
+
+  @override
+  String get reviewTitle => 'בדיקת התוכנית';
+
+  @override
+  String get reviewIntro =>
+      'בדקו את המצרכים, הזמנים והטמפרטורות. אפשר לתקן כל ערך לפני האישור.';
+
+  @override
+  String get reviewEstimatesTitle => 'מה הוערך';
+
+  @override
+  String get reviewNoEstimates => 'כל הערכים מופיעים במתכון המקורי.';
+
+  @override
+  String get reviewAssumptions => 'הנחות';
+
+  @override
+  String get reviewLimitations => 'מה לא הצלחנו לקבוע בבטחה';
+
+  @override
+  String get reviewWarnings => 'שימו לב';
+
+  @override
+  String get reviewSources => 'מקורות';
+
+  @override
+  String get reviewOriginalSource => 'המתכון המקורי';
+
+  @override
+  String reviewFromSource(String text) {
+    return 'מהמתכון המקורי: $text';
+  }
+
+  @override
+  String get reviewPhotoCheck =>
+      'התוכנית נבנתה מתמונה — בדקו שהכמויות והזמנים נקראו נכון.';
+
+  @override
+  String get reviewSafetyCheckbox => 'בדקתי את הערכים המסומנים';
+
+  @override
+  String get reviewApprove => 'אישור התוכנית';
+
+  @override
+  String get reviewCancelImport => 'ביטול הייבוא';
+
+  @override
+  String get reviewSave => 'שמירת השינויים';
+
+  @override
+  String get reviewOutdatedTitle => 'התוכנית לא מעודכנת לשינויים במתכון';
+
+  @override
+  String get reviewOutdatedBody =>
+      'שיניתם מצרכים או הוראות. צרו את התוכנית מחדש, או אשרו שבדקתם שהיא עדיין נכונה.';
+
+  @override
+  String get reviewRegenerate => 'יצירת התוכנית מחדש';
+
+  @override
+  String get reviewStillCorrect => 'בדקתי — התוכנית נכונה';
+
+  @override
+  String get provenanceInferred => 'הערכה';
+
+  @override
+  String get provenanceAnswered => 'לפי תשובתך';
+
+  @override
+  String get provenanceReference => 'לפי מקור בטיחות מזון';
+
+  @override
+  String get provenanceUser => 'ערך שלך';
+
+  @override
+  String get editIngredient => 'עריכת מצרך';
+
+  @override
+  String get editName => 'שם';
+
+  @override
+  String get editAmount => 'כמות (כפי שתוצג)';
+
+  @override
+  String get editStep => 'עריכת הוראה';
+
+  @override
+  String get editTimer => 'עריכת זמן';
+
+  @override
+  String get editTimerMinutes => 'לבדוק אחרי (דקות)';
+
+  @override
+  String get editTimerMaxMinutes => 'סוף הטווח (דקות, לא חובה)';
+
+  @override
+  String get editTemperature => 'עריכת טמפרטורה (°C)';
+
+  @override
+  String get editRecipe => 'עריכת המתכון והתוכנית';
+
+  @override
+  String get recipeOutdatedBanner =>
+      'התוכנית לא מעודכנת לשינויים במתכון. ערכו אותה או צרו אותה מחדש לפני הבישול.';
+
+  @override
+  String rangeMinutes(int from, int to) {
+    return '$from–$to דק\'';
+  }
+
+  @override
+  String minutesValue(int minutes) {
+    return '$minutes דק\'';
+  }
+
+  @override
+  String get errOffline =>
+      'אין חיבור לאינטרנט. ייבוא מתכון חדש דורש חיבור; בישול של מתכון שמור עובד גם בלי.';
+
+  @override
+  String get errTimeout => 'השרת לא הגיב בזמן. נסו שוב בעוד רגע.';
+
+  @override
+  String get errRateLimited => 'הגעתם למגבלת הייבוא לשעה. נסו שוב מאוחר יותר.';
+
+  @override
+  String get errAiBusy => 'שירות הבינה המלאכותית עמוס כרגע. נסו שוב בעוד דקה.';
+
+  @override
+  String get errDailyLimit => 'הגענו למגבלת הייבוא היומית. נסו שוב מחר.';
+
+  @override
+  String get errTooLarge =>
+      'התוכן גדול מדי. נסו מתכון קצר יותר או תמונה קטנה יותר.';
+
+  @override
+  String get errUnsupportedImage =>
+      'סוג התמונה לא נתמך. נסו תמונת JPEG או PNG.';
+
+  @override
+  String get errInvalidUrl => 'הקישור לא תקין או לא נתמך.';
+
+  @override
+  String get errFetchFailed =>
+      'לא הצלחנו לפתוח את הדף. נסו להדביק את טקסט המתכון במקום.';
+
+  @override
+  String get errSiteBlocked =>
+      'האתר לא מאפשר לקרוא את הדף. העתיקו את טקסט המתכון והדביקו אותו בלשונית \"טקסט\".';
+
+  @override
+  String get errNoRecipeFound =>
+      'לא מצאנו מתכון בדף. נסו להדביק את טקסט המתכון במקום.';
+
+  @override
+  String get errUnsafeToPlan =>
+      'המתכון כולל שימורים ביתיים, שדורשים מתכון בדוק ומאומת. לא נבנה עבורם תוכנית על סמך הערכה.';
+
+  @override
+  String get errInvalidAiOutput =>
+      'לא הצלחנו לבנות תוכנית אמינה מהמתכון הזה. נסו שוב, או נסחו את המתכון בבירור.';
+
+  @override
+  String get errNotConfigured => 'השרת עדיין לא מוגדר לייבוא מתכונים.';
+
+  @override
+  String get errGeneric => 'משהו השתבש בייבוא. נסו שוב.';
 }

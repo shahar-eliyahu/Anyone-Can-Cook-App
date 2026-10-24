@@ -87,8 +87,14 @@ class _RecipeDetail extends ConsumerWidget {
             ProvenancedText('${_number(s.amount)} ${s.unit}', s.provenance),
           ],
           const SizedBox(height: 16),
+          if (row.planStale)
+            Card(
+              color: theme.colorScheme.errorContainer,
+              child: Padding(padding: const EdgeInsets.all(12), child: Text(l10n.recipeOutdatedBanner)),
+            ),
           FilledButton.icon(
-            onPressed: () => startCooking(context, ref, row.id),
+            // An out-of-date plan is never cooked silently.
+            onPressed: row.planStale ? null : () => startCooking(context, ref, row.id),
             icon: const Icon(Icons.play_arrow),
             label: Text(l10n.startCooking),
           ),
@@ -97,6 +103,12 @@ class _RecipeDetail extends ConsumerWidget {
             onPressed: () => context.push('/recipes/${row.id}/plan'),
             icon: const Icon(Icons.list_alt),
             label: Text(l10n.viewPlan),
+          ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: () => context.push('/recipes/${row.id}/edit'),
+            icon: const Icon(Icons.edit_outlined),
+            label: Text(l10n.editRecipe),
           ),
           SectionTitle(l10n.ingredients),
           for (final i in recipe.ingredients)

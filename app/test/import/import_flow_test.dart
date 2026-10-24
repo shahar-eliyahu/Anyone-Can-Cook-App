@@ -1,0 +1,201 @@
+import 'package:anyone_can_cook/core/api_client.dart';
+import 'package:anyone_can_cook/core/db/database.dart';
+import 'package:anyone_can_cook/data/recipe_repository.dart';
+import 'package:anyone_can_cook/data/settings_repository.dart';
+import 'package:anyone_can_cook/models/plan_response.dart';
+import 'package:anyone_can_cook/models/recipe_analysis.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+
+import '../support/app_harness.dart';
+import '../support/sample.dart';
+import '../support/ui_helpers.dart';
+
+RecipeAnalysis analysis({SourceType type = SourceType.text, List<Question> questions = const []}) => RecipeAnalysis(
+      isRecipe: true,
+      source: RecipeSourceInfo(type: type),
+      sourceText: 'מתכון',
+      recipe: loadSampleBundle().recipe,
+      questions: questions,
+    );
+
+final planResponse = PlanResponse(plan: loadSampleBundle().plan, limitationsHe: const ['לא ידוע גודל התבנית']);
+
+Future<void> tapText(WidgetTester tester, String text) async {
+  await expectSeen(tester, find.text(text));
+  await tester.ensureVisible(find.text(text).first);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text(text).first);
+  await tester.pumpAndSettle();
+}
+
+VoidCallback? onPressedOf(WidgetTester tester, String label) => tester
+    .widget<ButtonStyleButton>(find.ancestor(of: find.text(label), matching: find.bySubtype<ButtonStyleButton>()))
+    .onPressed;
+
+// Plain queries: drift watch streams never emit inside testWidgets' fake async zone.
+Future<List<RecipeRow>> allRecipes(AppHarness h) => h.db.select(h.db.recipes).get();
+
+Future<void> acceptPrivacy(AppHarness h) =>
+    SettingsRepository(h.db, h.clock.call).set(SettingKeys.importPrivacyAccepted, 'true');
+
+void main() {
+  final title = loadSampleBundle().recipe.title;
+
+  testApp('text import: privacy notice once, review, approve, then reopen and cook with zero API calls',
+      (tester, h) async {
+    h.api.analyses.add(analysis());
+    h.api.plans.add(planResponse);
+    await tester.pumpWidget(h.build());
+    await tester.pumpAndSettle();
+
+    await tapText(tester, 'מתכון חדש');
+    expect(find.text('לפני הייבוא הראשון'), findsOneWidget);
+    await tapText(tester, 'הבנתי, להמשיך');
+    expect(await SettingsRepository(h.db, h.clock.call).get(SettingKeys.importPrivacyAccepted), 'true');
+
+    await tester.enterText(find.byType(TextField), 'כרעי עוף בתנור עם אורז');
+    await tapText(tester, 'ניתוח המתכון');
+
+    // Review: estimates and limitations are shown; approval needs the check.
+    expect(find.text('בדיקת התוכנית'), findsOneWidget);
+    await expectSeen(tester, find.text('מה הוערך'));
+    await expectSeen(tester, find.text('לא ידוע גודל התבנית'));
+    await expectSeen(tester, find.text('אישור התוכנית'));
+    expect(onPressedOf(tester, 'אישור התוכנית'), isNull);
+    await tapText(tester, 'בדקתי את הערכים המסומנים');
+    expect(onPressedOf(tester, 'אישור התוכנית'), isNotNull);
+    await tapText(tester, 'אישור התוכנית');
+
+    // Saved: the recipe detail opens; exactly one analysis and one plan call.
+    await expectSeen(tester, find.text('התחל בישול'));
+    expect(find.text(title), findsWidgets);
+    expect(h.api.calls, ['analyzeText', 'plan']);
+
+    // Reopening and cooking never calls the API.
+    h.api.forbidCalls = true;
+    await tapText(tester, 'תוכנית הבישול');
+    await expectSeen(tester, find.textContaining(loadSampleBundle().plan.steps.first.title));
+    GoRouter.of(tester.element(find.byType(Scaffold).last)).pop();
+    await tester.pumpAndSettle();
+    await tapText(tester, 'התחל בישול');
+    await expectSeen(tester, find.textContaining(loadSampleBundle().plan.steps.first.title));
+    expect(h.api.calls, ['analyzeText', 'plan']);
+    expect((await allRecipes(h)).where((r) => r.title == title).single.status, RecipeStatus.ready);
+  });
+
+  testApp('a question answered "I don\'t know" is not asked again: the plan is generated', (tester, h) async {
+    await acceptPrivacy(h);
+    h.api.analyses.add(analysis(questions: const [
+      Question(
+        id: 'q1',
+        textHe: 'מה גודל התבנית?',
+        whyHe: 'משנה את זמן האפייה',
+        kind: QuestionKind.number,
+        unitHe: 'ס"מ',
+        category: GapCategory.outcome,
+      ),
+    ]));
+    h.api.plans.add(planResponse);
+    await tester.pumpWidget(h.build(initialLocation: '/import'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'עוגה');
+    await tapText(tester, 'ניתוח המתכון');
+    expect(find.text('מה גודל התבנית?'), findsOneWidget);
+    expect(h.api.calls, ['analyzeText']);
+
+    await tapText(tester, 'לא יודע/ת');
+    expect(find.byType(TextField), findsNothing);
+    await tapText(tester, 'בניית התוכנית');
+
+    expect(find.text('בדיקת התוכנית'), findsOneWidget);
+    expect(h.api.calls, ['analyzeText', 'plan']);
+    expect(h.api.lastPlanRequest!.answers, const [Answer(questionId: 'q1', unknown: true)]);
+  });
+
+  testApp('photo import: the photo is kept for review and deleted on approval', (tester, h) async {
+    await acceptPrivacy(h);
+    h.pickedPhoto = '/picked/recipe.jpg';
+    h.api.analyses.add(analysis(type: SourceType.image));
+    h.api.plans.add(planResponse);
+    await tester.pumpWidget(h.build(initialLocation: '/import'));
+    await tester.pumpAndSettle();
+
+    await tapText(tester, 'תמונה');
+    await tapText(tester, 'מהגלריה');
+    expect(h.images.saved, {'/images/1.jpg'});
+    await tapText(tester, 'ניתוח המתכון');
+
+    expect(h.api.calls, ['analyzeImage', 'plan']);
+    await expectSeen(tester, find.text('התוכנית נבנתה מתמונה — בדקו שהכמויות והזמנים נקראו נכון.'));
+    final draft = (await allRecipes(h)).single;
+    expect(draft.sourceImagePath, '/images/1.jpg');
+
+    await tapText(tester, 'בדקתי את הערכים המסומנים');
+    await tapText(tester, 'אישור התוכנית');
+    expect(h.images.deleted, ['/images/1.jpg']);
+    expect((await h.recipes.getRecipe(draft.id))!.sourceImagePath, isNull);
+  });
+
+  testApp('offline: a Hebrew message, the text is kept, nothing is saved', (tester, h) async {
+    await acceptPrivacy(h);
+    h.api.analyses.add(const ApiFailure('offline'));
+    await tester.pumpWidget(h.build(initialLocation: '/import'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(find.byType(TextField), 'מרק עדשים');
+    await tapText(tester, 'ניתוח המתכון');
+    await expectSeen(tester, find.textContaining('אין חיבור לאינטרנט'));
+    expect(find.text('מרק עדשים'), findsOneWidget);
+    expect(await allRecipes(h), isEmpty);
+  });
+
+  testApp('an edit the plan cannot absorb blocks cooking until the plan is re-checked', (tester, h) async {
+    final id = await h.saveFixture('sample_recipe');
+    h.api.forbidCalls = true;
+    final firstPlan = (await h.recipes.latestApprovedPlan(id))!;
+    final lastSource = loadSampleBundle().recipe.sourceSteps.last.text;
+    await tester.pumpWidget(h.build(initialLocation: '/recipes/$id/edit'));
+    await tester.pumpAndSettle();
+
+    // Correct an original instruction: the plan was built from it.
+    await expectSeen(tester, find.text(lastSource));
+    final edit = find.byTooltip('עריכת הוראה').last;
+    await tester.ensureVisible(edit);
+    await tester.pumpAndSettle();
+    await tester.tap(edit);
+    await tester.pumpAndSettle();
+    await tester.enterText(
+        find.descendant(of: find.byType(AlertDialog), matching: find.byType(TextField)), 'מגישים חם עם לימון.');
+    await tapText(tester, 'שמירה');
+
+    await expectSeen(tester, find.text('התוכנית לא מעודכנת לשינויים במתכון'));
+    expect((await h.recipes.getRecipe(id))!.planStale, isTrue);
+
+    // The recipe can't be cooked while its plan is out of date.
+    await tester.pumpWidget(h.build(initialLocation: '/recipes/$id'));
+    await tester.pumpAndSettle();
+    await expectSeen(tester, find.textContaining('התוכנית לא מעודכנת לשינויים במתכון. ערכו'));
+    await expectSeen(tester, find.text('התחל בישול'));
+    expect(onPressedOf(tester, 'התחל בישול'), isNull);
+
+    // Re-check it by hand, approve, and cooking is available again.
+    await tapText(tester, 'עריכת המתכון והתוכנית');
+    await tapText(tester, 'בדקתי — התוכנית נכונה');
+    expect(find.text('התוכנית לא מעודכנת לשינויים במתכון'), findsNothing);
+    await tapText(tester, 'בדקתי את הערכים המסומנים');
+    await tapText(tester, 'אישור התוכנית');
+    await expectSeen(tester, find.text('התחל בישול'));
+    expect(onPressedOf(tester, 'התחל בישול'), isNotNull);
+
+    final row = (await h.recipes.getRecipe(id))!;
+    expect(row.planStale, isFalse);
+    expect(row.recipe.sourceSteps.last.text, 'מגישים חם עם לימון.');
+    final approved = (await h.recipes.latestApprovedPlan(id))!;
+    expect(approved.basedOnPlanId, firstPlan.id);
+    expect(h.api.calls, isEmpty);
+    expect(row.status, RecipeStatus.ready);
+  });
+}
