@@ -2188,12 +2188,6 @@ abstract class AppLocalizations {
   /// **'פעולות למתכון'**
   String get overviewMore;
 
-  /// No description provided for @remySheetSubtitle.
-  ///
-  /// In he, this message translates to:
-  /// **'אפשר לדבר או להקליד'**
-  String get remySheetSubtitle;
-
   /// No description provided for @remyPrepGreeting.
   ///
   /// In he, this message translates to:
@@ -2308,36 +2302,6 @@ abstract class AppLocalizations {
   /// **'כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה.'**
   String get attentionAckHint;
 
-  /// No description provided for @handsFreeTitle.
-  ///
-  /// In he, this message translates to:
-  /// **'דיבור בלי ידיים'**
-  String get handsFreeTitle;
-
-  /// No description provided for @handsFreeOffHint.
-  ///
-  /// In he, this message translates to:
-  /// **'אמרו \"היי רמי\" ורמי יקשיב, בלי לגעת במסך'**
-  String get handsFreeOffHint;
-
-  /// No description provided for @handsFreeListening.
-  ///
-  /// In he, this message translates to:
-  /// **'מקשיב ל\"היי רמי\". המסך יישאר דלוק.'**
-  String get handsFreeListening;
-
-  /// No description provided for @handsFreePaused.
-  ///
-  /// In he, this message translates to:
-  /// **'רמי איתכם עכשיו'**
-  String get handsFreePaused;
-
-  /// No description provided for @handsFreeStarting.
-  ///
-  /// In he, this message translates to:
-  /// **'מכינים את המיקרופון…'**
-  String get handsFreeStarting;
-
   /// No description provided for @handsFreeNetwork.
   ///
   /// In he, this message translates to:
@@ -2421,6 +2385,60 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'הכתובת הועתקה. אפשר לפתוח אותה בדפדפן.'**
   String get importUrlCopied;
+
+  /// No description provided for @handsFreePrepTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'רוצים לדבר עם רמי בלי לגעת במסך?'**
+  String get handsFreePrepTitle;
+
+  /// No description provided for @handsFreePrepBody.
+  ///
+  /// In he, this message translates to:
+  /// **'כשהאפשרות פעילה, אפשר לומר \"היי רמי\" בזמן הבישול ורמי יקשיב. המסך יישאר דלוק בזמן הבישול.'**
+  String get handsFreePrepBody;
+
+  /// No description provided for @handsFreeSettingTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'דיבור בלי ידיים בזמן בישול'**
+  String get handsFreeSettingTitle;
+
+  /// No description provided for @handsFreeSettingBody.
+  ///
+  /// In he, this message translates to:
+  /// **'אמרו \"היי רמי\" בזמן הבישול ורמי יקשיב, בלי לגעת במסך. המסך יישאר דלוק בזמן הבישול.'**
+  String get handsFreeSettingBody;
+
+  /// No description provided for @remySettingsSection.
+  ///
+  /// In he, this message translates to:
+  /// **'רמי'**
+  String get remySettingsSection;
+
+  /// No description provided for @handsFreeIndicator.
+  ///
+  /// In he, this message translates to:
+  /// **'מקשיב'**
+  String get handsFreeIndicator;
+
+  /// No description provided for @handsFreeIndicatorLabel.
+  ///
+  /// In he, this message translates to:
+  /// **'רמי מקשיב ל\"היי רמי\". לחצו כדי להפסיק.'**
+  String get handsFreeIndicatorLabel;
+
+  /// No description provided for @handsFreeResume.
+  ///
+  /// In he, this message translates to:
+  /// **'להפעיל שוב את \"היי רמי\"'**
+  String get handsFreeResume;
+
+  /// No description provided for @handsFreeStopped.
+  ///
+  /// In he, this message translates to:
+  /// **'\"היי רמי\" הופסק לבישול הזה.'**
+  String get handsFreeStopped;
 }
 
 class _AppLocalizationsDelegate

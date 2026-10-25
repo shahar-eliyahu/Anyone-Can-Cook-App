@@ -621,7 +621,8 @@ wake phrase ("Hey Remy") stays later (always-on listening: battery and privacy).
 
 - Phase 4: visual identity from the final logo (`docs/branding/logo.png`, DECISIONS #64), navigation, the
   beginner journey, an original "Remy" (רמי) look, motion and accessibility. **Implemented 2026-10-24 (4B–4E,
-  local commits); design and as-built notes in `docs/DESIGN.md`, decisions #65–#71.** Release work (store,
+  local commits); design and as-built notes in `docs/DESIGN.md`, decisions #65–#71; real-device refinements in
+  `docs/DESIGN.md` §13–§14, decisions #72–#80.** Release work (store,
   privacy policy, App Check, paid tier, iOS builds) remains separate and needs approval.
 - "היי רמי" (hands-free in the cooking screen, the phone's own recognizer in a loop) was added in the Phase 4
   refinement (`docs/DESIGN.md` §13). Future: a true on-device wake-word engine, if a free option without a new

@@ -22,8 +22,7 @@ void main() {
     expect(find.text('הערכה'), findsNothing); // no technical badges while cooking
 
     // Preheat (prep task) starts its plan timer.
-    await tester.tap(find.text('הדליקו את התנור על 200 מעלות'));
-    await tester.pumpAndSettle();
+    await tapText(tester, 'הדליקו את התנור על 200 מעלות');
     expect(h.notifier.scheduled.keys, ['${session.id}/tp1']);
     await expectSeen(tester, find.text('חימום תנור'));
 

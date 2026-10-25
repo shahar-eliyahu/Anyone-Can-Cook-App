@@ -86,9 +86,12 @@ Key invariants:
   Cook" is the internal name for code, packages, folders, GitHub. Never rename the repo or folders.
 - **Design system (Phase 4, `docs/DESIGN.md`):** colours, type, spacing and motion come from `core/theme.dart` and
   `core/motion.dart`, never hard-coded; use the shared widgets (`AppScaffold` with "תפריט", `BottomActionBar`,
-  `NoteBanner`, `RecipeTile`, `StageLoader`…). Routes stay nested under `/`. Remy's entry point is `RemyButton` (a tap opens him listening). "תפריט" sits in
-  the top-right corner with back beside it. Hands-free "היי רמי" lives in `assistant/hands_free.dart` (cooking
-  screen only; Remy's sheet pauses it via `remySheetOpenProvider`).
+  `NoteBanner`, `RecipeTile`, `StageLoader`…). Routes stay nested under `/`. Navigation rule: "תפריט" only on home (right side); inner screens have only a
+  back arrow (right side) and their own title (`AppScaffold(title: …)`; `title: null` means home). Remy's entry
+  point is `RemyButton` (a tap opens him listening). Hands-free "היי רמי" lives in `assistant/hands_free.dart`
+  (cooking screen only; one saved preference `handsFreePreferenceProvider`, chosen in preparation/settings via
+  `HandsFreeChoice`; Remy's sheet pauses it via `remySheetOpenProvider`). Plan-ahead notices show in preparation
+  and with their step (`features/cooking/guidance.dart`), never as a cooking banner.
   Hebrew copy: no dash separators (tested), temperatures in words, `tidyHe` for AI/user text. Animations are
   bounded and respect `Motion.reduced`.
 - **Dependencies:** add a package only when the approved plan needs it; prefer small local code.

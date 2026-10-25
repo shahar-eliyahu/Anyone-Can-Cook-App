@@ -18,6 +18,7 @@ import '../assistant/hands_free.dart';
 import '../assistant/remy_widgets.dart';
 import 'cooking_controller.dart';
 import 'engine/cooking_engine.dart';
+import 'guidance.dart';
 
 /// The cooking screen: the current step big and clear, with one main button and Remy beside
 /// it at the bottom (docs/DECISIONS.md #35, #36; docs/DESIGN.md §5). Timers, prep tasks and
@@ -60,6 +61,7 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
   final _helpOpen = <String>{};
 
   CookingController get _controller => ref.read(cookingControllerProvider(widget.sessionId).notifier);
+  late final String? _noticeStepId = advanceNoticeStepId(widget.view.state.plan);
   CookingState get _state => widget.view.state;
   DateTime get _now => widget.now;
 
@@ -164,6 +166,10 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
 
     return AppScaffold(
       title: title,
+      actions: [
+        if (handsFree.enabled)
+          _HandsFreeIndicator(state: handsFree, controller: ref.read(handsFreeControllerProvider(widget.sessionId).notifier)),
+      ],
       bottomBar: _state.isComplete
           ? null
           : Row(
@@ -179,18 +185,18 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(Space.page, Space.s, Space.page, Space.xl),
         children: [
-          // Progress, with the one-tap undo next to it.
+          // Where we are, in one light line, with the one-tap undo beside it.
           Row(
             children: [
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  spacing: 2,
+                child: Wrap(
+                  spacing: Space.s,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     if (!_state.isComplete && focus != null)
                       Text(
                         l10n.stepOfTotal(plan.steps.indexOf(focus) + 1, total),
-                        style: theme.textTheme.labelLarge?.copyWith(color: AppColors.primary, fontWeight: FontWeight.w700),
+                        style: theme.textTheme.titleSmall?.copyWith(color: AppColors.primary, fontWeight: FontWeight.w700),
                       ),
                     Text(l10n.cookingProgress(done, total), style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
                   ],
@@ -198,30 +204,19 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
               ),
               TextButton.icon(
                 onPressed: _state.log.isEmpty ? null : _back,
-                icon: const Icon(Icons.undo_rounded),
+                icon: const Icon(Icons.undo_rounded, size: 20),
                 label: Text(l10n.backButton),
               ),
             ],
           ),
-          const SizedBox(height: Space.xs),
           TweenAnimationBuilder<double>(
             tween: Tween(end: total == 0 ? 0 : done / total),
             duration: Motion.of(context, Motion.long),
             curve: Motion.standard,
-            builder: (context, v, _) => LinearProgressIndicator(value: v, semanticsLabel: l10n.progressLabel),
+            builder: (context, v, _) => LinearProgressIndicator(value: v, minHeight: 4, semanticsLabel: l10n.progressLabel),
           ),
-          if (ref.read(handsFreeControllerProvider(widget.sessionId).notifier).available)
-            _HandsFreeRow(
-              state: handsFree,
-              onChanged: (on) => ref.read(handsFreeControllerProvider(widget.sessionId).notifier).setEnabled(on),
-            ),
-          if (plan.advanceNoticeHe case final notice? when done == 0)
-            NoteBanner(tidyHe(notice), kind: NoteKind.tip, icon: Icons.schedule_rounded),
-          if (prep.isNotEmpty) ...[
-            SectionTitle(l10n.prepTasks),
-            for (final p in prep) _PrepCard(view: p, onDone: () => _controller.completePrepTask(p.task.id)),
-          ],
           const SizedBox(height: Space.m),
+          // The instruction first: what to do now.
           AnimatedSwitcher(
             duration: Motion.of(context, Motion.medium),
             switchInCurve: Motion.enter,
@@ -233,6 +228,10 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
                     ? KeyedSubtree(key: ValueKey(focus.id), child: _stepCard(focus, primary, guidance, emphasized: true))
                     : const SizedBox.shrink(),
           ),
+          if (prep.isNotEmpty) ...[
+            SectionTitle(l10n.prepTasks),
+            for (final p in prep) _PrepCard(view: p, onDone: () => _controller.completePrepTask(p.task.id)),
+          ],
           if (otherTimers.isNotEmpty) ...[
             SectionTitle(l10n.timersTitle),
             for (final t in otherTimers) _timerTile(t, guidance[t.timerId]),
@@ -344,12 +343,12 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
         side: BorderSide(color: emphasized ? AppColors.brandBlue.withValues(alpha: 0.5) : theme.colorScheme.outlineVariant, width: emphasized ? 1.5 : 1),
       ),
       child: Padding(
-        padding: EdgeInsets.all(emphasized ? Space.l + 4 : Space.l),
+        padding: const EdgeInsets.all(Space.l),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           spacing: Space.s,
           children: [
-            Text(step.title, style: emphasized ? theme.textTheme.headlineSmall : theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+            Text(step.title, style: (emphasized ? theme.textTheme.titleLarge : theme.textTheme.titleMedium)?.copyWith(fontWeight: FontWeight.w700)),
             Text(
               tidyHe(step.instructionHe),
               style: emphasized ? theme.textTheme.bodyLarge?.copyWith(fontSize: 20, height: 1.5) : theme.textTheme.bodyMedium,
@@ -373,6 +372,11 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
               ),
             if (step.temperature case final t?)
               InfoPill(icon: Icons.thermostat_rounded, label: l10n.temperatureLabel(t.value)),
+            // Planning-ahead advice ("לנוח במקרר לילה שלם") shows with the step it is about;
+            // before cooking it is in preparation.
+            if (emphasized && step.id == _noticeStepId)
+              if (_state.plan.advanceNoticeHe case final notice?)
+                NoteBanner(tidyHe(notice), kind: NoteKind.tip, icon: Icons.schedule_rounded),
             if (timer != null) _TimerStatus(timer: timer, now: _now, guidance: g, controller: _controller),
             if (checkDue && cue != null) Text('👀 ${tidyHe(cue)}', style: theme.textTheme.titleSmall),
             if (p?.kind == PrimaryKind.startTimer)
@@ -624,48 +628,68 @@ class _TimerStatus extends StatelessWidget {
   }
 }
 
-/// "דיבור בלי ידיים": one compact row with a switch. On, it says what to say and that it is
-/// listening; when it can't listen, it says why.
-class _HandsFreeRow extends StatelessWidget {
-  const _HandsFreeRow({required this.state, required this.onChanged});
+/// Hands-free in the header: "מקשיב" only while it really listens (a tap stops it for this
+/// cooking session); a muted microphone to turn it back on when it was stopped or can't
+/// listen; nothing while starting or while Remy's sheet is open. Setup lives in preparation
+/// and settings, not on every step.
+class _HandsFreeIndicator extends StatelessWidget {
+  const _HandsFreeIndicator({required this.state, required this.controller});
 
   final HandsFreeState state;
-  final ValueChanged<bool> onChanged;
+  final HandsFreeController controller;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    final listening = state.enabled && state.status == HandsFreeStatus.listening;
-    final subtitle = !state.enabled
-        ? l10n.handsFreeOffHint
-        : switch (state.status) {
-            HandsFreeStatus.listening => l10n.handsFreeListening,
-            HandsFreeStatus.paused => l10n.handsFreePaused,
-            HandsFreeStatus.unavailable => state.messageHe ?? l10n.handsFreeError,
-            _ => l10n.handsFreeStarting,
-          };
-    return Padding(
-      padding: const EdgeInsets.only(top: Space.m),
-      child: Material(
-        color: state.enabled ? theme.colorScheme.primaryContainer : theme.colorScheme.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(Radii.input),
-        child: SwitchListTile(
-          value: state.enabled,
-          onChanged: onChanged,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(Radii.input)),
-          secondary: BreathingRing(
-            active: listening,
-            child: Icon(
-              state.status == HandsFreeStatus.unavailable && state.enabled ? Icons.mic_off_outlined : Icons.record_voice_over_outlined,
-              color: AppColors.primary,
+    switch (state.status) {
+      case HandsFreeStatus.listening:
+        return Semantics(
+          button: true,
+          label: l10n.handsFreeIndicatorLabel,
+          excludeSemantics: true,
+          child: Material(
+            color: theme.colorScheme.primaryContainer,
+            shape: const StadiumBorder(),
+            child: InkWell(
+              customBorder: const StadiumBorder(),
+              onTap: () {
+                controller.stopForNow();
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.handsFreeStopped)));
+              },
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(minHeight: 40),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: Space.m),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: Space.xs,
+                    children: [
+                      BreathingRing(active: true, child: Icon(Icons.mic_rounded, size: 18, color: AppColors.primary)),
+                      Text(
+                        l10n.handsFreeIndicator,
+                        style: theme.textTheme.labelLarge?.copyWith(color: theme.colorScheme.onPrimaryContainer),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
-          title: Text(l10n.handsFreeTitle, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-          subtitle: Text(subtitle),
-        ),
-      ),
-    );
+        );
+      case HandsFreeStatus.stopped || HandsFreeStatus.unavailable:
+        final why = state.status == HandsFreeStatus.unavailable ? state.messageHe : null;
+        return IconButton(
+          tooltip: why ?? l10n.handsFreeResume,
+          icon: Icon(Icons.mic_off_outlined, color: theme.colorScheme.onSurfaceVariant),
+          onPressed: () {
+            if (why != null) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(why)));
+            controller.resume();
+          },
+        );
+      case HandsFreeStatus.off || HandsFreeStatus.starting || HandsFreeStatus.paused:
+        return const SizedBox.shrink();
+    }
   }
 }
 

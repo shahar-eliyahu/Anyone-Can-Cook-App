@@ -17,6 +17,7 @@ import '../../models/cooking_plan.dart';
 import '../../models/recipe.dart';
 import '../../models/recipe_analysis.dart';
 import '../assistant/assistant_models.dart';
+import '../assistant/hands_free_choice.dart';
 import '../assistant/remy_widgets.dart';
 import '../cooking/start_cooking.dart';
 import '../import/import_service.dart';
@@ -302,6 +303,11 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
                   )
                 : const SizedBox(key: ValueKey('not-ready'), width: double.infinity),
           ),
+          // Optional and secondary: decided calmly here, not on every cooking step.
+          if (!view.cookingNow) ...[
+            const SizedBox(height: Space.l),
+            const HandsFreeChoice(),
+          ],
         ],
       ),
     );

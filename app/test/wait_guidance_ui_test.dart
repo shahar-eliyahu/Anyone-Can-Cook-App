@@ -12,8 +12,9 @@ void main() {
     await tester.pumpWidget(h.build(initialLocation: '/cook/${session.id}'));
     await tester.pumpAndSettle();
 
-    // Advance notice before starting.
-    await expectSeen(tester, find.textContaining('כל התהליך לוקח כ-4 שעות'));
+    // The plan-ahead notice belongs to preparation (and to the waiting step it is about), not
+    // to the start of cooking.
+    expect(find.textContaining('כל התהליך לוקח כ-4 שעות'), findsNothing);
 
     // Knead (a timed step: explicit start), finish early, then start the first proof (60–90 minutes).
     await tapButton(tester, 'התחלתי ללוש');

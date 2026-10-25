@@ -1243,9 +1243,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get overviewMore => 'פעולות למתכון';
 
   @override
-  String get remySheetSubtitle => 'אפשר לדבר או להקליד';
-
-  @override
   String get remyPrepGreeting =>
       'היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.';
 
@@ -1313,21 +1310,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get attentionAckHint => 'כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה.';
 
   @override
-  String get handsFreeTitle => 'דיבור בלי ידיים';
-
-  @override
-  String get handsFreeOffHint => 'אמרו \"היי רמי\" ורמי יקשיב, בלי לגעת במסך';
-
-  @override
-  String get handsFreeListening => 'מקשיב ל\"היי רמי\". המסך יישאר דלוק.';
-
-  @override
-  String get handsFreePaused => 'רמי איתכם עכשיו';
-
-  @override
-  String get handsFreeStarting => 'מכינים את המיקרופון…';
-
-  @override
   String get handsFreeNetwork =>
       'זיהוי הדיבור בטלפון הזה צריך אינטרנט, ולכן \"היי רמי\" לא זמין כרגע. אפשר ללחוץ על רמי.';
 
@@ -1377,4 +1359,34 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get importUrlCopied => 'הכתובת הועתקה. אפשר לפתוח אותה בדפדפן.';
+
+  @override
+  String get handsFreePrepTitle => 'רוצים לדבר עם רמי בלי לגעת במסך?';
+
+  @override
+  String get handsFreePrepBody =>
+      'כשהאפשרות פעילה, אפשר לומר \"היי רמי\" בזמן הבישול ורמי יקשיב. המסך יישאר דלוק בזמן הבישול.';
+
+  @override
+  String get handsFreeSettingTitle => 'דיבור בלי ידיים בזמן בישול';
+
+  @override
+  String get handsFreeSettingBody =>
+      'אמרו \"היי רמי\" בזמן הבישול ורמי יקשיב, בלי לגעת במסך. המסך יישאר דלוק בזמן הבישול.';
+
+  @override
+  String get remySettingsSection => 'רמי';
+
+  @override
+  String get handsFreeIndicator => 'מקשיב';
+
+  @override
+  String get handsFreeIndicatorLabel =>
+      'רמי מקשיב ל\"היי רמי\". לחצו כדי להפסיק.';
+
+  @override
+  String get handsFreeResume => 'להפעיל שוב את \"היי רמי\"';
+
+  @override
+  String get handsFreeStopped => '\"היי רמי\" הופסק לבישול הזה.';
 }

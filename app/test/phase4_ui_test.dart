@@ -3,6 +3,7 @@ import 'package:anyone_can_cook/data/recipe_repository.dart';
 import 'package:anyone_can_cook/features/kitchen/kitchen_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
 
 import 'support/app_harness.dart';
 import 'support/ui_helpers.dart';
@@ -58,9 +59,9 @@ void main() {
     expect(find.byType(KitchenScreen), findsOneWidget);
   });
 
-  testApp('the menu is one labelled tap away everywhere and lists cooking in progress first', (tester, h) async {
+  testApp('the menu lives on home: one labelled tap, cooking in progress listed first', (tester, h) async {
     final sessionId = await startSession(h);
-    await tester.pumpWidget(h.build(initialLocation: '/recipes'));
+    await tester.pumpWidget(h.build());
     await tester.pumpAndSettle();
     await openMenu(tester);
     for (final item in ['המשך בישול', 'המטבח שלי', 'מתכון חדש', 'המתכונים שלי', 'מועדפים', 'היסטוריית בישול', 'הגדרות']) {
@@ -72,17 +73,15 @@ void main() {
     expect((await h.sessions.activeSession())?.id, sessionId);
   });
 
-  testApp('leaving the cooking screen through the menu never stops cooking: timers and undo stay', (tester, h) async {
+  testApp('leaving the cooking screen with back never stops cooking: timers and undo stay', (tester, h) async {
     final sessionId = await startSession(h);
     await tester.pumpWidget(h.build(initialLocation: '/cook/$sessionId'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('הדליקו את התנור על 200 מעלות'));
-    await tester.pumpAndSettle();
+    await tapText(tester, 'הדליקו את התנור על 200 מעלות');
     await tapButton(tester, 'סיימתי, לשלב הבא');
     expect(h.notifier.scheduled.keys, ['$sessionId/tp1']);
 
-    await openMenu(tester);
-    await tester.tap(find.text('המטבח שלי'));
+    await tester.tap(find.byType(BackButton));
     await tester.pumpAndSettle();
     expect(find.byType(KitchenScreen), findsOneWidget);
     expect(find.text('מבשלים עכשיו'), findsOneWidget);
@@ -96,25 +95,56 @@ void main() {
     expect(find.text('0 מתוך 5 שלבים הושלמו'), findsOneWidget);
   });
 
-  testApp('Hebrew bar layout: "תפריט" in the right corner on every screen, back beside it, menu from the right',
+  testApp('navigation rule: home has the menu on the right; inner screens have only back on the right and their title',
       (tester, h) async {
     phone(tester);
     final recipeId = await h.seedSample();
-    await tester.pumpWidget(h.build(initialLocation: '/recipes/$recipeId'));
+    await tester.pumpWidget(h.build());
     await tester.pumpAndSettle();
-    final menu = tester.getRect(find.text('תפריט'));
-    final back = tester.getRect(find.byType(BackButton));
-    expect(menu.center.dx, greaterThan(300)); // the right corner of a 360-wide screen
-    expect(back.center.dx, lessThan(menu.center.dx)); // next to it, on its left
-    expect(back.center.dx, greaterThan(180)); // still on the right half
-    expect(tester.getRect(find.byTooltip('פעולות למתכון')).center.dx, lessThan(100)); // actions far left
-
-    await tester.binding.handlePopRoute();
-    await tester.pumpAndSettle();
-    expect(tester.getRect(find.text('תפריט')).center.dx, menu.center.dx); // same place on home
+    expect(tester.getRect(find.text('תפריט')).center.dx, greaterThan(300)); // the right corner
+    expect(find.byType(BackButton), findsNothing);
     await tester.tap(find.text('תפריט'));
     await tester.pumpAndSettle();
     expect(tester.getRect(find.byType(Drawer)).right, 360); // slides in from the right
+    await tester.tap(find.text('הגדרות'));
+    await tester.pump(const Duration(seconds: 1));
+
+    for (final location in ['/settings', '/recipes', '/recipes/$recipeId', '/import', '/history']) {
+      GoRouter.of(tester.element(find.byType(Scaffold).last)).go(location);
+      await tester.pump(const Duration(seconds: 1));
+      final bar = find.byType(AppBar).last;
+      expect(find.descendant(of: bar, matching: find.byType(BackButton)), findsOneWidget, reason: location);
+      expect(tester.getRect(find.descendant(of: bar, matching: find.byType(BackButton))).center.dx, greaterThan(300), reason: location);
+      expect(find.descendant(of: bar, matching: find.text('תפריט')), findsNothing, reason: location);
+      expect(find.descendant(of: bar, matching: find.text('לבשל כל אחד יכול')), findsNothing, reason: location);
+    }
+    if (find.text('הבנתי, להמשיך').evaluate().isNotEmpty) await tapText(tester, 'הבנתי, להמשיך');
+  });
+
+  testApp('the cooking header is one compact row: back and the recipe name, truncated, nothing else', (tester, h) async {
+    phone(tester, textScale: 1.3);
+    final sessionId = await startSession(h);
+    await tester.pumpWidget(h.build(initialLocation: '/cook/$sessionId'));
+    await tester.pumpAndSettle();
+    final bar = find.byType(AppBar).last;
+    expect(tester.getSize(bar).height, lessThanOrEqualTo(64));
+    final title = tester.widget<Text>(find.descendant(of: bar, matching: find.text('עוף בתנור עם תפוחי אדמה ואורז')));
+    expect(title.maxLines, 1);
+    expect(title.overflow, TextOverflow.ellipsis);
+    expect(tester.takeException(), isNull);
+    // The instruction is the focus: the step title sits right under the light progress line.
+    final step = tester.getRect(find.text('הכנת תפוחי האדמה'));
+    expect(step.top, lessThan(260));
+  });
+
+  testApp('back from a screen opened with nothing under it still goes home', (tester, h) async {
+    final sessionId = await startSession(h);
+    await tester.pumpWidget(h.build(initialLocation: '/cook/$sessionId'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byType(BackButton));
+    await tester.pumpAndSettle();
+    expect(find.byType(KitchenScreen), findsOneWidget);
+    expect((await h.sessions.activeSession())?.id, sessionId);
   });
 
   testApp('RTL: forward arrows point left (chevron_right mirrors), back points right', (tester, h) async {
@@ -150,7 +180,8 @@ void main() {
       // Settings shows a progress bar while it asks the system; the platform never answers here.
       location == '/settings' ? await tester.pump(const Duration(seconds: 2)) : await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
-      expect(find.text('תפריט'), findsOneWidget);
+      // Home: the menu; every other screen: one back button.
+      expect(location == '/' ? find.text('תפריט') : find.byType(BackButton), findsOneWidget);
     });
   }
 
@@ -206,8 +237,7 @@ void main() {
     final sessionId = await startSession(h);
     await tester.pumpWidget(h.build(initialLocation: '/cook/$sessionId'));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('הדליקו את התנור על 200 מעלות'));
-    await tester.pumpAndSettle();
+    await tapText(tester, 'הדליקו את התנור על 200 מעלות');
     await h.advance(tester, const Duration(minutes: 15));
     await expectSeen(tester, find.text('זמן לבדוק!'));
     await tester.pump();

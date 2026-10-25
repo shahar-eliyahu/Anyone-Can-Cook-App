@@ -7,12 +7,12 @@ import '../../l10n/app_localizations.dart';
 import '../theme.dart';
 import 'brand.dart';
 
-/// The frame of every screen (docs/DESIGN.md §3, §13): in Hebrew the start of the bar is the
-/// right edge, so the labelled "תפריט" sits in that corner on every screen (the menu slides in
-/// from the same side) and the back arrow, pointing right, sits right next to it; then the
-/// small app name above the screen title; screen actions stay on the far (left) side. Bottom bars sit above the system
-/// navigation and the keyboard; content is centred and never wider than a comfortable
-/// reading width.
+/// The frame of every screen (docs/DESIGN.md §3, §14). Home: the labelled "תפריט" on the
+/// right (the start side in Hebrew) and the menu sliding in from there. Every inner screen:
+/// one back arrow on the right, pointing right, and only that screen's title (no app name,
+/// no menu), truncated on one line. Back always ends at home (routes are nested under it).
+/// Bottom bars sit above the system navigation and the keyboard; content is centred and
+/// never wider than a comfortable reading width.
 class AppScaffold extends StatelessWidget {
   const AppScaffold({
     super.key,
@@ -21,57 +21,44 @@ class AppScaffold extends StatelessWidget {
     this.actions,
     this.floatingActionButton,
     this.bottomBar,
-    this.showMenu = true,
   });
 
-  /// Null on home, where the app name is shown large in the page itself.
+  /// The screen's own title. Null only on home, which shows the app name large in the page
+  /// and has the menu instead of a back arrow.
   final String? title;
   final Widget body;
 
-  /// Screen actions, placed before the menu button.
+  /// Screen actions, on the far (left) side.
   final List<Widget>? actions;
   final Widget? floatingActionButton;
 
   /// Fixed at the bottom, above the system navigation bar (e.g. the cooking screen's main
   /// button, so it never scrolls away).
   final Widget? bottomBar;
-  final bool showMenu;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final l10n = AppLocalizations.of(context);
     final title = this.title;
-    final canGoBack = ModalRoute.of(context)?.impliesAppBarDismissal ?? false;
+    final home = title == null;
+    final canPop = ModalRoute.of(context)?.impliesAppBarDismissal ?? false;
     return Scaffold(
       appBar: AppBar(
-        toolbarHeight: title == null ? kToolbarHeight : 64,
         automaticallyImplyLeading: false,
-        leadingWidth: (showMenu ? 64 : 0) + (canGoBack ? 48 : 0) + Space.xs,
-        leading: Row(
-          children: [
-            const SizedBox(width: Space.xs),
-            if (showMenu) const MenuButton(),
-            if (canGoBack) const BackButton(),
-          ],
+        leadingWidth: home ? 64 + Space.s : 48 + Space.s,
+        leading: Padding(
+          padding: const EdgeInsetsDirectional.only(start: Space.s),
+          // A screen opened with nothing under it (a notification, a restored session) still
+          // gets a way home.
+          child: home ? const MenuButton() : BackButton(onPressed: canPop ? null : () => GoRouter.of(context).go('/')),
         ),
-        titleSpacing: canGoBack || showMenu ? 0 : Space.l,
-        title: title == null
-            ? null
-            : Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(l10n.appTitle, style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
-                  Text(title, overflow: TextOverflow.ellipsis, maxLines: 1),
-                ],
-              ),
+        titleSpacing: home ? 0 : Space.xs,
+        title: home ? null : Text(title, overflow: TextOverflow.ellipsis, maxLines: 1),
         actions: [
           ...?actions,
           const SizedBox(width: Space.xs),
         ],
       ),
-      drawer: showMenu ? const AppMenu() : null,
+      drawer: home ? const AppMenu() : null,
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: bottomBar == null ? null : BottomActionBar(child: bottomBar!),
       body: SafeArea(top: false, bottom: bottomBar == null, child: ContentWidth(child: body)),

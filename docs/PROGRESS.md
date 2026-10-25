@@ -494,6 +494,28 @@ Checked what existed, changed only what was missing.
 - **Limits:** sites behind bot protection can't be imported by link (by design); links that resolve only with
   JavaScript in a browser are reported, not resolved; the backend change ships only with an approved deploy.
 
+### Real-device UX refinement, 2026-10-25 (local commit)
+
+- **What:** navigation rule (menu only on home, back only on inner screens, titles without the app name);
+  compact cooking header; instruction-first cooking hierarchy; hands-free choice moved to preparation and
+  settings (one preference, microphone asked up front) with a small "מקשיב" indicator during cooking (stop for this
+  session / resume); plan-ahead notices moved out of the start of cooking into preparation and their own step.
+  Details: `docs/DESIGN.md` §14; decisions #77–#80.
+- **Cause of the premature tip:** the plan's `advance_notice_he` ("מומלץ לתת לעוגה לנוח במקרר לילה שלם") was shown
+  as a banner while no step was done, i.e. during step 1. It is now matched to its step (`features/cooking/
+  guidance.dart`) and shown in preparation; the prompt asks for the wait to be its own step (ships with a deploy).
+- **Tests (fakes only, zero Gemini calls):** Flutter **293/293**, analyzer clean (new: navigation rule on every
+  main screen, compact cooking header, back home from a screen with nothing under it, hands-free chosen in
+  preparation, settings agree and turning off there stops listening, permission refused keeps it off, "מקשיב"
+  stop/resume, no control when off, offline shows a muted mic and never "מקשיב", guidance timing unit tests
+  including the biscuit cake, notice in preparation, not at step 1, and with its own step); backend **200/200**.
+- **Emulator (Pixel 8a, Android 15):** home (menu right, no back), overview (back right, title only, actions
+  left, hands-free card under the checklist), turning hands-free on asked for the microphone, cooking (one-row
+  header with "מקשיב", progress line, instruction at the top), tapping "מקשיב" stopped listening (no new recognizer
+  sessions) and the muted mic resumed it, back went home, settings showed the same choice and turning it off there
+  removed the indicator, cooking at 1.5x system font. The emulator had stopped mid-check and was started again.
+  Test session abandoned, hands-free left off and the microphone permission revoked afterwards.
+
 ## Next step
 
 1. User reviews Phase 4 on a real phone (`bac3d0d`, `73d2f01`, `bf9853f` are local only; Phase 3D is on

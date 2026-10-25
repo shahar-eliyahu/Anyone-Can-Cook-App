@@ -886,7 +886,6 @@
   "importLeaveNote": "אפשר לצאת מהמסך. כשהמתכון יהיה מוכן, הוא יחכה לכם במטבח.",
   "overviewReady": "הכול מוכן. אפשר להתחיל לבשל!",
   "overviewMore": "פעולות למתכון",
-  "remySheetSubtitle": "אפשר לדבר או להקליד",
   "remyPrepGreeting": "היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.",
   "remyPrepChipFirst": "במה מתחילים?",
   "remyPrepChipTime": "כמה זמן זה לוקח?",
@@ -925,11 +924,6 @@
     }
   },
   "attentionAckHint": "כדי להתחיל, סמנו \"קראתי\" בהערות שלמעלה.",
-  "handsFreeTitle": "דיבור בלי ידיים",
-  "handsFreeOffHint": "אמרו \"היי רמי\" ורמי יקשיב, בלי לגעת במסך",
-  "handsFreeListening": "מקשיב ל\"היי רמי\". המסך יישאר דלוק.",
-  "handsFreePaused": "רמי איתכם עכשיו",
-  "handsFreeStarting": "מכינים את המיקרופון…",
   "handsFreeNetwork": "זיהוי הדיבור בטלפון הזה צריך אינטרנט, ולכן \"היי רמי\" לא זמין כרגע. אפשר ללחוץ על רמי.",
   "handsFreeError": "\"היי רמי\" הפסיק להקשיב. אפשר להפעיל שוב, או ללחוץ על רמי.",
   "voiceTapToSpeak": "לחצו על המיקרופון ודברו",
@@ -960,5 +954,14 @@
   },
   "importPasteTextInstead": "להדביק את טקסט המתכון",
   "importCopyFullUrl": "העתקת הכתובת המלאה",
-  "importUrlCopied": "הכתובת הועתקה. אפשר לפתוח אותה בדפדפן."
+  "importUrlCopied": "הכתובת הועתקה. אפשר לפתוח אותה בדפדפן.",
+  "handsFreePrepTitle": "רוצים לדבר עם רמי בלי לגעת במסך?",
+  "handsFreePrepBody": "כשהאפשרות פעילה, אפשר לומר \"היי רמי\" בזמן הבישול ורמי יקשיב. המסך יישאר דלוק בזמן הבישול.",
+  "handsFreeSettingTitle": "דיבור בלי ידיים בזמן בישול",
+  "handsFreeSettingBody": "אמרו \"היי רמי\" בזמן הבישול ורמי יקשיב, בלי לגעת במסך. המסך יישאר דלוק בזמן הבישול.",
+  "remySettingsSection": "רמי",
+  "handsFreeIndicator": "מקשיב",
+  "handsFreeIndicatorLabel": "רמי מקשיב ל\"היי רמי\". לחצו כדי להפסיק.",
+  "handsFreeResume": "להפעיל שוב את \"היי רמי\"",
+  "handsFreeStopped": "\"היי רמי\" הופסק לבישול הזה."
 }

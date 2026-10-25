@@ -38,7 +38,48 @@ abstract final class ScreenAwake {
   }
 }
 
-enum HandsFreeStatus { off, starting, listening, paused, unavailable }
+/// The cook's choice: "היי רמי" during cooking, yes or no (kept across sessions). Shared by
+/// the preparation screen, settings and the cooking screen, so they always agree.
+class HandsFreePreference extends AsyncNotifier<bool> {
+  @override
+  Future<bool> build() async => await ref.read(settingsRepositoryProvider).get(SettingKeys.handsFree) == 'on';
+
+  Future<void> set(bool on) async {
+    await ref.read(settingsRepositoryProvider).set(SettingKeys.handsFree, on ? 'on' : 'off');
+    state = AsyncData(on);
+  }
+}
+
+final handsFreePreferenceProvider = AsyncNotifierProvider<HandsFreePreference, bool>(HandsFreePreference.new);
+
+/// Why hands-free can't listen, in words the cook can act on.
+String handsFreeMessage(VoiceIssue issue) {
+  final l10n = lookupAppLocalizations(const Locale('he'));
+  return switch (issue) {
+    VoiceIssue.permissionDenied => l10n.voicePermissionDenied,
+    VoiceIssue.recognitionUnavailable => l10n.voiceUnavailable,
+    VoiceIssue.hebrewUnsupported => l10n.voiceHebrewUnsupported,
+    VoiceIssue.network => l10n.handsFreeNetwork,
+    _ => l10n.handsFreeError,
+  };
+}
+
+/// Turning hands-free on (preparation or settings): asks for the microphone first, so the cook
+/// decides about it calmly before cooking. Returns why it couldn't be turned on, or null.
+Future<String?> turnOnHandsFree(WidgetRef ref) async {
+  final recognizer = ref.read(speechRecognizerProvider);
+  if (recognizer == null) return handsFreeMessage(VoiceIssue.recognitionUnavailable);
+  try {
+    await recognizer.prepare();
+  } on VoiceException catch (e) {
+    return handsFreeMessage(e.issue);
+  }
+  await ref.read(handsFreePreferenceProvider.notifier).set(true);
+  return null;
+}
+
+/// `stopped`: the cook stopped listening for this cooking session (the saved choice stays).
+enum HandsFreeStatus { off, starting, listening, paused, stopped, unavailable }
 
 /// "היי רמי" was heard; [command] is what followed it (may be empty).
 class WakeEvent {
@@ -50,7 +91,7 @@ class WakeEvent {
 class HandsFreeState {
   const HandsFreeState({this.enabled = false, this.status = HandsFreeStatus.off, this.messageHe, this.wake});
 
-  /// The cook turned hands-free on (remembered for next time).
+  /// The cook's saved choice is on.
   final bool enabled;
   final HandsFreeStatus status;
 
@@ -70,7 +111,8 @@ class HandsFreeState {
 /// Hands-free cooking (docs/DESIGN.md §13): while the cooking screen is open and the app is
 /// in front, listen for "היי רמי" with the phone's own speech recognition, in a loop of
 /// patient sessions. A heard call becomes a [WakeEvent]; the cooking screen opens Remy, and
-/// this listener pauses until his sheet closes. Off by default; the cook's choice is kept.
+/// this listener pauses until his sheet closes. Follows [handsFreePreferenceProvider] (off by
+/// default); the cook can stop it for the current session from the cooking screen.
 class HandsFreeController extends Notifier<HandsFreeState> {
   HandsFreeController(this.sessionId);
 
@@ -94,7 +136,6 @@ class HandsFreeController extends Notifier<HandsFreeState> {
   bool _handingOff = false;
   Timer? _handOffFallback;
 
-  AppLocalizations get _l10n => lookupAppLocalizations(const Locale('he'));
   SpeechRecognizer? get _recognizer => ref.read(speechRecognizerProvider);
   bool get available => _recognizer != null;
 
@@ -125,32 +166,42 @@ class HandsFreeController extends Notifier<HandsFreeState> {
       if (_running) recognizer?.cancel();
       ScreenAwake.set(false);
     });
-    if (recognizer != null) Future.microtask(_loadChoice);
+    if (recognizer != null) {
+      // The saved choice (settings or preparation) turns listening on and off, live.
+      ref.listen(handsFreePreferenceProvider, (_, next) {
+        final on = next.value ?? false;
+        if (on != state.enabled) on ? _start() : _stop();
+      });
+      Future.microtask(() async {
+        final on = await ref.read(handsFreePreferenceProvider.future);
+        if (ref.mounted && on && !state.enabled) _start();
+      });
+    }
     return const HandsFreeState();
   }
 
-  Future<void> _loadChoice() async {
-    final on = await ref.read(settingsRepositoryProvider).get(SettingKeys.handsFree) == 'on';
-    if (!ref.mounted || !on) return;
-    state = state.copyWith(enabled: true, status: HandsFreeStatus.starting);
+  void _start() {
+    _errorsInRow = 0;
+    state = state.copyWith(enabled: true, status: HandsFreeStatus.starting, clearMessage: true);
     _kick();
   }
 
-  /// The switch on the cooking screen. Turning it on asks for the microphone the first time.
-  Future<void> setEnabled(bool on) async {
-    if (!available) return;
-    await ref.read(settingsRepositoryProvider).set(SettingKeys.handsFree, on ? 'on' : 'off');
-    if (!ref.mounted) return;
-    _errorsInRow = 0;
-    if (on) {
-      state = state.copyWith(enabled: true, status: HandsFreeStatus.starting, clearMessage: true);
-      _kick();
-    } else {
-      state = state.copyWith(enabled: false, status: HandsFreeStatus.off, clearMessage: true);
-      _settle?.cancel();
-      if (_running) await _recognizer?.cancel();
-      unawaited(ScreenAwake.set(false));
-    }
+  void _stop({HandsFreeStatus status = HandsFreeStatus.off}) {
+    state = state.copyWith(enabled: status != HandsFreeStatus.off, status: status, clearMessage: true);
+    _settle?.cancel();
+    if (_running) _recognizer?.cancel();
+    unawaited(ScreenAwake.set(false));
+  }
+
+  /// The "מקשיב" indicator: stop listening for this cooking session. The saved choice stays,
+  /// so the next cooking session listens again.
+  void stopForNow() {
+    if (state.enabled) _stop(status: HandsFreeStatus.stopped);
+  }
+
+  /// Listen again after [stopForNow], or try again after a problem.
+  void resume() {
+    if (state.enabled) _start();
   }
 
   bool get _canListen =>
@@ -159,6 +210,7 @@ class HandsFreeController extends Notifier<HandsFreeState> {
       !_handingOff &&
       _foreground &&
       state.status != HandsFreeStatus.unavailable &&
+      state.status != HandsFreeStatus.stopped &&
       ref.read(remySheetOpenProvider) == 0;
 
   void _toBackground() {
@@ -169,7 +221,10 @@ class HandsFreeController extends Notifier<HandsFreeState> {
   void _suspend() {
     _settle?.cancel();
     if (_running) _recognizer?.cancel();
-    if (ref.mounted && state.enabled && state.status != HandsFreeStatus.unavailable) {
+    if (ref.mounted &&
+        state.enabled &&
+        state.status != HandsFreeStatus.unavailable &&
+        state.status != HandsFreeStatus.stopped) {
       state = state.copyWith(status: HandsFreeStatus.paused);
     }
   }
@@ -246,13 +301,7 @@ class HandsFreeController extends Notifier<HandsFreeState> {
     ScreenAwake.set(false);
   }
 
-  String messageFor(VoiceIssue issue) => switch (issue) {
-        VoiceIssue.permissionDenied => _l10n.voicePermissionDenied,
-        VoiceIssue.recognitionUnavailable => _l10n.voiceUnavailable,
-        VoiceIssue.hebrewUnsupported => _l10n.voiceHebrewUnsupported,
-        VoiceIssue.network => _l10n.handsFreeNetwork,
-        _ => _l10n.handsFreeError,
-      };
+  String messageFor(VoiceIssue issue) => handsFreeMessage(issue);
 }
 
 final handsFreeControllerProvider =

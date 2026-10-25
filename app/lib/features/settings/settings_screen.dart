@@ -6,6 +6,8 @@ import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/brand.dart';
 import '../../l10n/app_localizations.dart';
 import '../timers/timer_notifier.dart';
+import '../assistant/hands_free_choice.dart';
+import '../assistant/voice.dart';
 import 'battery_optimization.dart';
 
 class _Reliability {
@@ -128,6 +130,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
               ),
             ),
           ),
+          if (ref.watch(speechRecognizerProvider) != null) ...[
+            SectionTitle(l10n.remySettingsSection),
+            const Card(child: Padding(padding: EdgeInsets.symmetric(vertical: Space.xs), child: HandsFreeChoice(compact: true))),
+          ],
           SectionTitle(l10n.batteryTitle),
           Card(
             child: Padding(

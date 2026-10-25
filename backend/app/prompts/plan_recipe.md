@@ -65,7 +65,10 @@ Prep tasks (preheat oven, boil water, gather ingredients): needed_by_step, lead_
 surface_at_start or surface_with_step, an optional timer, and remind_before_needed=true when a
 reminder before a waiting step ends would help (e.g. preheating during proofing).
 
-advance_notice_he: set when the recipe needs planning ahead (an overnight soak, hours of chilling).
+advance_notice_he: set only when the recipe needs planning ahead (an overnight soak, hours of chilling). It is
+shown before cooking, in preparation, so write it for that moment, in one short sentence ("צריך לתכנן מראש: העוגה
+נחה במקרר לילה שלם."). The chilling, resting or soaking itself must still be a step with its own timer and
+instructions, so the cook meets it at the right time; the notice never replaces that step.
 Never give unsafe instructions (e.g. leaving cooked meat out for hours).
 
 Hebrew style: natural, short, friendly sentences. Never use dashes (—, –, or a spaced -) as separators

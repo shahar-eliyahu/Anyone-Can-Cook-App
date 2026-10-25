@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../support/app_harness.dart';
+import '../support/ui_helpers.dart';
 
 const doneFirst = '✓ סיימנו: הכנת תפוחי האדמה. עכשיו: תיבול העוף.';
 const doneFirstSpoken = 'סיימנו: הכנת תפוחי האדמה. עכשיו: תיבול העוף.';
@@ -52,22 +53,41 @@ void main() {
 
   bool sheetOpen() => find.byTooltip('דיבור עם רמי').evaluate().isNotEmpty;
 
-  testApp('hands-free is off until the cook turns it on, and the choice is remembered', (tester, h) async {
-    await openCooking(tester, h);
-    expect(find.text('דיבור בלי ידיים'), findsOneWidget);
-    expect(find.text('אמרו "היי רמי" ורמי יקשיב, בלי לגעת במסך'), findsOneWidget);
+  testApp('hands-free is chosen in preparation (asking for the microphone) and cooking then listens', (tester, h) async {
+    final recipeId = await h.seedSample();
+    await tester.pumpWidget(h.build(initialLocation: '/recipes/$recipeId'));
+    await tester.pumpAndSettle();
+    await expectSeen(tester, find.text('רוצים לדבר עם רמי בלי לגעת במסך?'));
     expect(h.mic.wakeListens, 0);
 
-    await tester.tap(find.text('דיבור בלי ידיים'));
+    await tester.ensureVisible(find.text('רוצים לדבר עם רמי בלי לגעת במסך?'));
     await tester.pumpAndSettle();
+    await tester.tap(find.text('רוצים לדבר עם רמי בלי לגעת במסך?'));
+    await tester.pumpAndSettle();
+    expect(await SettingsRepository(h.db, h.clock.call).get(SettingKeys.handsFree), 'on');
+    expect(h.mic.wakeListens, 0); // nothing listens before cooking
+
+    await tapButton(tester, 'מתחילים לבשל');
     expect(h.mic.wakeListens, 1);
     expect(h.mic.listening, isTrue);
-    expect(find.text('מקשיב ל"היי רמי". המסך יישאר דלוק.'), findsOneWidget);
-    expect(await SettingsRepository(h.db, h.clock.call).get(SettingKeys.handsFree), 'on');
+    expect(find.text('מקשיב'), findsOneWidget); // the small indicator, not a setup card
+    expect(find.text('רוצים לדבר עם רמי בלי לגעת במסך?'), findsNothing);
+  });
 
-    await tester.tap(find.text('דיבור בלי ידיים'));
+  testApp('settings show the same choice; turning it off there stops listening in cooking', (tester, h) async {
+    await openCooking(tester, h, handsFreeOn: true);
+    expect(h.mic.listening, isTrue);
+    await tester.binding.handlePopRoute(); // home
     await tester.pumpAndSettle();
-    expect(h.mic.listening, isFalse);
+    await tester.tap(find.text('תפריט'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('הגדרות'));
+    await tester.pump(const Duration(seconds: 1));
+    final tile = find.widgetWithText(SwitchListTile, 'דיבור בלי ידיים בזמן בישול');
+    expect(tester.widget<SwitchListTile>(tile).value, isTrue); // the saved choice, as set before
+    await tester.tap(tile);
+    await tester.pump(const Duration(seconds: 1));
+    expect(tester.widget<SwitchListTile>(tile).value, isFalse);
     expect(await SettingsRepository(h.db, h.clock.call).get(SettingKeys.handsFree), 'off');
   });
 
@@ -150,20 +170,50 @@ void main() {
     expect((await h.sessions.activeSession())?.id, sessionId);
   });
 
-  testApp('without the microphone permission hands-free says why and stops', (tester, h) async {
+  testApp('without the microphone permission the choice stays off and says why', (tester, h) async {
     h.mic.prepareIssue = VoiceIssue.permissionDenied;
-    await openCooking(tester, h);
-    await tester.tap(find.text('דיבור בלי ידיים'));
+    final recipeId = await h.seedSample();
+    await tester.pumpWidget(h.build(initialLocation: '/recipes/$recipeId'));
+    await tester.pumpAndSettle();
+    await expectSeen(tester, find.text('רוצים לדבר עם רמי בלי לגעת במסך?'));
+    await tester.ensureVisible(find.text('רוצים לדבר עם רמי בלי לגעת במסך?'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('רוצים לדבר עם רמי בלי לגעת במסך?'));
     await tester.pumpAndSettle();
     expect(find.textContaining('כדי לדבר עם רמי צריך לאשר גישה למיקרופון'), findsOneWidget);
+    expect(await SettingsRepository(h.db, h.clock.call).get(SettingKeys.handsFree), isNot('on'));
     expect(h.mic.wakeListens, 0);
   });
 
-  testApp('offline recognition: hands-free explains it and the Remy button still works', (tester, h) async {
+  testApp('offline recognition: no "מקשיב", a muted microphone explains it; the Remy button still works', (tester, h) async {
     h.mic.utterances.add(VoiceIssue.network);
     await openCooking(tester, h, handsFreeOn: true);
-    expect(find.textContaining('"היי רמי" לא זמין כרגע'), findsOneWidget);
+    expect(find.text('מקשיב'), findsNothing); // never a misleading "listening"
+    expect(find.byTooltip('זיהוי הדיבור בטלפון הזה צריך אינטרנט, ולכן "היי רמי" לא זמין כרגע. אפשר ללחוץ על רמי.'), findsOneWidget);
     expect(find.byTooltip('רמי, העוזר שלך לבישול'), findsOneWidget);
-    expect(find.byType(Switch), findsOneWidget);
+  });
+
+  testApp('"מקשיב" stops listening for this cooking session with one tap; the muted mic resumes it', (tester, h) async {
+    await openCooking(tester, h, handsFreeOn: true);
+    expect(find.text('מקשיב'), findsOneWidget);
+    await tester.tap(find.text('מקשיב'));
+    await tester.pumpAndSettle();
+    expect(h.mic.listening, isFalse);
+    expect(find.text('מקשיב'), findsNothing);
+    expect(find.text('"היי רמי" הופסק לבישול הזה.'), findsOneWidget);
+    expect(await SettingsRepository(h.db, h.clock.call).get(SettingKeys.handsFree), 'on'); // the choice stays
+
+    await tester.tap(find.byTooltip('להפעיל שוב את "היי רמי"'));
+    await tester.pumpAndSettle();
+    expect(h.mic.listening, isTrue);
+    expect(find.text('מקשיב'), findsOneWidget);
+  });
+
+  testApp('with hands-free off, cooking shows no hands-free control at all', (tester, h) async {
+    await openCooking(tester, h);
+    expect(find.text('מקשיב'), findsNothing);
+    expect(find.byIcon(Icons.mic_off_outlined), findsNothing);
+    expect(find.textContaining('היי רמי'), findsNothing);
+    expect(h.mic.wakeListens, 0);
   });
 }

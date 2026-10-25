@@ -413,3 +413,32 @@ No new packages are needed for 4B–4E (transitions, skeletons and haptics are l
   top-right corner on every screen and opens the menu from the right; the back arrow, pointing right, sits
   right beside it on inner screens; screen actions stay on the left.
 
+---
+
+## 14. Real-device refinement: navigation, cooking hierarchy, hands-free placement (2026-10-25)
+
+Supersedes the bar layout of §3.2 and §13.
+
+- **Navigation rule (final):** home shows the app name and logo in the page and a labelled "תפריט" on the
+  right (the menu slides in from the right); no back. Every inner screen shows one back arrow on the right,
+  pointing right, and only its own title (one line, ellipsis); no menu, no app name. Back always ends at home
+  (routes nested under `/`); a screen opened with nothing under it (a notification, a restored session) goes home.
+  Android back matches the visible arrow. Remy's sheet keeps its close control.
+- **Cooking screen:** one compact header row (back, recipe name, and the hands-free indicator in the free
+  corner); a light progress line ("שלב N מתוך M", the done count, "חזרה" undo, a 4px bar); then the instruction
+  card first (title 20, instruction 20px, this step's ingredients, temperature, the timer, cue, safety, help),
+  then prep tasks, other timers, "בינתיים אפשר", all steps and "הפסקת הבישול". The bottom bar keeps Remy and the
+  main action.
+- **Hands-free placement:** the choice "רוצים לדבר עם רמי בלי לגעת במסך?" is a quiet card under the preparation
+  checklist and a row in settings ("רמי" section); both are the same saved preference (`hands_free`, so an
+  existing choice is kept) and turning it on asks for the microphone first (refused → stays off, says why).
+  During cooking there is no setup card: a small "מקשיב" pill only while it really listens (a tap stops it for
+  this cooking session; the saved choice stays), a muted microphone to turn it back on when stopped or unable to
+  listen (its label says why), nothing while starting or while Remy's sheet is open.
+- **Guidance timing:** the plan's plan-ahead notice (`advance_notice_he`, e.g. "מומלץ לתת לעוגה לנוח במקרר לילה
+  שלם") is no longer a banner at the start of cooking. It shows in preparation, and during cooking inside the step
+  it is about (matched by kind of waiting: chilling, resting, freezing, soaking, rising, marinating; else the
+  longest wait of an hour or more; else the last step). Step notes, warnings, help, cues and wait tips were
+  already tied to their step or wait and are unchanged. The planning prompt now asks for a short plan-ahead
+  sentence and for the wait itself to be a real step with a timer.
+
