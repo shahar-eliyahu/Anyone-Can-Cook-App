@@ -1,8 +1,20 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Beta/release signing (docs/RELEASE.md): the key and its passwords live OUTSIDE the repository, in
+// ~/.anyone-can-cook/signing/key.properties (or the file named by ANYONE_CAN_COOK_SIGNING). Without that
+// file, release builds fall back to the debug key so `flutter run --release` still works locally; such an
+// APK can't update a beta install and must not be shared.
+val signingFile = file(
+    System.getenv("ANYONE_CAN_COOK_SIGNING")
+        ?: "${System.getProperty("user.home")}/.anyone-can-cook/signing/key.properties",
+)
+val signing = Properties().apply { if (signingFile.exists()) signingFile.inputStream().use { load(it) } }
 
 android {
     namespace = "com.anyonecancook.anyone_can_cook"
@@ -17,7 +29,7 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        // Never change it: updates install over the existing app (keeping recipes) only with the same id and key.
         applicationId = "com.anyonecancook.anyone_can_cook"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
@@ -31,11 +43,25 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        if (signingFile.exists()) {
+            create("beta") {
+                storeFile = file(signing.getProperty("storeFile"))
+                storePassword = signing.getProperty("storePassword")
+                keyAlias = signing.getProperty("keyAlias")
+                keyPassword = signing.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = if (signingFile.exists()) {
+                signingConfigs.getByName("beta")
+            } else {
+                logger.warn("Release signing file not found: signing with the DEBUG key (not for testers).")
+                signingConfigs.getByName("debug")
+            }
         }
     }
 }

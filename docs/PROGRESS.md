@@ -584,6 +584,26 @@ Checked what existed, changed only what was missing.
   when servings change; catalog recipes have no photos; a built-in recipe changed by an app update gets a new
   working copy (the old one keeps its history).
 
+### Private Android beta preparation, 2026-10-25 (local commit)
+
+- **Release setup reviewed:** application id `com.anyonecancook.anyone_can_cook` (kept), min SDK 24, target 36;
+  release builds were signed with the debug key, now with a dedicated beta key kept outside the repository
+  (`docs/RELEASE.md`, DECISIONS #88). Version `0.9.0+2`. Permissions in the release APK: INTERNET, RECORD_AUDIO,
+  POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM, RECEIVE_BOOT_COMPLETED, VIBRATE; cleartext HTTP stays debug-only.
+- **APK:** `C:\Users\shaha\AnyoneCanCook-Beta\AnyoneCanCook-beta-0.9.0-build2.apk` (64.8 MB, v2 signature,
+  signer `CN=Anyone Can Cook Beta`). It contains the Render URL and the app token (by design) and no Gemini-style key.
+- **Render (read-only, no AI calls):** `/health` ok with the Gemini provider; the deployed API includes
+  `/v1/assistant/create`; no token or a wrong token: 401; the beta token is accepted (a loopback link was refused
+  by the URL guard, 422, before any AI step). Rate limits, the daily AI cap and token checks are covered by the
+  backend tests (224/224).
+- **Checks:** analyzer clean, Flutter 327/327. On a clean second emulator (`Medium_Phone_API_35`; the main emulator
+  and its data were not touched): installed with `adb install` like a sideload and launched; the import reached Render
+  with the token; notification and exact-alarm prompts; a built-in recipe cooked with a timer whose notification
+  fired with the app in the background; Remy opened in voice, asked for the microphone, and the recognizer ran; an
+  update (build 3, same key) installed over it and kept the cooking in progress and the recipes.
+- **Open:** a phone with a development build must uninstall it before installing the beta (different key; its data
+  starts fresh).
+
 ## Next step
 
 1. User reviews Phase 4 on a real phone (`bac3d0d`, `73d2f01`, `bf9853f` are local only; Phase 3D is on

@@ -126,6 +126,7 @@ flutter gen-l10n                   # after changing lib/l10n/app_he.arb
 flutter analyze
 flutter test --timeout 90s
 flutter run -d emulator-5554 --dart-define=API_BASE_URL=https://anyone-can-cook-api.onrender.com
+flutter build apk --release --dart-define-from-file=%USERPROFILE%/.anyone-can-cook/dart_defines.json  # beta, docs/RELEASE.md
 ```
 
 Environment notes (Windows):
