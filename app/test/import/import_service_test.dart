@@ -4,6 +4,7 @@ import 'package:anyone_can_cook/core/api_client.dart';
 import 'package:anyone_can_cook/core/db/database.dart';
 import 'package:anyone_can_cook/data/recipe_repository.dart';
 import 'package:anyone_can_cook/data/settings_repository.dart';
+import 'package:anyone_can_cook/features/assistant/conversation_store.dart';
 import 'package:anyone_can_cook/features/import/import_service.dart';
 import 'package:anyone_can_cook/models/plan_response.dart';
 import 'package:anyone_can_cook/models/recipe_analysis.dart';
@@ -164,8 +165,11 @@ void main() {
     images.saved.addAll({'/images/1.jpg', '/images/orphan.jpg'});
     await service.cleanup();
     expect(images.deleted, ['/images/orphan.jpg']);
+    // The draft had a conversation with Remy: discarding the draft ends it too.
+    await service.settings.set(ConversationStore.keyFor(kept.draftId), '{"at":"2026-10-24T00:00:00Z","m":[]}');
     await service.discard(kept.draftId);
     expect(images.deleted.last, '/images/1.jpg');
     expect(await recipes.getRecipe(kept.draftId), isNull);
+    expect(await service.settings.get(ConversationStore.keyFor(kept.draftId)), isNull);
   });
 }

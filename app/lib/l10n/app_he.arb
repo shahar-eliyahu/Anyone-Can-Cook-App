@@ -528,10 +528,6 @@
   "remyTitle": "רמי, העוזר שלך לבישול",
   "remyOpen": "רמי",
   "remyHint": "כתבו לרמי…",
-  "remyGreeting": "היי, אני רמי! אפשר לשאול אותי על הבישול, או לבקש: \"הבא\", \"חזרה\", \"כמה זמן נשאר?\", \"תוסיף 5 דקות\".",
-  "remyChipNow": "מה עכשיו?",
-  "remyChipTime": "כמה זמן נשאר?",
-  "remyChipHelp": "עזרה בשלב",
   "remySend": "שליחה",
   "remyApprove": "כן",
   "remyReject": "לא",
@@ -858,7 +854,6 @@
   "voiceProcessing": "רגע…",
   "voiceSpeaking": "רמי מדבר…",
   "voiceStop": "עצירה",
-  "voiceContinuous": "שיחה רציפה",
   "voicePermissionDenied": "כדי לדבר עם רמי צריך לאשר גישה למיקרופון. אפשר לאשר בהגדרות הטלפון, או פשוט להקליד.",
   "voiceUnavailable": "זיהוי דיבור לא זמין בטלפון הזה. אפשר להקליד לרמי.",
   "voiceHebrewUnsupported": "זיהוי דיבור בעברית לא זמין בטלפון הזה. אפשר להקליד לרמי.",
@@ -886,10 +881,6 @@
   "importLeaveNote": "אפשר לצאת מהמסך. כשהמתכון יהיה מוכן, הוא יחכה לכם במטבח.",
   "overviewReady": "הכול מוכן. אפשר להתחיל לבשל!",
   "overviewMore": "פעולות למתכון",
-  "remyPrepGreeting": "היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.",
-  "remyPrepChipFirst": "במה מתחילים?",
-  "remyPrepChipTime": "כמה זמן זה לוקח?",
-  "remyPrepChipMissing": "חסר לי מצרך",
   "remyPrepNotYet": "את זה עושים כשמתחילים לבשל. בינתיים אפשר לשאול אותי על המתכון.",
   "remyPrepFirstStep": "מתחילים ב: {title}. {instruction}",
   "@remyPrepFirstStep": {
@@ -929,15 +920,6 @@
   "voiceTapToSpeak": "לחצו על המיקרופון ודברו",
   "remyRole": "העוזר שלך לבישול",
   "remyTypeInstead": "הקלדה",
-  "remyShowConversation": "כל השיחה ({count})",
-  "@remyShowConversation": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "remyHideConversation": "רק האחרונה",
   "remyAnswerHint": "אפשר גם לומר \"כן\" או \"לא\"",
   "errSiteBlockedNamed": "האתר {site} לא מאפשר לאפליקציות לקרוא את המתכונים שלו. אפשר לפתוח את המתכון בדפדפן, להעתיק את הטקסט ולהדביק אותו כאן.",
   "@errSiteBlockedNamed": {
@@ -963,5 +945,6 @@
   "handsFreeIndicator": "מקשיב",
   "handsFreeIndicatorLabel": "רמי מקשיב ל\"היי רמי\". לחצו כדי להפסיק.",
   "handsFreeResume": "להפעיל שוב את \"היי רמי\"",
-  "handsFreeStopped": "\"היי רמי\" הופסק לבישול הזה."
+  "handsFreeStopped": "\"היי רמי\" הופסק לבישול הזה.",
+  "remyEmptyHint": "אפשר לשאול אותי כל דבר על המתכון."
 }

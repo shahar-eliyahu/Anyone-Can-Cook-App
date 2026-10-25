@@ -442,3 +442,28 @@ Supersedes the bar layout of §3.2 and §13.
   already tied to their step or wait and are unchanged. The planning prompt now asks for a short plan-ahead
   sentence and for the wait itself to be a real step with a timer.
 
+---
+
+## 15. Remy: one simple assistant per recipe, with memory (2026-10-25)
+
+- **Default mode by state:** before cooking (overview, preparation) Remy opens as a chat: the input focused,
+  a small microphone beside it, nothing listening. In an active cooking session he opens in voice mode and
+  listens at once, with "הקלדה" to type instead. Long press opens the other mode. If voice can't work (no
+  permission, no recognition, no Hebrew, offline recognition) he switches to text by himself with one note.
+  On the overview of a recipe being cooked right now, Remy is the cooking session's.
+- **Interface:** a small header (avatar, "רמי", one status line: listening / thinking / speaking / "העוזר שלך
+  לבישול"), the conversation as plain chat bubbles (what is being heard shows as a faint bubble), a compact
+  "כן / לא" card for anything that needs a yes, and one input area (text field + send + small mic, or a big mic
+  + "הקלדה" + "עצירה"). Removed: the long introduction (one short hint line when empty), the suggestion chips,
+  the "שיחה רציפה" toggle and the "show the whole conversation" switch.
+- **Speech turn-taking:** after Remy answers a spoken request he listens once more for a follow-up (always for
+  the answer to a question he asked). The first silence ends the turn quietly; at most 6 follow-ups in a row.
+  Nothing listens after that unless the cook taps, or says "היי רמי" with hands-free on (unchanged:
+  foreground-only, cooking screen only, paused while the sheet is open).
+- **Memory (DECISIONS #81):** one conversation per
+  recipe or draft, shared by preparation and cooking, kept on the device (closing the sheet, leaving the screen
+  and restarting the app keep it), at most 20 messages, forgotten after 12 hours without activity, and cleared
+  when the recipe is finished, abandoned, deleted or its draft discarded. Requests to Gemini carry at most the
+  last 6 turns (600 characters each), the stage (preparation / cooking), the saved preparation decisions and the
+  live cooking state; never the source text or the whole history.
+

@@ -516,6 +516,34 @@ Checked what existed, changed only what was missing.
   removed the indicator, cooking at 1.5x system font. The emulator had stopped mid-check and was started again.
   Test session abandoned, hands-free left off and the microphone permission revoked afterwards.
 
+### Remy refinement: text/voice by state, simpler sheet, recipe memory, 2026-10-25 (local commit)
+
+- **Memory before:** in memory only (an auto-disposing provider per scope: one per cooking session, one per
+  recipe before cooking). Closing the sheet, leaving the screen or restarting the app erased it; preparation and
+  cooking never shared it; every opening started with the long introduction; nothing was cleared explicitly.
+  Gemini got the last 6 turns (600 characters each) of that sheet's conversation, the recipe's ingredients and
+  equipment, the plan (completed steps as titles) and the cooking state; the backend stores nothing.
+- **Memory after:** one conversation per recipe/draft, shared by preparation and cooking, stored on the device
+  (`app_settings`, `remy_chat:<recipeId>`), kept across closing the sheet, navigation and restarts, at most 20
+  messages, forgotten after 12 hours without activity, cleared on finish, abandon, recipe delete and draft
+  discard. Gemini additionally gets the stage and the saved preparation decisions; still at most 6 turns, one call.
+- **UI:** text-first before cooking (input focused, small mic, no listening), voice-first in cooking (listening at
+  once, "הקלדה"), automatic text fallback when voice can't work; no introduction, chips or "שיחה רציפה"; a compact
+  header and plain chat; voice turn-taking with a quiet end on silence (max 6 follow-ups).
+- **Bugs found:** on the emulator the keyboard's Enter added a new line instead of sending (multi-line keyboard);
+  now a one-line keyboard with Enter = send.
+- **Tests (fakes only, zero Gemini calls):** Flutter **305/305**, analyzer clean (new `remy_memory_test.dart`: the
+  20-message bound and 12-hour expiry, isolation, reopening keeps the conversation without an introduction,
+  preparation → cooking continuity with text then voice, restart, clearing on abandon / finish / delete, what
+  Gemini receives in preparation and cooking; draft discard clears it; voice tests for turn-taking, the bounded
+  follow-ups, text by long press and no continuous toggle; hands-free tests with the follow-up silence); backend
+  **200/200**.
+- **Emulator (Pixel 8a, Android 15):** Remy on the overview opened as text with the input focused and no listening;
+  Enter sent a message; the conversation survived closing, leaving the screen and a force-stop + relaunch; in
+  cooking Remy asked for the microphone, "Don't allow" switched him to text with the note and the same conversation;
+  with the permission he opened listening at once in voice mode; abandoning the cooking cleared the conversation
+  (the recipe stayed). Test session abandoned and the microphone permission revoked afterwards.
+
 ## Next step
 
 1. User reviews Phase 4 on a real phone (`bac3d0d`, `73d2f01`, `bf9853f` are local only; Phase 3D is on

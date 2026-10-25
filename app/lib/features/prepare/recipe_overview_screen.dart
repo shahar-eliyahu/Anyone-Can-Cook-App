@@ -17,6 +17,7 @@ import '../../models/cooking_plan.dart';
 import '../../models/recipe.dart';
 import '../../models/recipe_analysis.dart';
 import '../assistant/assistant_models.dart';
+import '../assistant/conversation_store.dart';
 import '../assistant/hands_free_choice.dart';
 import '../assistant/remy_widgets.dart';
 import '../cooking/start_cooking.dart';
@@ -109,7 +110,9 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
     final allReady = plan != null &&
         recipe.ingredients.every((i) => settled(prep.statusOf(i.id), i.omitted, prep.substitutionFor(ItemKind.ingredient, i.id) != null)) &&
         recipe.equipment.every((e) => settled(prep.statusOf(e.id), e.omitted, prep.substitutionFor(ItemKind.equipment, e.id) != null));
-    final remy = RemyButton(scope: RemyScope.recipe(row.id));
+    // While this recipe is being cooked, Remy is the cooking session's (voice first, live state).
+    final cookingId = view.cookingNow ? ref.watch(activeSessionProvider).value?.id : null;
+    final remy = RemyButton(scope: cookingId != null ? RemyScope.session(cookingId) : RemyScope.recipe(row.id));
 
     return AppScaffold(
       title: row.displayTitle,
@@ -419,6 +422,7 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
     if (ok != true) return;
     try {
       final deletedAt = await repo.softDelete(row.id);
+      await forgetConversation(ref.read(settingsRepositoryProvider), row.id);
       if (router.canPop()) router.pop();
       messenger.showSnackBar(SnackBar(
         duration: const Duration(seconds: 5),

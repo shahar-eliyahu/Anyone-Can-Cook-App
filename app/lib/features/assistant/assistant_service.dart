@@ -48,6 +48,10 @@ class AssistantService {
   final ApiClient api;
 
   static const autoExtendLimitSeconds = 15 * 60;
+
+  /// What Remy remembers in a request: the last few turns, each cut short.
+  static const maxHistoryTurns = 6;
+  static const maxTurnChars = 600;
   static const maxExtendSeconds = 3600;
 
   AppLocalizations get _l10n => lookupAppLocalizations(const Locale('he'));
@@ -61,11 +65,12 @@ class AssistantService {
     required Recipe recipe,
     required DateTime now,
     List<ChatTurn> history = const [],
+    Map<String, Object?> context = const {},
   }) async {
     if (!_intelligible(input.text)) return AssistantReply(answerHe: _l10n.remyDidntCatch);
     final local = interpretLocally(input, state: state, recipe: recipe, now: now);
     if (local != null) return local;
-    return _askRemy(input, state: state, recipe: recipe, now: now, history: history);
+    return _askRemy(input, state: state, recipe: recipe, now: now, history: history, context: context);
   }
 
   /// Remy before cooking (the recipe overview): questions about the recipe, answered from
@@ -78,13 +83,14 @@ class AssistantService {
     required Recipe recipe,
     required DateTime now,
     List<ChatTurn> history = const [],
+    Map<String, Object?> context = const {},
   }) async {
     final l10n = _l10n;
     if (!_intelligible(input.text)) return AssistantReply(answerHe: l10n.remyDidntCatch);
     final state = CookingEngine.replay(plan, const []);
     final local = _resolvePreparation(input.text, state, recipe, now);
     if (local != null) return local;
-    final reply = await _askRemy(input, state: state, recipe: recipe, now: now, history: history);
+    final reply = await _askRemy(input, state: state, recipe: recipe, now: now, history: history, context: context);
     return switch (reply.action) {
       null => reply,
       PatchPlanAction() => AssistantReply(answerHe: '${reply.answerHe}\n${l10n.remyPrepMissing}', source: ReplySource.ai),
@@ -373,6 +379,7 @@ class AssistantService {
     required Recipe recipe,
     required DateTime now,
     required List<ChatTurn> history,
+    Map<String, Object?> context = const {},
   }) async {
     final l10n = _l10n;
     final AssistantTurnResult res;
@@ -382,10 +389,12 @@ class AssistantService {
         modality: input.modality.name,
         recipe: recipe,
         plan: state.plan,
-        snapshot: state.snapshot(now),
+        // The live state plus where the cook is (preparation or cooking) and what they decided
+        // while preparing; never the source text.
+        snapshot: {...state.snapshot(now), ...context},
         history: [
-          for (final t in history.length > 6 ? history.sublist(history.length - 6) : history)
-            {'role': t.fromUser ? 'user' : 'assistant', 'text': t.textHe.length > 600 ? t.textHe.substring(0, 600) : t.textHe},
+          for (final t in history.length > maxHistoryTurns ? history.sublist(history.length - maxHistoryTurns) : history)
+            {'role': t.fromUser ? 'user' : 'assistant', 'text': t.textHe.length > maxTurnChars ? t.textHe.substring(0, maxTurnChars) : t.textHe},
         ],
       );
     } on ApiFailure catch (e) {

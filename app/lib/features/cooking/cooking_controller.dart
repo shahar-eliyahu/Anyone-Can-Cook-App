@@ -7,6 +7,7 @@ import '../../data/recipe_repository.dart';
 import '../../data/session_repository.dart';
 import '../../models/recipe.dart';
 import '../assistant/assistant_service.dart';
+import '../assistant/conversation_store.dart';
 import '../prepare/patch.dart';
 import '../timers/timer_coordinator.dart';
 import 'engine/action_dispatcher.dart';
@@ -128,6 +129,8 @@ class CookingController extends AsyncNotifier<CookingView> {
   Future<void> _endSession() async {
     await ref.read(timerCoordinatorProvider).clearSession(sessionId);
     final session = await ref.read(sessionRepositoryProvider).getSession(sessionId);
+    // The recipe's conversation with Remy ends with the cooking (the recipe and history stay).
+    if (session != null) await forgetConversation(ref.read(settingsRepositoryProvider), session.recipeId);
     final view = state.value;
     if (view != null && session != null) state = AsyncData(view.copyWith(session: session));
   }

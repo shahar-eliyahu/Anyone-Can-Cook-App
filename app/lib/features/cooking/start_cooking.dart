@@ -6,6 +6,7 @@ import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
 import '../../data/session_repository.dart';
 import '../../l10n/app_localizations.dart';
+import '../assistant/conversation_store.dart';
 import '../timers/timer_coordinator.dart';
 import '../timers/timer_notifier.dart';
 
@@ -80,6 +81,7 @@ Future<void> startCooking(BuildContext context, WidgetRef ref, String recipeId) 
       case _ActiveChoice.abandonAndStart:
         await sessions.abandon(e.active.id);
         await ref.read(timerCoordinatorProvider).clearSession(e.active.id);
+        await forgetConversation(ref.read(settingsRepositoryProvider), e.active.recipeId);
         final session = await sessions.startSession(recipeId: recipeId, planId: plan.id);
         router.go('/cook/${session.id}');
       case null:

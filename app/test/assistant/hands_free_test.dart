@@ -94,7 +94,7 @@ void main() {
   testApp('"היי רמי, סיימתי" finishes the step with no touch; Remy answers aloud, steps away, listens again',
       (tester, h) async {
     h.api.forbidCalls = true;
-    h.mic.utterances.addAll(['מה נשמע', 'היי רמי, סיימתי']);
+    h.mic.utterances.addAll(['מה נשמע', 'היי רמי, סיימתי', '']); // '' = the cook is quiet afterwards
     final sessionId = await openCooking(tester, h, handsFreeOn: true);
 
     expect(find.text(doneFirst), findsOneWidget); // shown in Remy's sheet, opened by voice
@@ -111,7 +111,7 @@ void main() {
 
   testApp('"היי רמי" alone opens Remy listening; the request that follows is answered', (tester, h) async {
     h.api.forbidCalls = true;
-    h.mic.utterances.addAll(['היי רמי', 'כמה זמן נשאר?']);
+    h.mic.utterances.addAll(['היי רמי', 'כמה זמן נשאר?', '']);
     await openCooking(tester, h, handsFreeOn: true);
     expect(find.text('אין טיימר פעיל כרגע.'), findsOneWidget);
     expect(h.speech.spoken, ['אין טיימר פעיל כרגע.']);
@@ -130,7 +130,7 @@ void main() {
 
   testApp('a question Remy asks hands-free is answered by voice too', (tester, h) async {
     h.api.forbidCalls = true;
-    h.mic.utterances.addAll(['היי רמי אולי סיימתי', 'כן']);
+    h.mic.utterances.addAll(['היי רמי אולי סיימתי', 'כן', '']);
     final sessionId = await openCooking(tester, h, handsFreeOn: true);
     expect(await confirmed(h, sessionId), hasLength(1));
     expect(h.speech.spoken.last, doneFirstSpoken);
@@ -140,7 +140,7 @@ void main() {
 
   testApp('touching the sheet keeps it open (the cook is here)', (tester, h) async {
     h.api.forbidCalls = true;
-    h.mic.utterances.add('היי רמי כמה זמן נשאר?');
+    h.mic.utterances.addAll(['היי רמי כמה זמן נשאר?', '']);
     await openCooking(tester, h, handsFreeOn: true);
     await tester.tap(find.text('אין טיימר פעיל כרגע.'));
     await waitForAutoClose(tester);

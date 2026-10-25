@@ -39,7 +39,8 @@ void main() {
     h.mic.utterances.add('רמי, סיימתי');
     await talkToRemy(tester);
 
-    expect(h.mic.listens, 1); // no choice between typing and speaking first
+    expect(h.mic.listens, 2); // listened at once; then once more for a follow-up
+    expect(h.mic.listening, isTrue);
     expect(find.text('רמי, סיימתי'), findsOneWidget); // the transcript, as if typed
     expect(find.text(doneFirst), findsOneWidget);
     expect(h.speech.spoken, [doneFirstSpoken]);
@@ -59,10 +60,10 @@ void main() {
     await talkToRemy(tester);
     expect(find.text('אין טיימר פעיל כרגע.'), findsOneWidget);
     expect(h.speech.spoken, ['אין טיימר פעיל כרגע.']);
-    await typeToRemy(tester, 'כמה זמן נשאר?');
-    expect(find.text('אין טיימר פעיל כרגע.'), findsOneWidget); // the latest exchange is shown
-    expect(find.text('כל השיחה (4)'), findsOneWidget);
+    await typeToRemy(tester, 'כמה זמן נשאר?'); // the same conversation, now typed
+    expect(find.text('אין טיימר פעיל כרגע.'), findsNWidgets(2));
     expect(h.speech.spoken, hasLength(1));
+    expect(h.mic.listening, isFalse); // typing ended the follow-up listening
   });
 
   testApp('Remy asks before an unsure request and listens for the answer: "כן" approves', (tester, h) async {
@@ -70,7 +71,7 @@ void main() {
     final sessionId = await openCooking(tester, h);
     h.mic.utterances.addAll(['אולי סיימתי', 'כן']);
     await talkToRemy(tester);
-    expect(h.mic.listens, 2); // the question was answered by voice, no tap
+    expect(h.mic.listens, 3); // the question was answered by voice, no tap; then a follow-up
     expect(find.text(doneFirst), findsOneWidget);
     expect(await confirmed(h, sessionId), hasLength(1));
     expect(h.speech.spoken, hasLength(2)); // the question, then the result
@@ -161,11 +162,16 @@ void main() {
     h.mic.heldPartial = 'סיימתי';
     await talkToRemy(tester);
     expect(find.text('מקשיב…'), findsOneWidget);
-    expect(find.text('סיימתי'), findsOneWidget);
+    expect(find.text('סיימתי'), findsOneWidget); // what is heard, as a faint bubble
     expect(find.text('עצירה'), findsOneWidget);
     await tapMic(tester);
     expect(find.text(doneFirst), findsOneWidget);
     expect(await confirmed(h, sessionId), hasLength(1));
+    // Remy listens once more for a follow-up; "עצירה" ends it.
+    expect(h.mic.listening, isTrue);
+    await tester.tap(find.text('עצירה'));
+    await tester.pumpAndSettle();
+    expect(h.mic.listening, isFalse);
     expect(find.text('עצירה'), findsNothing);
   });
 
@@ -188,23 +194,33 @@ void main() {
     expect(await confirmed(h, sessionId), isEmpty);
   });
 
-  testApp('a long press opens Remy quietly; continuous conversation stops after two silences', (tester, h) async {
+  testApp('a long press while cooking opens text; the mic switches to voice; the first silence ends quietly', (tester, h) async {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h);
     await tester.longPress(find.byTooltip('רמי, העוזר שלך לבישול'));
     await tester.pumpAndSettle();
     expect(h.mic.listens, 0);
-    expect(find.text('לחצו על המיקרופון ודברו'), findsOneWidget);
+    expect(find.byTooltip('שליחה'), findsOneWidget);
+    expect(find.text('שיחה רציפה'), findsNothing); // no continuous-mode toggle
 
-    await tester.tap(find.text('שיחה רציפה'));
-    await tester.pumpAndSettle();
-    h.mic.utterances.addAll(['הבא', 'הבא', '', '']);
-    await tapMic(tester);
+    h.mic.utterances.addAll(['הבא', 'הבא', '']);
+    await tapMic(tester); // the small microphone next to the input
     expect(await confirmed(h, sessionId), hasLength(2));
     expect(h.speech.spoken, hasLength(2));
-    expect(h.mic.listens, 4);
-    expect(find.text('לא שמעתי. אפשר לנסות שוב.'), findsOneWidget);
+    expect(h.mic.listens, 3);
+    expect(h.mic.listening, isFalse); // nothing keeps listening
+    expect(find.text('לא שמעתי. אפשר לנסות שוב.'), findsNothing); // a follow-up silence is no error
     expect(find.text('מקשיב…'), findsNothing);
+  });
+
+  testApp('follow-up listening is bounded: a long exchange still ends by itself', (tester, h) async {
+    h.api.forbidCalls = true;
+    await openCooking(tester, h);
+    h.mic.utterances.addAll(List.filled(10, 'כמה זמן נשאר?'));
+    await talkToRemy(tester);
+    expect(h.mic.listens, 1 + 6); // the first request and at most six follow-ups
+    expect(h.mic.listening, isFalse);
+    expect(h.mic.utterances, hasLength(3)); // the rest was never listened for
   });
 
   testApp('closing the sheet while listening stops the microphone and changes nothing', (tester, h) async {

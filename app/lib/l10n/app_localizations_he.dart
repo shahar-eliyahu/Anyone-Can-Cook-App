@@ -898,19 +898,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get remyHint => 'כתבו לרמי…';
 
   @override
-  String get remyGreeting =>
-      'היי, אני רמי! אפשר לשאול אותי על הבישול, או לבקש: \"הבא\", \"חזרה\", \"כמה זמן נשאר?\", \"תוסיף 5 דקות\".';
-
-  @override
-  String get remyChipNow => 'מה עכשיו?';
-
-  @override
-  String get remyChipTime => 'כמה זמן נשאר?';
-
-  @override
-  String get remyChipHelp => 'עזרה בשלב';
-
-  @override
   String get remySend => 'שליחה';
 
   @override
@@ -1167,9 +1154,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get voiceStop => 'עצירה';
 
   @override
-  String get voiceContinuous => 'שיחה רציפה';
-
-  @override
   String get voicePermissionDenied =>
       'כדי לדבר עם רמי צריך לאשר גישה למיקרופון. אפשר לאשר בהגדרות הטלפון, או פשוט להקליד.';
 
@@ -1243,19 +1227,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get overviewMore => 'פעולות למתכון';
 
   @override
-  String get remyPrepGreeting =>
-      'היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.';
-
-  @override
-  String get remyPrepChipFirst => 'במה מתחילים?';
-
-  @override
-  String get remyPrepChipTime => 'כמה זמן זה לוקח?';
-
-  @override
-  String get remyPrepChipMissing => 'חסר לי מצרך';
-
-  @override
   String get remyPrepNotYet =>
       'את זה עושים כשמתחילים לבשל. בינתיים אפשר לשאול אותי על המתכון.';
 
@@ -1327,14 +1298,6 @@ class AppLocalizationsHe extends AppLocalizations {
   String get remyTypeInstead => 'הקלדה';
 
   @override
-  String remyShowConversation(int count) {
-    return 'כל השיחה ($count)';
-  }
-
-  @override
-  String get remyHideConversation => 'רק האחרונה';
-
-  @override
   String get remyAnswerHint => 'אפשר גם לומר \"כן\" או \"לא\"';
 
   @override
@@ -1389,4 +1352,7 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get handsFreeStopped => '\"היי רמי\" הופסק לבישול הזה.';
+
+  @override
+  String get remyEmptyHint => 'אפשר לשאול אותי כל דבר על המתכון.';
 }

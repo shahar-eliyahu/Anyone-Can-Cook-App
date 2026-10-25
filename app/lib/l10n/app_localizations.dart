@@ -1654,30 +1654,6 @@ abstract class AppLocalizations {
   /// **'כתבו לרמי…'**
   String get remyHint;
 
-  /// No description provided for @remyGreeting.
-  ///
-  /// In he, this message translates to:
-  /// **'היי, אני רמי! אפשר לשאול אותי על הבישול, או לבקש: \"הבא\", \"חזרה\", \"כמה זמן נשאר?\", \"תוסיף 5 דקות\".'**
-  String get remyGreeting;
-
-  /// No description provided for @remyChipNow.
-  ///
-  /// In he, this message translates to:
-  /// **'מה עכשיו?'**
-  String get remyChipNow;
-
-  /// No description provided for @remyChipTime.
-  ///
-  /// In he, this message translates to:
-  /// **'כמה זמן נשאר?'**
-  String get remyChipTime;
-
-  /// No description provided for @remyChipHelp.
-  ///
-  /// In he, this message translates to:
-  /// **'עזרה בשלב'**
-  String get remyChipHelp;
-
   /// No description provided for @remySend.
   ///
   /// In he, this message translates to:
@@ -2056,12 +2032,6 @@ abstract class AppLocalizations {
   /// **'עצירה'**
   String get voiceStop;
 
-  /// No description provided for @voiceContinuous.
-  ///
-  /// In he, this message translates to:
-  /// **'שיחה רציפה'**
-  String get voiceContinuous;
-
   /// No description provided for @voicePermissionDenied.
   ///
   /// In he, this message translates to:
@@ -2188,30 +2158,6 @@ abstract class AppLocalizations {
   /// **'פעולות למתכון'**
   String get overviewMore;
 
-  /// No description provided for @remyPrepGreeting.
-  ///
-  /// In he, this message translates to:
-  /// **'היי, אני רמי! אפשר לשאול אותי על המתכון, על מצרך שחסר או על תחליף. כשתתחילו לבשל, אלווה אתכם בכל שלב.'**
-  String get remyPrepGreeting;
-
-  /// No description provided for @remyPrepChipFirst.
-  ///
-  /// In he, this message translates to:
-  /// **'במה מתחילים?'**
-  String get remyPrepChipFirst;
-
-  /// No description provided for @remyPrepChipTime.
-  ///
-  /// In he, this message translates to:
-  /// **'כמה זמן זה לוקח?'**
-  String get remyPrepChipTime;
-
-  /// No description provided for @remyPrepChipMissing.
-  ///
-  /// In he, this message translates to:
-  /// **'חסר לי מצרך'**
-  String get remyPrepChipMissing;
-
   /// No description provided for @remyPrepNotYet.
   ///
   /// In he, this message translates to:
@@ -2332,18 +2278,6 @@ abstract class AppLocalizations {
   /// **'הקלדה'**
   String get remyTypeInstead;
 
-  /// No description provided for @remyShowConversation.
-  ///
-  /// In he, this message translates to:
-  /// **'כל השיחה ({count})'**
-  String remyShowConversation(int count);
-
-  /// No description provided for @remyHideConversation.
-  ///
-  /// In he, this message translates to:
-  /// **'רק האחרונה'**
-  String get remyHideConversation;
-
   /// No description provided for @remyAnswerHint.
   ///
   /// In he, this message translates to:
@@ -2439,6 +2373,12 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'\"היי רמי\" הופסק לבישול הזה.'**
   String get handsFreeStopped;
+
+  /// No description provided for @remyEmptyHint.
+  ///
+  /// In he, this message translates to:
+  /// **'אפשר לשאול אותי כל דבר על המתכון.'**
+  String get remyEmptyHint;
 }
 
 class _AppLocalizationsDelegate

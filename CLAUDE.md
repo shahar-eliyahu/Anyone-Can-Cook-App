@@ -90,7 +90,9 @@ Key invariants:
   back arrow (right side) and their own title (`AppScaffold(title: …)`; `title: null` means home). Remy's entry
   point is `RemyButton` (a tap opens him listening). Hands-free "היי רמי" lives in `assistant/hands_free.dart`
   (cooking screen only; one saved preference `handsFreePreferenceProvider`, chosen in preparation/settings via
-  `HandsFreeChoice`; Remy's sheet pauses it via `remySheetOpenProvider`). Plan-ahead notices show in preparation
+  `HandsFreeChoice`; Remy's sheet pauses it via `remySheetOpenProvider`). Remy's conversation is per recipe
+  (`assistant/conversation_store.dart`: 20 messages, 12 h, cleared on finish/abandon/delete/discard); he opens as
+  text before cooking and as voice in a cooking session. Plan-ahead notices show in preparation
   and with their step (`features/cooking/guidance.dart`), never as a cooking banner.
   Hebrew copy: no dash separators (tested), temperatures in words, `tidyHe` for AI/user text. Animations are
   bounded and respect `Motion.reduced`.

@@ -18,6 +18,8 @@ class SettingsRepository {
           .getSingleOrNull())
       ?.value;
 
+  Future<void> delete(String key) => (_db.delete(_db.appSettings)..where((s) => s.key.equals(key))).go();
+
   Future<void> set(String key, String value) =>
       _db.into(_db.appSettings).insertOnConflictUpdate(AppSettingsCompanion.insert(
             key: key,

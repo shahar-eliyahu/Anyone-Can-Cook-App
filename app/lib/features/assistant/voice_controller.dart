@@ -13,7 +13,7 @@ class VoiceState {
     this.phase = VoicePhase.idle,
     this.partial = '',
     this.messageHe,
-    this.continuous = false,
+    this.issue,
     this.hebrewVoice,
   });
 
@@ -25,33 +25,42 @@ class VoiceState {
   /// A friendly note when voice can't be used (permission, no Hebrew, offline…).
   final String? messageHe;
 
-  /// "שיחה רציפה": listen again after Remy answers (hands-free cooking).
-  final bool continuous;
+  /// Why the last attempt to listen failed (the sheet falls back to typing when voice can't work).
+  final VoiceIssue? issue;
 
   /// Null until checked; false when the phone has no Hebrew voice (replies stay text).
   final bool? hebrewVoice;
 
-  VoiceState copyWith({VoicePhase? phase, String? partial, String? messageHe, bool clearMessage = false, bool? continuous, bool? hebrewVoice}) =>
+  VoiceState copyWith({
+    VoicePhase? phase,
+    String? partial,
+    String? messageHe,
+    VoiceIssue? issue,
+    bool clearMessage = false,
+    bool? hebrewVoice,
+  }) =>
       VoiceState(
         phase: phase ?? this.phase,
         partial: partial ?? this.partial,
         messageHe: clearMessage ? null : messageHe ?? this.messageHe,
-        continuous: continuous ?? this.continuous,
+        issue: clearMessage ? null : issue ?? this.issue,
         hebrewVoice: hebrewVoice ?? this.hebrewVoice,
       );
 }
 
-/// Talking with Remy (Phase 3D): listen → the same Remy pipeline as typed text → read the
-/// reply aloud. Uses the phone's own speech services; every problem becomes a friendly
-/// message and typing keeps working.
+/// Talking with Remy (Phase 3D, DECISIONS #82): listen → the same Remy pipeline as typed text →
+/// read the reply aloud → listen once more for a follow-up, like a conversation. The first
+/// silence ends the turn quietly; nothing listens after that until the cook asks (a tap, or
+/// "היי רמי" in hands-free cooking). Uses the phone's own speech services; every problem
+/// becomes a friendly message and typing keeps working.
 class VoiceController extends Notifier<VoiceState> {
   VoiceController(this.scope);
 
   final RemyScope scope;
 
-  /// Continuous mode stops after this many silent turns in a row.
-  static const maxSilentTurns = 2;
-  int _silentTurns = 0;
+  /// Follow-up listening in a row, so even a long exchange ends by itself.
+  static const maxFollowUps = 6;
+  int _followUps = 0;
 
   /// This conversation is holding the microphone right now (read where `state` can't be).
   bool _usingMic = false;
@@ -75,11 +84,6 @@ class VoiceController extends Notifier<VoiceState> {
 
   bool get available => _recognizer != null;
 
-  void setContinuous(bool on) {
-    _silentTurns = 0;
-    state = state.copyWith(continuous: on);
-  }
-
   /// The microphone button: start listening, or stop what is happening now.
   Future<void> toggle() async {
     switch (state.phase) {
@@ -88,7 +92,7 @@ class VoiceController extends Notifier<VoiceState> {
       case VoicePhase.listening:
         await _recognizer?.stop(); // what was heard becomes the utterance
       case VoicePhase.speaking:
-        state = state.copyWith(phase: VoicePhase.idle, continuous: false);
+        state = state.copyWith(phase: VoicePhase.idle);
         await _tts.stop();
       case VoicePhase.preparing || VoicePhase.processing:
         break;
@@ -98,14 +102,17 @@ class VoiceController extends Notifier<VoiceState> {
   /// Switching to typing (or closing the sheet): drop the utterance and stop speaking.
   Future<void> cancel() async {
     if (state.phase == VoicePhase.idle) return;
-    state = state.copyWith(phase: VoicePhase.idle, partial: '', continuous: false);
+    state = state.copyWith(phase: VoicePhase.idle, partial: '');
     await _recognizer?.cancel();
     await _tts.stop();
   }
 
-  Future<void> listen() async {
+  /// Listens for one utterance. [followUp]: right after Remy answered; silence then simply
+  /// ends the conversation turn (no "לא שמעתי").
+  Future<void> listen({bool followUp = false}) async {
     final recognizer = _recognizer;
     if (recognizer == null || state.phase != VoicePhase.idle) return;
+    if (!followUp) _followUps = 0;
     state = state.copyWith(phase: VoicePhase.preparing, partial: '', clearMessage: true);
     try {
       await recognizer.prepare();
@@ -133,15 +140,16 @@ class VoiceController extends Notifier<VoiceState> {
       }
       if (!_active) return; // cancelled while listening
       if (text.isEmpty) {
-        _silentTurns++;
-        _stop(message: _l10n.voiceNoSpeech, keepContinuous: _silentTurns < maxSilentTurns);
-        if (state.continuous) await listen(); // give the cook another chance
+        if (followUp) {
+          state = state.copyWith(phase: VoicePhase.idle, partial: ''); // the cook is done for now
+        } else {
+          _stop(VoiceIssue.noSpeech);
+        }
         return;
       }
-      _silentTurns = 0;
       await _respond(text, voice);
     } on VoiceException catch (e) {
-      if (ref.mounted) _stop(message: messageFor(e.issue), keepContinuous: false);
+      if (ref.mounted) _stop(e.issue);
     }
   }
 
@@ -158,7 +166,7 @@ class VoiceController extends Notifier<VoiceState> {
     try {
       await _respond(text, voice);
     } on VoiceException catch (e) {
-      if (ref.mounted) _stop(message: messageFor(e.issue), keepContinuous: false);
+      if (ref.mounted) _stop(e.issue);
     }
   }
 
@@ -172,16 +180,20 @@ class VoiceController extends Notifier<VoiceState> {
       if (!_active) return; // stopped while speaking
     }
     state = state.copyWith(phase: VoicePhase.idle, partial: '');
-    // A question Remy asked by voice ("לסמן…?") is answered by voice: listen once for it.
+    // A spoken exchange continues by voice: Remy listens once more (always for the answer to
+    // a question he asked, "לסמן…?"). A long exchange still ends after [maxFollowUps].
     final asked = ref.read(assistantControllerProvider(scope)).pending != null;
-    if (state.continuous || asked) await listen();
+    if (asked || _followUps < maxFollowUps) {
+      _followUps++;
+      await listen(followUp: true);
+    }
   }
 
   /// Still mounted and not stopped/cancelled meanwhile.
   bool get _active => ref.mounted && state.phase != VoicePhase.idle;
 
-  void _stop({required String message, required bool keepContinuous}) {
-    state = state.copyWith(phase: VoicePhase.idle, partial: '', messageHe: message, continuous: keepContinuous && state.continuous);
+  void _stop(VoiceIssue issue) {
+    state = state.copyWith(phase: VoicePhase.idle, partial: '', messageHe: messageFor(issue), issue: issue);
   }
 
   String messageFor(VoiceIssue issue) => switch (issue) {

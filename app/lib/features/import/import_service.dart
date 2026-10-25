@@ -11,6 +11,7 @@ import '../../data/recipe_repository.dart';
 import '../../data/settings_repository.dart';
 import '../../models/cooking_plan.dart';
 import '../../models/recipe_analysis.dart';
+import '../assistant/conversation_store.dart';
 import '../cooking/engine/plan_validator.dart';
 import 'image_store.dart';
 
@@ -164,7 +165,10 @@ class ImportService {
     await images.delete(row.sourceImagePath);
   }
 
-  Future<void> discard(String draftId) async => images.delete(await recipes.discardDraft(draftId));
+  Future<void> discard(String draftId) async {
+    await images.delete(await recipes.discardDraft(draftId));
+    await forgetConversation(settings, draftId); // the draft's conversation with Remy, if any
+  }
 
   /// Startup cleanup: expired drafts, their photos, and photos neither a draft nor
   /// the pending (not yet sent) import refers to.

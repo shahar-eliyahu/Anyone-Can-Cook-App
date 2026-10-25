@@ -1,29 +1,27 @@
+import 'dart:async';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/api_client.dart';
 import '../../core/clock.dart';
+import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../cooking/cooking_controller.dart';
+import '../prepare/preparation.dart';
 import '../prepare/preparation_service.dart';
 import 'assistant_models.dart';
 import 'assistant_service.dart';
 import 'command_parser.dart';
+import 'conversation_store.dart';
 
-class ChatMessage {
-  const ChatMessage({required this.fromUser, required this.textHe, String? speechHe}) : speechHe = speechHe ?? textHe;
-  final bool fromUser;
-  final String textHe;
-
-  /// What a future text-to-speech voice would say (Phase 3D).
-  final String speechHe;
-}
+export 'conversation_store.dart' show ChatMessage;
 
 class AssistantState {
   const AssistantState({this.messages = const [], this.pending, this.busy = false});
   final List<ChatMessage> messages;
 
-  /// A reply waiting for the cook's approval ("אישור" / "לא, תודה").
+  /// A reply waiting for the cook's approval ("כן" / "לא").
   final AssistantReply? pending;
   final bool busy;
 
@@ -37,25 +35,64 @@ class AssistantState {
 
 final assistantServiceProvider = Provider<AssistantService>((ref) => AssistantService(ref.watch(apiClientProvider)));
 
-/// One conversation with Remy per cooking session, or per recipe before cooking (kept in
-/// memory while open). The single entry point [send] serves typed and spoken requests.
+/// Remy's conversation about the current recipe (docs/DECISIONS.md #81). The scope says what
+/// Remy may do (act on a cooking session, or only answer before cooking); the conversation
+/// itself belongs to the recipe, so preparation and cooking continue the same one, and it is
+/// restored from [ConversationStore] whenever the sheet opens again. The single entry point
+/// [send] serves typed and spoken requests.
 class AssistantController extends Notifier<AssistantState> {
   AssistantController(this.scope);
 
   final RemyScope scope;
   String get sessionId => scope.id;
 
+  /// The recipe this conversation is about (a session's recipe, or the recipe itself).
+  late final Future<String?> _recipeId = _resolveRecipe();
+
+  /// Remembered messages are loaded before the first request is answered.
+  late final Future<void> _loaded = _load();
+  Future<void> _saving = Future.value();
+
   @override
-  AssistantState build() => const AssistantState();
+  AssistantState build() {
+    unawaited(_loaded);
+    return const AssistantState();
+  }
 
   AssistantService get _service => ref.read(assistantServiceProvider);
   CookingController get _cooking => ref.read(cookingControllerProvider(sessionId).notifier);
+  ConversationStore get _store => ref.read(conversationStoreProvider);
+
+  Future<String?> _resolveRecipe() async =>
+      scope.isSession ? (await ref.read(sessionRepositoryProvider).getSession(scope.id))?.recipeId : scope.id;
+
+  Future<void> _load() async {
+    final recipeId = await _recipeId;
+    if (recipeId == null || !ref.mounted) return;
+    final remembered = await _store.load(recipeId);
+    if (!ref.mounted || remembered.isEmpty) return;
+    state = state.copyWith(messages: [...remembered, ...state.messages]);
+  }
+
+  /// Saves after every change, in order (each save writes the whole bounded conversation).
+  void _remember() {
+    final messages = state.messages;
+    _saving = _saving.then((_) async {
+      final recipeId = await _recipeId;
+      if (recipeId != null) await _store.save(recipeId, messages);
+    });
+  }
+
+  /// The conversation sent with a request: the recent turns only (the service trims further).
+  List<ChatTurn> get _history => [for (final m in state.messages) ChatTurn(fromUser: m.fromUser, textHe: m.textHe)];
 
   /// One message from the cook, typed or spoken. Returns what Remy answered (the voice
   /// controller reads it aloud), or null when nothing was sent.
   Future<AssistantReply?> send(AssistantInput input) async {
     final text = input.text.trim();
     if (text.isEmpty || state.busy) return null;
+    await _loaded;
+    if (!ref.mounted) return null;
     // A pending confirmation can be answered in words: "כן" / "לא".
     if (state.pending != null) {
       switch (yesOrNo(text)) {
@@ -68,12 +105,8 @@ class AssistantController extends Notifier<AssistantState> {
         case null:
       }
     }
-    final history = [for (final m in state.messages) ChatTurn(fromUser: m.fromUser, textHe: m.textHe)];
-    state = state.copyWith(
-      messages: [...state.messages, ChatMessage(fromUser: true, textHe: text)],
-      busy: true,
-      clearPending: true,
-    );
+    final history = _history;
+    _addUser(text, busy: true);
     if (!scope.isSession) return _sendAboutRecipe(input, history);
     try {
       final view = await ref.read(cookingControllerProvider(sessionId).future);
@@ -84,13 +117,14 @@ class AssistantController extends Notifier<AssistantState> {
         recipe: view.displayRecipe,
         now: actions.now(),
         history: history,
+        context: {'stage': 'cooking', ...await _preparationContext(view.recipeRow.id)},
       );
       if (reply.action != null && !reply.requiresConfirmation) {
         return _say(await _service.execute(reply.action!, actions));
       }
       return _say(reply, pending: reply.action == null ? null : reply);
     } finally {
-      state = state.copyWith(busy: false);
+      if (ref.mounted) state = state.copyWith(busy: false);
     }
   }
 
@@ -101,7 +135,7 @@ class AssistantController extends Notifier<AssistantState> {
     try {
       return _say(await _service.execute(pending!.action!, _cooking.assistantActions));
     } finally {
-      state = state.copyWith(busy: false);
+      if (ref.mounted) state = state.copyWith(busy: false);
     }
   }
 
@@ -125,6 +159,7 @@ class AssistantController extends Notifier<AssistantState> {
         recipe: view.recipe,
         now: ref.read(clockProvider)().toUtc(),
         history: history,
+        context: {'stage': 'preparation', ..._summary(view)},
       );
       return _say(reply);
     } finally {
@@ -132,20 +167,63 @@ class AssistantController extends Notifier<AssistantState> {
     }
   }
 
+  /// What the cook decided while preparing, from the saved preparation (never from the chat):
+  /// what is still missing, what is used instead, what is left out.
+  Future<Map<String, Object?>> _preparationContext(String recipeId) async {
+    final view = await ref.read(preparationServiceProvider).load(recipeId);
+    return view == null ? const {} : _summary(view);
+  }
+
+  static Map<String, Object?> _summary(PrepView view) {
+    final recipe = view.recipe;
+    final prep = view.prep;
+    final missing = [
+      for (final i in recipe.ingredients)
+        if (prep.statusOf(i.id) == ItemStatus.missing && prep.substitutionFor(ItemKind.ingredient, i.id) == null && !i.omitted)
+          i.name,
+      for (final e in recipe.equipment)
+        if (prep.statusOf(e.id) == ItemStatus.missing && prep.substitutionFor(ItemKind.equipment, e.id) == null && !e.omitted)
+          e.name,
+    ];
+    final instead = [
+      for (final i in recipe.ingredients)
+        if (i.substitutedFor case final o? when o != i.name && !i.omitted) {'instead_of': o, 'using': i.name},
+      for (final e in recipe.equipment)
+        if (e.substitutedFor case final o? when o != e.name && !e.omitted) {'instead_of': o, 'using': e.name},
+    ];
+    final notUsed = [for (final i in recipe.ingredients) if (i.omitted) i.substitutedFor ?? i.name];
+    if (missing.isEmpty && instead.isEmpty && notUsed.isEmpty) return const {};
+    return {
+      'preparation': {
+        if (missing.isNotEmpty) 'missing': missing,
+        if (instead.isNotEmpty) 'substitutions': instead,
+        if (notUsed.isNotEmpty) 'not_used': notUsed,
+      },
+    };
+  }
+
   /// What speech recognition delivers: the same pipeline as typed text.
   Future<AssistantReply?> sendSpoken(String transcript) =>
       send(AssistantInput(transcript, modality: InputModality.voice));
 
-  void _addUser(String text) =>
-      state = state.copyWith(messages: [...state.messages, ChatMessage(fromUser: true, textHe: text)]);
+  void _addUser(String text, {bool busy = false}) {
+    state = state.copyWith(messages: _bounded([...state.messages, ChatMessage(fromUser: true, textHe: text)]), busy: busy ? true : null, clearPending: busy);
+    _remember();
+  }
 
   AssistantReply _say(AssistantReply reply, {AssistantReply? pending}) {
+    if (!ref.mounted) return reply;
     state = state.copyWith(
-      messages: [...state.messages, ChatMessage(fromUser: false, textHe: reply.answerHe, speechHe: reply.speechHe)],
+      messages: _bounded([...state.messages, ChatMessage(fromUser: false, textHe: reply.answerHe, speechHe: reply.speechHe)]),
       pending: pending,
     );
+    _remember();
     return reply;
   }
+
+  static List<ChatMessage> _bounded(List<ChatMessage> messages) => messages.length > ConversationStore.maxMessages
+      ? messages.sublist(messages.length - ConversationStore.maxMessages)
+      : messages;
 }
 
 /// "כן" → true, "לא" → false, anything else → null (a new request).

@@ -5,7 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../support/app_harness.dart';
 
-/// Typing is secondary in Remy's sheet: open the text field first if needed.
+/// Types to Remy (in cooking, where he opens listening, through "הקלדה" first).
 Future<void> typeToRemy(WidgetTester tester, String text) async {
   if (find.byTooltip('שליחה').evaluate().isEmpty) {
     await tester.tap(find.text('הקלדה'));
@@ -31,15 +31,14 @@ void main() {
   testApp('Remy runs a simple command offline and answers from the plan', (tester, h) async {
     h.api.forbidCalls = true;
     final sessionId = await openCooking(tester, h);
-    expect(find.textContaining('היי, אני רמי'), findsOneWidget);
+    expect(find.text('אפשר לשאול אותי כל דבר על המתכון.'), findsOneWidget); // one short line, no long intro
 
     await typeToRemy(tester, 'הבא');
     expect(find.text('✓ סיימנו: הכנת תפוחי האדמה. עכשיו: תיבול העוף.'), findsOneWidget);
     final events = await h.sessions.loadEvents(sessionId);
     expect(events.whereType<ActionConfirmed>().map((e) => e.source).toSet(), {ActionSource.agent});
 
-    await tester.tap(find.text('כמה זמן נשאר?'));
-    await tester.pumpAndSettle();
+    await typeToRemy(tester, 'כמה זמן נשאר?');
     expect(find.text('אין טיימר פעיל כרגע.'), findsOneWidget);
     expect(h.api.calls, isEmpty);
   });

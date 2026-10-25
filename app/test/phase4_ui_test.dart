@@ -268,18 +268,19 @@ void main() {
     testApp('answers recipe questions locally, offline, with no API call', (tester, h) async {
       h.api.forbidCalls = true;
       await openOverviewRemy(tester, h);
-      expect(find.textContaining('אפשר לשאול אותי על המתכון'), findsOneWidget);
-      await tester.ensureVisible(find.text('כמה זמן זה לוקח?'));
-      await tester.tap(find.text('כמה זמן זה לוקח?'));
-      await tester.pumpAndSettle();
+      expect(h.mic.listens, 0); // before cooking Remy opens as a chat, not listening
+      expect(find.byTooltip('דיבור עם רמי'), findsOneWidget); // the microphone is there, small
+      Future<void> ask(String q) async {
+        await tester.enterText(find.byType(TextField).last, q);
+        await tester.tap(find.byTooltip('שליחה'));
+        await tester.pumpAndSettle();
+      }
+
+      await ask('כמה זמן זה לוקח?');
       expect(find.textContaining('המתכון לוקח בערך'), findsOneWidget);
-      await tester.ensureVisible(find.text('במה מתחילים?'));
-      await tester.tap(find.text('במה מתחילים?'));
-      await tester.pumpAndSettle();
+      await ask('במה מתחילים?');
       expect(find.textContaining('מתחילים ב: הכנת תפוחי האדמה'), findsOneWidget);
-      await tester.ensureVisible(find.text('חסר לי מצרך'));
-      await tester.tap(find.text('חסר לי מצרך'));
-      await tester.pumpAndSettle();
+      await ask('חסר לי מצרך');
       expect(find.textContaining('סמנו "חסר לי" ליד המצרך'), findsWidgets);
       expect(h.api.calls, isEmpty);
     });
@@ -287,8 +288,6 @@ void main() {
     testApp('cooking commands wait for cooking: nothing starts, nothing changes', (tester, h) async {
       h.api.forbidCalls = true;
       await openOverviewRemy(tester, h);
-      await tester.tap(find.text('הקלדה'));
-      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).last, 'סיימתי');
       await tester.tap(find.byTooltip('שליחה'));
       await tester.pumpAndSettle();
@@ -307,8 +306,6 @@ void main() {
           {'op': 'replace_ingredient', 'ingredient_id': 'i3', 'name': 'שמן קנולה'},
         ]),
       ));
-      await tester.tap(find.text('הקלדה'));
-      await tester.pumpAndSettle();
       await tester.enterText(find.byType(TextField).last, 'אפשר להחליף את שמן הזית במשהו אחר?');
       await tester.tap(find.byTooltip('שליחה'));
       await tester.pumpAndSettle();
