@@ -467,3 +467,27 @@ Supersedes the bar layout of §3.2 and §13.
   last 6 turns (600 characters each), the stage (preparation / cooking), the saved preparation decisions and the
   live cooking state; never the source text or the whole history.
 
+---
+
+## 16. "מה בא לכם לבשל?": built-in recipes, Remy creates, or your own (2026-10-25)
+
+- **Hub (`/new`):** home's "מתכון חדש" (and the menu) opens three choices as plain recipe tiles: "מתכונים
+  מוכנים" (the built-in catalog), "רמי יציע מתכון" (Remy creates one with the cook) and "מתכון משלי" (the
+  existing import: text, photo, link, unchanged).
+- **Catalog (`/catalog`, DECISIONS #84):** 24 bundled recipes; a search field (title or ingredient) and one
+  row of category choices (הכל, מהיר, עוף, פסטה, אפייה, ארוחת בוקר, צמחוני, קינוחים). Each tile shows the
+  estimated time (from the plan), servings and categories. Opening one shows the usual overview, marked
+  "מתכון מהאוסף", with preparation, Remy and "מתחילים לבשל" as for any recipe. Nothing there changes the
+  built-in recipe itself: no rename, favourite, advanced edit or delete; "שמירה במתכונים שלי" saves the cook's
+  own copy (with what they prepared), which can then be edited like any recipe.
+- **Remy creates (`/create`, DECISIONS #85–#87):** the same chat as Remy's sheet on a screen of its own, text
+  first (input focused, small microphone, nothing listening; voice works as in the sheet). An empty chat shows
+  one hint line. A broad request gets 2 to 4 dishes as buttons under Remy's reply; a tap answers with that dish.
+  A specific request (or a choice) gets a recipe: the review opens by itself, and the chat keeps a
+  "לצפייה במתכון" link. The app bar has "שיחה חדשה".
+- **Review (`/drafts/:id/preview`):** a note that this is Remy's suggestion, the title, description, servings,
+  "הערכת זמן", ingredients, equipment, numbered steps and Remy's tips. "שמירה במתכונים שלי" (plans it and opens
+  its overview), "עריכה" (names, amounts, equipment, steps; add and remove rows), "שינוי עם רמי" (back to the
+  chat, e.g. "בלי חלב"), "ביטול המתכון" (with a confirmation). An unsaved Remy draft also appears under
+  "מתכונים שהתחלתם להוסיף" on home and opens this review.
+

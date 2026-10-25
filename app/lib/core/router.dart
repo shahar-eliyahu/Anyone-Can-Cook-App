@@ -1,7 +1,11 @@
 import 'package:go_router/go_router.dart';
 
+import '../features/catalog/catalog_screen.dart';
 import '../features/cooking/cooking_screen.dart';
 import '../features/cooking/finish_screen.dart';
+import '../features/create/create_hub_screen.dart';
+import '../features/create/recipe_preview_screen.dart';
+import '../features/create/remy_create_screen.dart';
 import '../features/history/history_detail_screen.dart';
 import '../features/history/history_screen.dart';
 import '../features/import/clarify_screen.dart';
@@ -42,7 +46,20 @@ GoRouter createRouter({String initialLocation = '/'}) => GoRouter(
                 ),
               ],
             ),
+            GoRoute(path: 'new', builder: (context, state) => const CreateHubScreen()),
+            GoRoute(path: 'catalog', builder: (context, state) => const CatalogScreen()),
+            GoRoute(
+              path: 'create',
+              builder: (context, state) => RemyCreateScreen(conversationId: state.uri.queryParameters['id']),
+            ),
             GoRoute(path: 'import', builder: (context, state) => const ImportScreen()),
+            GoRoute(
+              path: 'drafts/:id/preview',
+              builder: (context, state) => RecipePreviewScreen(
+                draftId: state.pathParameters['id']!,
+                fromChat: state.uri.queryParameters['from'] == 'chat',
+              ),
+            ),
             GoRoute(
               path: 'drafts/:id/clarify',
               builder: (context, state) => ClarifyScreen(draftId: state.pathParameters['id']!, planError: state.extra),

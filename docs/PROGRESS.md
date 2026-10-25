@@ -3,7 +3,7 @@
 Frequently changing status. Permanent rules are in `CLAUDE.md`; the approved design is `docs/PLAN.md`.
 Update this file at the end of every work step.
 
-_Last updated: 2026-10-24 (origin/main at `9386cbb`: Phases 3C–3D; Phase 4 `bac3d0d` `73d2f01` `bf9853f` local only)_
+_Last updated: 2026-10-25 (origin/main at `d30f556`; later commits local only)_
 
 ## Phase status
 
@@ -543,6 +543,46 @@ Checked what existed, changed only what was missing.
   cooking Remy asked for the microphone, "Don't allow" switched him to text with the note and the same conversation;
   with the permission he opened listening at once in voice mode; abandoning the cooking cleared the conversation
   (the recipe stayed). Test session abandoned and the microphone permission revoked afterwards.
+
+### Recipe discovery and creation: hub, built-in catalog, Remy creates, 2026-10-25 (local commit)
+
+- **Hub:** "מתכון חדש" now opens "מה בא לכם לבשל?" with three paths: "מתכונים מוכנים", "רמי יציע מתכון",
+  "מתכון משלי" (the existing import, unchanged).
+- **Built-in catalog (DECISIONS #84):** 24 recipes in `app/assets/recipes/catalog.json` (breakfast, pasta,
+  chicken, rice, vegetarian, baking, desserts, quick), each a full Recipe + CookingPlan in the existing contract;
+  search and categories; opened as a `builtin` working copy and cooked through the usual flows; "שמירה במתכונים
+  שלי" makes a personal copy.
+- **Remy creates (DECISIONS #85–#87):** new stage `recipe_creation` (backend `POST /v1/assistant/create`,
+  prompt `create_recipe.md`, `recipe_creation.py` validation and safety rules, dev mock that offers options for a
+  short request and the sample recipe otherwise). The app: `RemyScope.creation`, the same chat panel on
+  `/create`, dish options as buttons, drafts with source type `remy`, the review and edit screen, save through the
+  usual `/plan`, discard. Contract: `RecipeSourceInfo.type` gained `remy` (schemas exported).
+- **Memory:** creation conversations live in the existing store under their own id with their preferences, are
+  kept across leaving and restarts, expire after 12 hours, and are cleared on discard, save, draft purge or
+  "שיחה חדשה"; they never appear in a recipe's preparation or cooking conversation.
+- **Tests (fakes only, zero Gemini calls):** Flutter **327/327**, analyzer clean (new
+  `test/catalog/builtin_catalog_test.dart`: catalog size, validity, safety checks, every plan cooked to the end
+  by the engine, copy rules, search, storage isolation and purge, fresh start after cooking, personal copy, browse
+  → overview → cooking, save copy; new `test/create/recipe_creation_test.dart`: options → choice → review → edit →
+  save → overview with a fresh Remy, saved recipe prepares and cooks, discard, persistence across leaving and
+  restart, "שיחה חדשה", draft refinement, malformed and unsafe answers, offline/quota messages, one call per
+  message, the bounded payload, isolation and expiry; import flow tests go through the hub). Backend **224/224**
+  (new `tests/test_recipe_creation.py`: strict rebuild, options, out of scope, rejected incomplete/impossible
+  recipes, raw or uncooked meat refused, malformed output not retried, payload, preferences, limits, planning of a
+  created recipe, endpoint, dev mock, the bundled catalog against the Pydantic contract).
+- **Emulator (Pixel 8a, Android 15, local backend with the mock provider, no Gemini):** hub → catalog (category
+  filter) → chocolate cake overview ("מתכון מהאוסף", no favourite or delete) → "יש לי הכול" → Remy opened as text
+  with an empty conversation → cooking started from the built-in plan (preheat task shown), a step advanced, then
+  stopped; the cake did not appear in "המתכונים שלי". Ask Remy opened as text; a vague request got three options;
+  a choice produced a draft whose review opened by itself; an amount was edited; saving made one plan call and
+  opened a normal overview; its Remy had no creation messages; preparation and cooking started. A second
+  conversation started empty; a specific request went straight to a draft; after force-stop and relaunch the draft
+  was on home and its chat was kept; discarding removed it from home, and Ask Remy started empty again. Backend
+  log: only `/v1/assistant/create` and `/v1/recipes/plan`, all on the mock. Voice was not exercised on the
+  emulator this time (covered by the existing voice tests; the microphone permission stays revoked).
+- **Limitations:** the dev mock returns the sample recipe for every specific request; quantities are not scaled
+  when servings change; catalog recipes have no photos; a built-in recipe changed by an app update gets a new
+  working copy (the old one keeps its history).
 
 ## Next step
 

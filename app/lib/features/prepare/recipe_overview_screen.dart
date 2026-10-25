@@ -20,6 +20,7 @@ import '../assistant/assistant_models.dart';
 import '../assistant/conversation_store.dart';
 import '../assistant/hands_free_choice.dart';
 import '../assistant/remy_widgets.dart';
+import '../catalog/builtin_catalog.dart';
 import '../cooking/start_cooking.dart';
 import '../import/import_service.dart';
 import 'plan_estimate.dart';
@@ -117,7 +118,7 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
     return AppScaffold(
       title: row.displayTitle,
       actions: [
-        if (!row.isDraft)
+        if (!row.isDraft && !row.isBuiltin)
           IconButton(
             tooltip: row.isFavorite ? l10n.removeFavorite : l10n.addFavorite,
             icon: Icon(row.isFavorite ? Icons.star_rounded : Icons.star_outline_rounded, color: row.isFavorite ? context.palette.woodLight : null),
@@ -128,13 +129,14 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
           icon: const Icon(Icons.more_vert_rounded),
           onSelected: (m) => _onMenu(m, view),
           itemBuilder: (context) => [
-            if (!row.isDraft) PopupMenuItem(value: _Menu.rename, child: Text(l10n.rename)),
+            // A built-in recipe is never changed itself: the cook saves their own copy to edit it.
+            if (!row.isDraft && !row.isBuiltin) PopupMenuItem(value: _Menu.rename, child: Text(l10n.rename)),
             PopupMenuItem(value: _Menu.source, child: Text(l10n.viewSource)),
-            if (!view.cookingNow) PopupMenuItem(value: _Menu.advanced, child: Text(l10n.advancedEdit)),
+            if (!view.cookingNow && !row.isBuiltin) PopupMenuItem(value: _Menu.advanced, child: Text(l10n.advancedEdit)),
             if (!row.isDraft) PopupMenuItem(value: _Menu.fullPlan, child: Text(l10n.fullPlan)),
             if (row.isDraft)
               PopupMenuItem(value: _Menu.discard, child: Text(l10n.draftCancel))
-            else
+            else if (!row.isBuiltin)
               PopupMenuItem(value: _Menu.delete, child: Text(l10n.deleteRecipe)),
           ],
         ),
@@ -191,6 +193,7 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
                 ),
                 if (row.isDraft)
                   TextButton(onPressed: canStart ? () => _saveDraft(view) : null, child: Text(l10n.saveToMyRecipes)),
+                if (row.isBuiltin) TextButton(onPressed: _busy ? null : () => _saveCopy(row), child: Text(l10n.saveToMyRecipes)),
               ],
             ),
       body: ListView(
@@ -208,6 +211,7 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
                   spacing: Space.s,
                   runSpacing: Space.s,
                   children: [
+                    if (row.isBuiltin) InfoPill(icon: Icons.menu_book_rounded, label: l10n.builtinLabel),
                     if (recipe.servings case final s?) InfoPill(icon: Icons.restaurant_rounded, label: '${_number(s.amount)} ${s.unit}'),
                     if (estimate != null) ...[
                       InfoPill(icon: Icons.schedule_rounded, label: l10n.overviewTotalTime(formatApproxDuration(estimate.totalMinutes, l10n))),
@@ -349,6 +353,21 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
     setState(() => _busy = true);
     try {
       await ref.read(importServiceProvider).approve(view.row.id, view.plan!, view.analysis);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  /// A built-in recipe becomes the cook's own (with what they prepared); its copy opens.
+  Future<void> _saveCopy(RecipeRow row) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    setState(() => _busy = true);
+    try {
+      final id = await ref.read(builtinRecipesProvider).copyToMyRecipes(row.id);
+      router.pushReplacement('/recipes/$id');
+      messenger.showSnackBar(SnackBar(content: Text(l10n.builtinSaved)));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

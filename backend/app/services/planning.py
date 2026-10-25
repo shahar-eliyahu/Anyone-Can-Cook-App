@@ -42,6 +42,11 @@ async def plan_recipe(
 ) -> PlanResult:
     if not analysis.is_recipe or analysis.recipe is None:
         raise ApiError(422, "not_a_recipe")
+    if analysis.source.type == "remy":
+        # A recipe Remy created is its own source; the cook may have edited it since.
+        from app.services.recipe_creation import recipe_text
+
+        analysis = analysis.model_copy(update={"source_text": recipe_text(analysis.recipe)})
     facts = gap_resolution.facts_for_plan(analysis.gaps, analysis.answers)
     unresolved = [f for f in facts if f.status == "unresolved"]
     if any(f.note_he == UNSCHEDULABLE_HE for f in unresolved):

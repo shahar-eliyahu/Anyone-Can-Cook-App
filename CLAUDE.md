@@ -32,6 +32,8 @@ app/        Flutter (Android/iOS). Riverpod, go_router, drift (SQLite), dio, flu
   lib/data/                    repositories over drift (recipes, plans, sessions, events, settings)
   lib/features/prepare/        recipe overview + checklist, substitutions (patch ops, local table)
   lib/features/import/         import, clarify, advanced editing (review screen)
+  lib/features/catalog/        built-in recipes (bundled catalog, browse, working copies)
+  lib/features/create/         "מה בא לכם לבשל?" hub, Remy creates a recipe, draft review
   lib/features/assistant/      Remy: command parser, AssistantService (interpret/execute), sheet, voice
   lib/features/*/              other screens (kitchen, recipes, cooking, history, settings)
   lib/core/theme.dart, motion.dart, widgets/   design system (colours, type, motion, shared components)
@@ -39,7 +41,8 @@ app/        Flutter (Android/iOS). Riverpod, go_router, drift (SQLite), dio, flu
   lib/l10n/app_he.arb          ALL user-facing strings (Hebrew)
 backend/    FastAPI, stateless, deployed on Render Free (root dir backend/)
   app/services/llm/            LLMProvider interface; MockProvider (local/tests), GeminiProvider
-  app/services/                analysis, planning, substitution (+ patching), assistant, url_fetcher, ai_calls
+  app/services/                analysis, planning, substitution (+ patching), assistant, recipe_creation,
+                               url_fetcher, ai_calls
   app/schemas/                 Pydantic Recipe/CookingPlan — SOURCE OF TRUTH for the JSON contract
   scripts/export_schemas.py    writes shared/schema/*.json
 shared/     schema/ (exported JSON Schema), fixtures/ (sample recipe + plan used by both sides)
@@ -92,7 +95,10 @@ Key invariants:
   (cooking screen only; one saved preference `handsFreePreferenceProvider`, chosen in preparation/settings via
   `HandsFreeChoice`; Remy's sheet pauses it via `remySheetOpenProvider`). Remy's conversation is per recipe
   (`assistant/conversation_store.dart`: 20 messages, 12 h, cleared on finish/abandon/delete/discard); he opens as
-  text before cooking and as voice in a cooking session. Plan-ahead notices show in preparation
+  text before cooking and as voice in a cooking session. "מתכון חדש" opens the hub (`/new`): built-in catalog
+  (`features/catalog/`, `assets/recipes/catalog.json`, rows with status `builtin`, never the cook's own), Remy
+  creates (`features/create/`, `RemyScope.creation`, stage `recipe_creation`, drafts with source `remy`, saved only
+  after review) and the import. Plan-ahead notices show in preparation
   and with their step (`features/cooking/guidance.dart`), never as a cooking banner.
   Hebrew copy: no dash separators (tested), temperatures in words, `tidyHe` for AI/user text. Animations are
   bounded and respect `Motion.reduced`.

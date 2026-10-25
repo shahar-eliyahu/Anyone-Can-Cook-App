@@ -82,6 +82,7 @@ flutter:
   # Copy of shared/fixtures/sample_recipe.json (kept identical by test/contract_test.dart).
   assets:
     - assets/recipes/sample_recipe.json
+    - assets/recipes/catalog.json
     - assets/branding/logo_mark.png
     - assets/fonts/OFL.txt
 

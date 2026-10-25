@@ -58,12 +58,26 @@ Future<void> showAssistantSheet(
 const _voiceBlocked = {VoiceIssue.permissionDenied, VoiceIssue.recognitionUnavailable, VoiceIssue.hebrewUnsupported, VoiceIssue.network};
 
 class AssistantPanel extends ConsumerStatefulWidget {
-  const AssistantPanel({super.key, required this.scope, this.listenOnOpen = false, this.command, this.handsFree = false});
+  const AssistantPanel({
+    super.key,
+    required this.scope,
+    this.listenOnOpen = false,
+    this.command,
+    this.handsFree = false,
+    this.embedded = false,
+    this.onOpenRecipe,
+  });
 
   final RemyScope scope;
   final bool listenOnOpen;
   final String? command;
   final bool handsFree;
+
+  /// On a screen of its own (creating a recipe): the screen's back arrow closes it.
+  final bool embedded;
+
+  /// Recipe creation: opens the draft Remy created.
+  final void Function(String recipeId)? onOpenRecipe;
 
   @override
   ConsumerState<AssistantPanel> createState() => _AssistantPanelState();
@@ -150,6 +164,7 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
     // A pending question is shown in its own card with "כן" / "לא", not repeated as a bubble.
     final asked = pending != null && s.messages.isNotEmpty && !s.messages.last.fromUser;
     final shown = asked ? s.messages.sublist(0, s.messages.length - 1) : s.messages;
+    final latestRecipe = shown.reversed.toList().indexWhere((m) => m.recipeId != null);
 
     final status = switch (voice.phase) {
       VoicePhase.preparing => l10n.voicePreparing,
@@ -198,11 +213,12 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
                     ),
                   ),
                   if (s.busy || voice.phase == VoicePhase.processing) const ThinkingDots(size: 6),
-                  IconButton(
-                    tooltip: l10n.remyClose,
-                    onPressed: () => Navigator.of(context).maybePop(),
-                    icon: const Icon(Icons.keyboard_arrow_down_rounded),
-                  ),
+                  if (!widget.embedded)
+                    IconButton(
+                      tooltip: l10n.remyClose,
+                      onPressed: () => Navigator.of(context).maybePop(),
+                      icon: const Icon(Icons.keyboard_arrow_down_rounded),
+                    ),
                 ],
               ),
             ),
@@ -214,7 +230,7 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
                       child: Padding(
                         padding: const EdgeInsets.all(Space.xl),
                         child: Text(
-                          l10n.remyEmptyHint,
+                          widget.scope.isCreation ? l10n.createEmptyHint : l10n.remyEmptyHint,
                           textAlign: TextAlign.center,
                           style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant),
                         ),
@@ -228,7 +244,24 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
                           _ConfirmCard(question: pending.answerHe, busy: s.busy, voice: canListen, controller: _controller),
                         // What is being heard, as a faint bubble of its own.
                         if (hearing) _Bubble(message: ChatMessage(fromUser: true, textHe: voice.partial), draft: true),
-                        for (final (i, m) in shown.reversed.indexed) _Bubble(key: ValueKey(shown.length - i), message: m),
+                        for (final (i, m) in shown.reversed.indexed) ...[
+                          // Under Remy's latest message: the dishes he offered, and the draft he made.
+                          if (i == 0 && !m.fromUser && m.options.isNotEmpty && !s.busy && pending == null)
+                            _Options(options: m.options, onChoose: _send),
+                          if (m.recipeId case final id? when widget.onOpenRecipe != null && i == latestRecipe)
+                            Align(
+                              alignment: AlignmentDirectional.centerStart,
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: Space.s),
+                                child: FilledButton.tonalIcon(
+                                  onPressed: () => widget.onOpenRecipe!(id),
+                                  icon: const Icon(Icons.menu_book_rounded),
+                                  label: Text(l10n.createOpenRecipe),
+                                ),
+                              ),
+                            ),
+                          _Bubble(key: ValueKey(shown.length - i), message: m),
+                        ],
                       ],
                     ),
             ),
@@ -347,6 +380,31 @@ class _AssistantPanelState extends ConsumerState<AssistantPanel> {
                 tooltip: l10n.voiceMic,
                 onPressed: s.busy ? null : _toVoice,
                 icon: const Icon(Icons.mic_none_rounded),
+              ),
+          ],
+        ),
+      );
+}
+
+/// The dishes Remy offered (recipe creation): a tap answers with that dish.
+class _Options extends StatelessWidget {
+  const _Options({required this.options, required this.onChoose});
+
+  final List<String> options;
+  final void Function(String) onChoose;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: Space.s),
+        child: Wrap(
+          spacing: Space.s,
+          runSpacing: Space.s,
+          children: [
+            for (final o in options)
+              OutlinedButton(
+                style: OutlinedButton.styleFrom(minimumSize: const Size(48, 44)),
+                onPressed: () => onChoose(o),
+                child: Text(tidyHe(o)),
               ),
           ],
         ),

@@ -8,6 +8,7 @@ import '../../core/clock.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../cooking/cooking_controller.dart';
+import '../create/recipe_creation_service.dart';
 import '../prepare/preparation.dart';
 import '../prepare/preparation_service.dart';
 import 'assistant_models.dart';
@@ -18,18 +19,28 @@ import 'conversation_store.dart';
 export 'conversation_store.dart' show ChatMessage;
 
 class AssistantState {
-  const AssistantState({this.messages = const [], this.pending, this.busy = false});
+  const AssistantState({this.messages = const [], this.pending, this.busy = false, this.context = const {}});
   final List<ChatMessage> messages;
 
   /// A reply waiting for the cook's approval ("כן" / "לא").
   final AssistantReply? pending;
   final bool busy;
 
-  AssistantState copyWith({List<ChatMessage>? messages, AssistantReply? pending, bool clearPending = false, bool? busy}) =>
+  /// Recipe creation: the preferences gathered in this conversation (servings, time, diet...).
+  final Map<String, Object?> context;
+
+  AssistantState copyWith({
+    List<ChatMessage>? messages,
+    AssistantReply? pending,
+    bool clearPending = false,
+    bool? busy,
+    Map<String, Object?>? context,
+  }) =>
       AssistantState(
         messages: messages ?? this.messages,
         pending: clearPending ? null : pending ?? this.pending,
         busy: busy ?? this.busy,
+        context: context ?? this.context,
       );
 }
 
@@ -63,6 +74,7 @@ class AssistantController extends Notifier<AssistantState> {
   CookingController get _cooking => ref.read(cookingControllerProvider(sessionId).notifier);
   ConversationStore get _store => ref.read(conversationStoreProvider);
 
+  /// A creation conversation is its own key (the draft it creates shares it).
   Future<String?> _resolveRecipe() async =>
       scope.isSession ? (await ref.read(sessionRepositoryProvider).getSession(scope.id))?.recipeId : scope.id;
 
@@ -70,16 +82,18 @@ class AssistantController extends Notifier<AssistantState> {
     final recipeId = await _recipeId;
     if (recipeId == null || !ref.mounted) return;
     final remembered = await _store.load(recipeId);
+    final context = scope.isCreation ? await _store.loadContext(recipeId) : const <String, Object?>{};
     if (!ref.mounted || remembered.isEmpty) return;
-    state = state.copyWith(messages: [...remembered, ...state.messages]);
+    state = state.copyWith(messages: [...remembered, ...state.messages], context: {...context, ...state.context});
   }
 
   /// Saves after every change, in order (each save writes the whole bounded conversation).
   void _remember() {
     final messages = state.messages;
+    final context = state.context;
     _saving = _saving.then((_) async {
       final recipeId = await _recipeId;
-      if (recipeId != null) await _store.save(recipeId, messages);
+      if (recipeId != null) await _store.save(recipeId, messages, context: context);
     });
   }
 
@@ -107,6 +121,7 @@ class AssistantController extends Notifier<AssistantState> {
     }
     final history = _history;
     _addUser(text, busy: true);
+    if (scope.isCreation) return _sendForCreation(input, history);
     if (!scope.isSession) return _sendAboutRecipe(input, history);
     try {
       final view = await ref.read(cookingControllerProvider(sessionId).future);
@@ -167,6 +182,19 @@ class AssistantController extends Notifier<AssistantState> {
     }
   }
 
+  /// Creating a recipe: options, a draft to review, or an answer (nothing is saved as a recipe here).
+  Future<AssistantReply?> _sendForCreation(AssistantInput input, List<ChatTurn> history) async {
+    try {
+      final (reply, preferences) = await ref
+          .read(recipeCreationServiceProvider)
+          .turn(scope.id, input, history: history, preferences: state.context);
+      if (ref.mounted) state = state.copyWith(context: preferences);
+      return _say(reply);
+    } finally {
+      if (ref.mounted) state = state.copyWith(busy: false);
+    }
+  }
+
   /// What the cook decided while preparing, from the saved preparation (never from the chat):
   /// what is still missing, what is used instead, what is left out.
   Future<Map<String, Object?>> _preparationContext(String recipeId) async {
@@ -214,7 +242,10 @@ class AssistantController extends Notifier<AssistantState> {
   AssistantReply _say(AssistantReply reply, {AssistantReply? pending}) {
     if (!ref.mounted) return reply;
     state = state.copyWith(
-      messages: _bounded([...state.messages, ChatMessage(fromUser: false, textHe: reply.answerHe, speechHe: reply.speechHe)]),
+      messages: _bounded([
+        ...state.messages,
+        ChatMessage(fromUser: false, textHe: reply.answerHe, speechHe: reply.speechHe, options: reply.options, recipeId: reply.recipeId),
+      ]),
       pending: pending,
     );
     _remember();

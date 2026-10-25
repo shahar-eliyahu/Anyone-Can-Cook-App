@@ -41,6 +41,7 @@ void main() {
     await tester.pumpAndSettle();
 
     await tapText(tester, 'מתכון חדש');
+    await tapText(tester, 'מתכון משלי');
     expect(find.text('לפני הייבוא הראשון'), findsOneWidget);
     await tapText(tester, 'הבנתי, להמשיך');
     expect(await SettingsRepository(h.db, h.clock.call).get(SettingKeys.importPrivacyAccepted), 'true');
@@ -189,6 +190,7 @@ void main() {
     await tester.pumpWidget(h.build());
     await tester.pumpAndSettle();
     await tapText(tester, 'מתכון חדש');
+    await tapText(tester, 'מתכון משלי');
     await tester.enterText(find.byType(TextField), 'שקשוקה לארבעה');
     await tapText(tester, 'קריאת המתכון');
 
@@ -201,7 +203,7 @@ void main() {
     // Leave and come back later: the input is restored.
     GoRouter.of(tester.element(find.byType(Scaffold).last)).pop();
     await tester.pumpAndSettle();
-    await tapText(tester, 'מתכון חדש');
+    await tapText(tester, 'מתכון משלי'); // back on the new-recipe choices
     expect(find.text('שקשוקה לארבעה'), findsOneWidget);
     await expectSeen(tester, find.text('שחזרנו את מה שהזנתם בניסיון הקודם.'));
 
@@ -302,6 +304,7 @@ void main() {
       GoRouter.of(tester.element(find.byType(Scaffold).last)).pop();
       await tester.pumpAndSettle();
       await tapText(tester, 'מתכון חדש');
+      await tapText(tester, 'מתכון משלי');
       expect(find.text('https://bit.ly/abc'), findsOneWidget);
       await expectSeen(tester, find.text('שחזרנו את מה שהזנתם בניסיון הקודם.'));
     });

@@ -34,6 +34,19 @@ extension RecipeRowX on RecipeRow {
 
   bool get isDraft => status == RecipeStatus.draft;
 
+  /// A built-in recipe (the bundled catalog's working copy on this device).
+  bool get isBuiltin => status == RecipeStatus.builtin;
+
+  /// What Remy said about a recipe he created (stage recipe_creation): his time estimate and tips.
+  CreationInfo get creation {
+    final raw = analysisJson == null ? null : _analysisMap['creation'];
+    if (raw is! Map<String, dynamic>) return const CreationInfo();
+    return CreationInfo(
+      totalMinutes: raw['total_minutes'] as int?,
+      tipsHe: [for (final t in raw['tips_he'] as List? ?? const []) t as String],
+    );
+  }
+
   /// Warnings, limitations and sources returned with the latest generated plan.
   PlanReviewInfo get planReview {
     final review = _analysisMap['plan_review'];
@@ -58,7 +71,7 @@ extension RecipePreparationX on RecipeRow {
 }
 
 /// Keys kept in `analysis_json` next to the analysis itself; every write preserves them.
-const _extraKeys = ['plan_review', 'preparation'];
+const _extraKeys = ['plan_review', 'preparation', 'creation'];
 
 Map<String, dynamic> _withExtras(String? oldJson, Map<String, dynamic> map) {
   if (oldJson == null) return map;
@@ -67,6 +80,14 @@ Map<String, dynamic> _withExtras(String? oldJson, Map<String, dynamic> map) {
     if (old[k] != null && !map.containsKey(k)) map[k] = old[k];
   }
   return map;
+}
+
+class CreationInfo {
+  const CreationInfo({this.totalMinutes, this.tipsHe = const []});
+  final int? totalMinutes;
+  final List<String> tipsHe;
+
+  Map<String, Object?> toJson() => {'total_minutes': ?totalMinutes, 'tips_he': tipsHe};
 }
 
 class PlanReviewInfo {
@@ -79,6 +100,7 @@ class PlanReviewInfo {
 abstract final class RecipeStatus {
   static const draft = 'draft';
   static const ready = 'ready';
+  static const builtin = 'builtin';
 }
 
 abstract final class PlanStatus {
@@ -110,6 +132,9 @@ class RecipeRepository {
     required String sourceType,
     String? sourceText,
     String? sourceUrl,
+    String status = RecipeStatus.ready,
+    String? contentHash,
+    String? analysisJson,
   }) async {
     final recipeId = newId();
     final now = _now();
@@ -122,8 +147,10 @@ class RecipeRepository {
             sourceType: sourceType,
             sourceText: Value(sourceText),
             sourceUrl: Value(sourceUrl),
-            analysisJson: Value(jsonEncode({'recipe': bundle.recipe.toJson()})),
+            analysisJson: Value(analysisJson ?? jsonEncode({'recipe': bundle.recipe.toJson()})),
             analysisSchemaVersion: Value(bundle.recipe.schemaVersion),
+            status: Value(status),
+            contentHash: Value(contentHash),
           ));
       await _db.into(_db.plans).insert(PlansCompanion.insert(
             id: newId(),
@@ -234,12 +261,14 @@ class RecipeRepository {
   /// Saves an analysis as a draft (not listed until a plan is approved).
   Future<String> saveDraft(
     RecipeAnalysis analysis, {
+    String? id,
     String? sourceText,
     String? sourceUrl,
     String? imagePath,
     String? contentHash,
+    CreationInfo? creation,
   }) async {
-    final id = newId();
+    id ??= newId();
     final now = _now();
     await _db.into(_db.recipes).insert(RecipesCompanion.insert(
           id: id,
@@ -250,7 +279,7 @@ class RecipeRepository {
           sourceText: Value(sourceText ?? analysis.sourceText),
           sourceUrl: Value(sourceUrl ?? analysis.source.url),
           sourceImagePath: Value(imagePath),
-          analysisJson: Value(jsonEncode(analysis.toJson())),
+          analysisJson: Value(jsonEncode({..._json(analysis), 'creation': ?creation?.toJson()})),
           analysisSchemaVersion: Value(analysis.schemaVersion),
           status: const Value(RecipeStatus.draft),
           contentHash: Value(contentHash),
@@ -259,9 +288,9 @@ class RecipeRepository {
   }
 
   /// Replaces the stored analysis (keeping the latest plan review information).
-  Future<void> updateAnalysis(String recipeId, RecipeAnalysis analysis, {bool? planStale}) async {
+  Future<void> updateAnalysis(String recipeId, RecipeAnalysis analysis, {bool? planStale, CreationInfo? creation}) async {
     final row = await (_db.select(_db.recipes)..where((r) => r.id.equals(recipeId))).getSingle();
-    final map = _withExtras(row.analysisJson, _json(analysis));
+    final map = _withExtras(row.analysisJson, {..._json(analysis), 'creation': ?creation?.toJson()});
     await (_db.update(_db.recipes)..where((r) => r.id.equals(recipeId))).write(RecipesCompanion(
       title: Value(analysis.recipe?.title ?? row.title),
       analysisJson: Value(jsonEncode(map)),
@@ -349,7 +378,8 @@ class RecipeRepository {
             basedOnPlanId: Value(previous?.id),
           ));
       await (_db.update(_db.recipes)..where((r) => r.id.equals(recipeId))).write(RecipesCompanion(
-        status: const Value(RecipeStatus.ready),
+        // A built-in recipe's working copy stays built-in (a new plan version is still its own).
+        status: row.isBuiltin ? const Value.absent() : const Value(RecipeStatus.ready),
         planStale: const Value(false),
         title: analysis?.recipe == null ? const Value.absent() : Value(analysis!.recipe!.title),
         analysisJson: analysis == null ? const Value.absent() : Value(jsonEncode(_withExtras(row.analysisJson, _json(analysis)))),

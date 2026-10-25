@@ -10,7 +10,9 @@ GapResolution = Literal["context", "reference", "estimate", "question", "unresol
 
 
 class RecipeSourceInfo(ContractModel):
-    type: Literal["text", "image", "url", "sample"]
+    # "remy": a recipe Remy created with the cook (stage recipe_creation); its source text is
+    # rendered from the recipe itself.
+    type: Literal["text", "image", "url", "sample", "remy"]
     url: str | None = None
     site_name: str | None = None
     title: str | None = None

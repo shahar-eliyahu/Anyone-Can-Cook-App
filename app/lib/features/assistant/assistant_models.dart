@@ -7,20 +7,25 @@ library;
 
 enum InputModality { text, voice }
 
-/// Where Remy is talking: inside a cooking session (he can act on it), or about a recipe
-/// before cooking (questions only; nothing changes from the chat).
+/// Where Remy is talking: inside a cooking session (he can act on it), about a recipe before
+/// cooking (questions only; nothing changes from the chat), or creating a new recipe with the
+/// cook (stage recipe_creation; [id] is the creation conversation, and the draft it produces
+/// gets the same id).
 class RemyScope {
-  const RemyScope.session(this.id) : isSession = true;
-  const RemyScope.recipe(this.id) : isSession = false;
+  const RemyScope.session(this.id) : isSession = true, isCreation = false;
+  const RemyScope.recipe(this.id) : isSession = false, isCreation = false;
+  const RemyScope.creation(this.id) : isSession = false, isCreation = true;
 
   final String id;
   final bool isSession;
+  final bool isCreation;
 
   @override
-  bool operator ==(Object other) => other is RemyScope && other.id == id && other.isSession == isSession;
+  bool operator ==(Object other) =>
+      other is RemyScope && other.id == id && other.isSession == isSession && other.isCreation == isCreation;
 
   @override
-  int get hashCode => Object.hash(id, isSession);
+  int get hashCode => Object.hash(id, isSession, isCreation);
 }
 
 class AssistantInput {
@@ -90,6 +95,8 @@ class AssistantReply {
     this.action,
     this.requiresConfirmation = false,
     this.source = ReplySource.local,
+    this.options = const [],
+    this.recipeId,
   }) : speechHe = speechHe ?? answerHe;
 
   /// What Remy says on screen.
@@ -102,6 +109,12 @@ class AssistantReply {
   final AssistantAction? action;
   final bool requiresConfirmation;
   final ReplySource source;
+
+  /// Recipe creation: dishes to choose from (a tap sends one as the cook's answer).
+  final List<String> options;
+
+  /// Recipe creation: the draft Remy created, to review before saving.
+  final String? recipeId;
 }
 
 /// Plain text for text-to-speech: no emoji or symbols.

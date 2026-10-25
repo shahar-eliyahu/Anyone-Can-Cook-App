@@ -206,7 +206,7 @@ class AppMenu extends ConsumerWidget {
               const SizedBox(height: Space.s),
             ],
             item(Icons.home_outlined, l10n.kitchenTitle, '/'),
-            item(Icons.add_circle_outline, l10n.newRecipe, '/import'),
+            item(Icons.add_circle_outline, l10n.newRecipe, '/new'),
             item(Icons.menu_book_outlined, l10n.myRecipes, '/recipes'),
             item(Icons.star_outline_rounded, l10n.favorites, '/recipes?favorites=1'),
             item(Icons.history_rounded, l10n.cookingHistory, '/history'),

@@ -5,8 +5,9 @@ import 'recipe.dart';
 part 'recipe_analysis.freezed.dart';
 part 'recipe_analysis.g.dart';
 
+/// `remy`: a recipe Remy created with the cook (stage recipe_creation).
 @JsonEnum(fieldRename: FieldRename.snake)
-enum SourceType { text, image, url, sample }
+enum SourceType { text, image, url, sample, remy }
 
 @JsonEnum(fieldRename: FieldRename.snake)
 enum GapCategory { safety, outcome, equipment, preference, minor }

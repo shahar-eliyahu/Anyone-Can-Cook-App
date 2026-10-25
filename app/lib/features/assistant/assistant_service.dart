@@ -67,7 +67,7 @@ class AssistantService {
     List<ChatTurn> history = const [],
     Map<String, Object?> context = const {},
   }) async {
-    if (!_intelligible(input.text)) return AssistantReply(answerHe: _l10n.remyDidntCatch);
+    if (!intelligible(input.text)) return AssistantReply(answerHe: _l10n.remyDidntCatch);
     final local = interpretLocally(input, state: state, recipe: recipe, now: now);
     if (local != null) return local;
     return _askRemy(input, state: state, recipe: recipe, now: now, history: history, context: context);
@@ -86,7 +86,7 @@ class AssistantService {
     Map<String, Object?> context = const {},
   }) async {
     final l10n = _l10n;
-    if (!_intelligible(input.text)) return AssistantReply(answerHe: l10n.remyDidntCatch);
+    if (!intelligible(input.text)) return AssistantReply(answerHe: l10n.remyDidntCatch);
     final state = CookingEngine.replay(plan, const []);
     final local = _resolvePreparation(input.text, state, recipe, now);
     if (local != null) return local;
@@ -131,8 +131,14 @@ class AssistantService {
     }
   }
 
+  /// The conversation sent with a request: the last [maxHistoryTurns] turns, each cut short.
+  static List<Map<String, String>> historyPayload(List<ChatTurn> history) => [
+        for (final t in history.length > maxHistoryTurns ? history.sublist(history.length - maxHistoryTurns) : history)
+          {'role': t.fromUser ? 'user' : 'assistant', 'text': t.textHe.length > maxTurnChars ? t.textHe.substring(0, maxTurnChars) : t.textHe},
+      ];
+
   /// Noise from speech recognition ("…", a stray letter) never goes to the server.
-  static bool _intelligible(String text) =>
+  static bool intelligible(String text) =>
       RegExp(r'[\p{L}\p{N}]{2,}', unicode: true).hasMatch(normalizeCommand(text));
 
   /// The deterministic part: commands and simple questions, resolved against the live
@@ -392,10 +398,7 @@ class AssistantService {
         // The live state plus where the cook is (preparation or cooking) and what they decided
         // while preparing; never the source text.
         snapshot: {...state.snapshot(now), ...context},
-        history: [
-          for (final t in history.length > maxHistoryTurns ? history.sublist(history.length - maxHistoryTurns) : history)
-            {'role': t.fromUser ? 'user' : 'assistant', 'text': t.textHe.length > maxTurnChars ? t.textHe.substring(0, maxTurnChars) : t.textHe},
-        ],
+        history: historyPayload(history),
       );
     } on ApiFailure catch (e) {
       final text = e.code == 'offline' || e.code == 'timeout' ? l10n.remyOffline : l10n.remyUnavailable;

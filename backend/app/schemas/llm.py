@@ -227,6 +227,58 @@ class LlmAssistantTurn(BaseModel):
     user_uncertain: bool = False
 
 
+class LlmCreatedIngredient(BaseModel):
+    id: str
+    name: str
+    amount: float | None = None
+    amount_max: float | None = None
+    unit: str | None = None
+    # How the amount is shown ("2 כפות", "לפי הטעם"); empty when there is no amount.
+    display: str = ""
+    preparation: str | None = None
+    optional: bool = False
+
+
+class LlmCreatedEquipment(BaseModel):
+    id: str
+    name: str
+
+
+class LlmCreatedStep(BaseModel):
+    id: str
+    text: str
+    ingredient_ids: list[str] = []
+
+
+class LlmCreationPreferences(BaseModel):
+    servings: float | None = None
+    max_minutes: int | None = None
+    diet_he: list[str] = []
+    available_ingredients_he: list[str] = []
+    avoid_he: list[str] = []
+
+
+class LlmRecipeCreation(BaseModel):
+    """Remy helping the cook decide what to cook (stage recipe_creation): an answer, a few
+    options to choose from, or one complete recipe draft."""
+
+    intent: Literal["options", "recipe", "question", "answer", "out_of_scope"]
+    answer_he: str
+    speech_he: str | None = None
+    options_he: list[str] = []
+    # What the cook asked for so far in this conversation (kept by the app, sent back each turn).
+    preferences: LlmCreationPreferences = LlmCreationPreferences()
+    title: str = ""
+    description: str | None = None
+    servings_amount: float | None = None
+    servings_unit: str | None = None
+    total_minutes: int | None = None
+    ingredients: list[LlmCreatedIngredient] = []
+    equipment: list[LlmCreatedEquipment] = []
+    steps: list[LlmCreatedStep] = []
+    tips_he: list[str] = []
+
+
 class LlmPlan(BaseModel):
     steps: list[LlmStep]
     prep_tasks: list[LlmPrepTask] = []

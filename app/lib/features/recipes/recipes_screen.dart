@@ -81,7 +81,7 @@ class _RecipesScreenState extends ConsumerState<RecipesScreen> {
                     action: _favoritesOnly || _query.trim().isNotEmpty
                         ? null
                         : FilledButton.icon(
-                            onPressed: () => context.push('/import'),
+                            onPressed: () => context.push('/new'),
                             icon: const Icon(Icons.add_rounded),
                             label: Text(l10n.newRecipe),
                           ),

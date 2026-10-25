@@ -111,6 +111,9 @@ class FakeApi extends ApiClient {
   final plans = <Object>[];
   final substitutions = <Object>[];
   final turns = <Object>[];
+
+  /// Remy creating a recipe (stage recipe_creation).
+  final creations = <Object>[];
   final calls = <String>[];
   bool forbidCalls = false;
 
@@ -170,6 +173,32 @@ class FakeApi extends ApiClient {
   }
 
   ({String message, String modality, Map<String, Object?> snapshot, List<Map<String, String>> history})? lastTurn;
+
+  @override
+  Future<RecipeCreationResult> createRecipeTurn({
+    required String messageHe,
+    required String modality,
+    required Map<String, Object?> preferences,
+    required List<Map<String, String>> history,
+    Map<String, Object?>? currentRecipe,
+  }) async {
+    lastCreation = (
+      message: messageHe,
+      modality: modality,
+      preferences: preferences,
+      history: history,
+      currentRecipe: currentRecipe,
+    );
+    return _next(creations, 'createRecipeTurn');
+  }
+
+  ({
+    String message,
+    String modality,
+    Map<String, Object?> preferences,
+    List<Map<String, String>> history,
+    Map<String, Object?>? currentRecipe,
+  })? lastCreation;
 }
 
 /// Records what Remy says aloud. [hebrew] false = a phone without a Hebrew voice.

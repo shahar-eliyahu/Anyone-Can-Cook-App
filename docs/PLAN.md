@@ -738,6 +738,10 @@ only on Gemini 3 models (preview); the Gemini API terms require grounded results
 Search Suggestions and not modified or cached. Re-check pricing, limits and terms before designing this.
 Phase 2 keeps URL fetching and recipe analysis callable on their own so a future search step can reuse them.
 
+**Implemented 2026-10-25 (without online search):** the "מה בא לכם לבשל?" hub with a bundled catalog of
+built-in recipes and Remy creating a recipe draft with the cook (`docs/DESIGN.md` §16, `docs/DECISIONS.md` #84–#87).
+Online search for recipes with their sources remains a later step.
+
 ### Build order: what to develop when
 | Area | When | Why |
 |---|---|---|

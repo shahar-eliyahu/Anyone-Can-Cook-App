@@ -49,6 +49,16 @@ class SessionRepository {
             ..where((s) => s.id.equals(id) & s.deletedAt.isNull()))
           .getSingleOrNull();
 
+  /// When the last cooking of [recipeId] ended (finished or abandoned), if it ever did.
+  Future<DateTime?> lastEndedAt(String recipeId) async {
+    final row = await (_db.select(_db.cookingSessions)
+          ..where((s) => s.recipeId.equals(recipeId) & s.endedAt.isNotNull() & s.deletedAt.isNull())
+          ..orderBy([(s) => OrderingTerm.desc(s.endedAt)])
+          ..limit(1))
+        .getSingleOrNull();
+    return row?.endedAt;
+  }
+
   Stream<SessionRow?> watchSession(String id) => (_db.select(_db.cookingSessions)
         ..where((s) => s.id.equals(id) & s.deletedAt.isNull()))
       .watchSingleOrNull();

@@ -29,6 +29,7 @@ const _$SourceTypeEnumMap = {
   SourceType.image: 'image',
   SourceType.url: 'url',
   SourceType.sample: 'sample',
+  SourceType.remy: 'remy',
 };
 
 _ReferenceSource _$ReferenceSourceFromJson(Map<String, dynamic> json) =>

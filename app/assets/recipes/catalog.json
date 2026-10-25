@@ -1,0 +1,7071 @@
+{
+ "schema_version": 1,
+ "recipes": [
+  {
+   "id": "omelette",
+   "categories": [
+    "breakfast",
+    "quick",
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "חביתה",
+    "description": "חביתה רכה ופשוטה, מוכנה בחמש דקות.",
+    "servings": {
+     "amount": 1,
+     "unit": "מנה",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "ביצים",
+      "quantity": {
+       "display": "2",
+       "provenance": "original",
+       "amount": 2
+      }
+     },
+     {
+      "id": "i2",
+      "name": "חלב",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "מלח",
+      "quantity": {
+       "display": "קורט",
+       "provenance": "original"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "פלפל שחור",
+      "quantity": {
+       "display": "קורט",
+       "provenance": "original"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "שמן או חמאה",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "קערה קטנה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מזלג",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "מחבת",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "שוברים את הביצים לקערה, מוסיפים חלב, מלח ופלפל וטורפים במזלג עד שהתערובת אחידה."
+     },
+     {
+      "id": "src2",
+      "text": "מחממים את השמן במחבת על אש בינונית, יוצקים את הביצים ומטגנים כ-3 דקות, עד שהחביתה יציבה. מקפלים לחצי ומגישים."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "טריפת הביצים",
+      "instruction_he": "שוברים את הביצים לקערה, מוסיפים חלב, מלח ופלפל וטורפים במזלג עד שהתערובת אחידה.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "טיגון החביתה",
+      "instruction_he": "מחממים את השמן במחבת על אש בינונית, יוצקים את הביצים ומטגנים כ-3 דקות, עד שהחביתה יציבה. מקפלים לחצי ומגישים.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i5"
+      ],
+      "equipment_ids": [
+       "e3"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "חביתה במחבת",
+        "seconds": 180,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "החלק העליון כמעט יציב והתחתית זהובה.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "שמתי במחבת",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "החביתה מוכנה",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "החלק העליון כמעט יציב והתחתית זהובה."
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "shakshuka",
+   "categories": [
+    "breakfast",
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "שקשוקה",
+    "description": "ביצים ברוטב עגבניות ופלפלים, מגישים עם לחם טרי.",
+    "servings": {
+     "amount": 2,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "בצל",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i3",
+      "name": "פלפל אדום",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i4",
+      "name": "שום",
+      "quantity": {
+       "display": "2 שיניים",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "שיניים"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "עגבניות מרוסקות",
+      "quantity": {
+       "display": "1 קופסה (400 גרם)",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "קופסה"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "רסק עגבניות",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "פפריקה מתוקה",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "כמון",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i9",
+      "name": "מלח",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i10",
+      "name": "ביצים",
+      "quantity": {
+       "display": "4",
+       "provenance": "original",
+       "amount": 4
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "מחבת רחבה עם מכסה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "קרש חיתוך",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "סכין",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "קוצצים את הבצל, חותכים את הפלפל לרצועות דקות וכותשים את השום."
+     },
+     {
+      "id": "src2",
+      "text": "מחממים שמן זית במחבת על אש בינונית ומטגנים את הבצל והפלפל כ-7 דקות, עד שהם מתרככים. מוסיפים את השום ומערבבים דקה."
+     },
+     {
+      "id": "src3",
+      "text": "מוסיפים את העגבניות, הרסק והתבלינים, מערבבים ומבשלים על אש נמוכה כ-10 דקות, עד שהרוטב מסמיך."
+     },
+     {
+      "id": "src4",
+      "text": "יוצרים בכף 4 גומות ברוטב, שוברים ביצה לכל גומה, מכסים ומבשלים על אש נמוכה כ-6 דקות, עד שהחלבון לבן ויציב."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "חיתוך הירקות",
+      "instruction_he": "קוצצים את הבצל, חותכים את הפלפל לרצועות דקות וכותשים את השום.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i2",
+       "i3",
+       "i4"
+      ],
+      "equipment_ids": [
+       "e2",
+       "e3"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 7,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "טיגון הירקות",
+      "instruction_he": "מחממים שמן זית במחבת על אש בינונית ומטגנים את הבצל והפלפל כ-7 דקות, עד שהם מתרככים. מוסיפים את השום ומערבבים דקה.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 8,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "טיגון בצל ופלפל",
+        "seconds": 420,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הבצל שקוף והפלפל רך.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הבצל שקוף והפלפל רך."
+     },
+     {
+      "id": "s3",
+      "title": "בישול הרוטב",
+      "instruction_he": "מוסיפים את העגבניות, הרסק והתבלינים, מערבבים ומבשלים על אש נמוכה כ-10 דקות, עד שהרוטב מסמיך.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i5",
+       "i6",
+       "i7",
+       "i8",
+       "i9"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "רוטב עגבניות",
+        "seconds": 600,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הרוטב סמיך ולא מימי.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הרוטב סמיך ולא מימי."
+     },
+     {
+      "id": "s4",
+      "title": "בישול הביצים",
+      "instruction_he": "יוצרים בכף 4 גומות ברוטב, שוברים ביצה לכל גומה, מכסים ומבשלים על אש נמוכה כ-6 דקות, עד שהחלבון לבן ויציב.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [
+       "i10"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "ביצים ברוטב",
+        "seconds": 360,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "החלבון לבן ויציב לגמרי.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "שברתי את הביצים",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "הביצים מוכנות",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "החלבון לבן ויציב לגמרי."
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "pancakes",
+   "categories": [
+    "breakfast"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "פנקייק",
+    "description": "פנקייקים תפוחים ורכים לבוקר של סוף שבוע.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "קמח לבן",
+      "quantity": {
+       "display": "1½ כוסות",
+       "provenance": "original",
+       "amount": 1.5,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "אבקת אפייה",
+      "quantity": {
+       "display": "2 כפיות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפיות"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "סוכר",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "מלח",
+      "quantity": {
+       "display": "קורט",
+       "provenance": "original"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "ביצים",
+      "quantity": {
+       "display": "2",
+       "provenance": "original",
+       "amount": 2
+      }
+     },
+     {
+      "id": "i6",
+      "name": "חלב",
+      "quantity": {
+       "display": "1¼ כוסות",
+       "provenance": "original",
+       "amount": 1.25,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "חמאה מומסת",
+      "quantity": {
+       "display": "3 כפות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "שמן לטיגון",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "קערה גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מטרפה",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "מחבת",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "מצקת",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מערבבים בקערה את הקמח, אבקת האפייה, הסוכר והמלח. מוסיפים ביצים, חלב וחמאה מומסת וטורפים עד שמתקבלת בלילה חלקה."
+     },
+     {
+      "id": "src2",
+      "text": "משאירים את הבלילה לנוח 5 דקות."
+     },
+     {
+      "id": "src3",
+      "text": "מחממים מחבת משומנת קלות על אש בינונית. יוצקים מצקת בלילה ומטגנים עד שמופיעות בועות על פני השטח, הופכים ומטגנים עוד דקה. חוזרים על זה עד שהבלילה נגמרת."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "הכנת הבלילה",
+      "instruction_he": "מערבבים בקערה את הקמח, אבקת האפייה, הסוכר והמלח. מוסיפים ביצים, חלב וחמאה מומסת וטורפים עד שמתקבלת בלילה חלקה.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4",
+       "i5",
+       "i6",
+       "i7"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 7,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "מנוחת הבלילה",
+      "instruction_he": "משאירים את הבלילה לנוח 5 דקות.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "מנוחת בלילה",
+        "seconds": 300,
+        "provenance": "original",
+        "wait_kind": "rest",
+        "check_cue_he": "מופיעות בועות קטנות בבלילה.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "השארתי לנוח",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "ממשיכים",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "מופיעות בועות קטנות בבלילה."
+     },
+     {
+      "id": "s3",
+      "title": "טיגון הפנקייקים",
+      "instruction_he": "מחממים מחבת משומנת קלות על אש בינונית. יוצקים מצקת בלילה ומטגנים עד שמופיעות בועות על פני השטח, הופכים ומטגנים עוד דקה. חוזרים על זה עד שהבלילה נגמרת.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i8"
+      ],
+      "equipment_ids": [
+       "e3",
+       "e4"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 15,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "כל הפנקייקים מוכנים",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "french-toast",
+   "categories": [
+    "breakfast",
+    "quick"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "טוסט צרפתי",
+    "description": "פרוסות לחם בתערובת ביצים וקינמון, מטוגנות עד שהן זהובות.",
+    "servings": {
+     "amount": 2,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "ביצים",
+      "quantity": {
+       "display": "2",
+       "provenance": "original",
+       "amount": 2
+      }
+     },
+     {
+      "id": "i2",
+      "name": "חלב",
+      "quantity": {
+       "display": "½ כוס",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "סוכר",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "קינמון",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "פרוסות לחם או חלה",
+      "quantity": {
+       "display": "4",
+       "provenance": "original",
+       "amount": 4
+      }
+     },
+     {
+      "id": "i6",
+      "name": "חמאה",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "צלחת עמוקה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מזלג",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "מחבת",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "טורפים בצלחת עמוקה את הביצים, החלב, הסוכר והקינמון."
+     },
+     {
+      "id": "src2",
+      "text": "טובלים כל פרוסה בתערובת משני הצדדים, כמה שניות בכל צד."
+     },
+     {
+      "id": "src3",
+      "text": "ממיסים חמאה במחבת על אש בינונית ומטגנים את הפרוסות כ-3 דקות מכל צד, עד שהן זהובות."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "תערובת הביצים",
+      "instruction_he": "טורפים בצלחת עמוקה את הביצים, החלב, הסוכר והקינמון.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "טבילת הלחם",
+      "instruction_he": "טובלים כל פרוסה בתערובת משני הצדדים, כמה שניות בכל צד.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i5"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "טיגון",
+      "instruction_he": "ממיסים חמאה במחבת על אש בינונית ומטגנים את הפרוסות כ-3 דקות מכל צד, עד שהן זהובות.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i6"
+      ],
+      "equipment_ids": [
+       "e3"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 7,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "טוסט צרפתי במחבת",
+        "seconds": 360,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "שני הצדדים זהובים והמרכז לא רטוב.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "שמתי במחבת",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "הפרוסות מוכנות",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "שני הצדדים זהובים והמרכז לא רטוב."
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "pasta-tomato",
+   "categories": [
+    "pasta",
+    "vegetarian",
+    "quick"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "פסטה ברוטב עגבניות",
+    "description": "רוטב עגבניות ושום פשוט שמתבשל בזמן שהפסטה מתבשלת.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "פסטה (ספגטי או פנה)",
+      "quantity": {
+       "display": "500 גרם",
+       "provenance": "original",
+       "amount": 500,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "מלח למי הבישול",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "3 כפות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "שום",
+      "quantity": {
+       "display": "3 שיניים",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "שיניים"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "עגבניות מרוסקות",
+      "quantity": {
+       "display": "1 קופסה (800 גרם)",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "קופסה"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "סוכר",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "מלח לרוטב",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "בזיליקום טרי",
+      "quantity": {
+       "display": "חופן",
+       "provenance": "original"
+      },
+      "optional": true
+     },
+     {
+      "id": "i9",
+      "name": "פרמזן מגורר",
+      "quantity": {
+       "display": "לפי הטעם",
+       "provenance": "original"
+      },
+      "optional": true
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "סיר גדול",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מחבת רחבה",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "מסננת",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "כף עץ",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "כותשים את השום. מחממים שמן זית במחבת על אש נמוכה ומטגנים את השום כדקה, בלי שישחים."
+     },
+     {
+      "id": "src2",
+      "text": "מוסיפים את העגבניות, הסוכר והמלח ומבשלים על אש נמוכה כ-15 דקות, עם ערבוב מדי פעם."
+     },
+     {
+      "id": "src3",
+      "text": "מוסיפים את המלח למים הרותחים, מכניסים את הפסטה ומבשלים לפי הזמן שעל האריזה, בדרך כלל כ-10 דקות."
+     },
+     {
+      "id": "src4",
+      "text": "מסננים את הפסטה, מערבבים אותה עם הרוטב ומגישים עם בזיליקום ופרמזן."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "טיגון השום",
+      "instruction_he": "כותשים את השום. מחממים שמן זית במחבת על אש נמוכה ומטגנים את השום כדקה, בלי שישחים.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i3",
+       "i4"
+      ],
+      "equipment_ids": [
+       "e2",
+       "e4"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "בישול הרוטב",
+      "instruction_he": "מוסיפים את העגבניות, הסוכר והמלח ומבשלים על אש נמוכה כ-15 דקות, עם ערבוב מדי פעם.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i5",
+       "i6",
+       "i7"
+      ],
+      "equipment_ids": [
+       "e2",
+       "e4"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "רוטב עגבניות",
+        "seconds": 900,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הרוטב הסמיך מעט.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הרוטב הסמיך מעט."
+     },
+     {
+      "id": "s3",
+      "title": "בישול הפסטה",
+      "instruction_he": "מוסיפים את המלח למים הרותחים, מכניסים את הפסטה ומבשלים לפי הזמן שעל האריזה, בדרך כלל כ-10 דקות.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "parallel_ok": true,
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "פסטה",
+        "seconds": 600,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הפסטה רכה אבל עדיין מעט נגיסה.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "הכנסתי את הפסטה",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "הפסטה מוכנה",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הפסטה רכה אבל עדיין מעט נגיסה."
+     },
+     {
+      "id": "s4",
+      "title": "ערבוב והגשה",
+      "instruction_he": "מסננים את הפסטה, מערבבים אותה עם הרוטב ומגישים עם בזיליקום ופרמזן.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [
+       "i8",
+       "i9"
+      ],
+      "equipment_ids": [
+       "e3"
+      ],
+      "depends_on": [
+       "s2",
+       "s3"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p2",
+      "kind": "boil_water",
+      "text_he": "מרתיחים סיר גדול של מים לפסטה",
+      "needed_by_step": "s3",
+      "lead_minutes": {
+       "value": 10,
+       "provenance": "inferred"
+      },
+      "surface": {
+       "at_start": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "pasta-cream-mushrooms",
+   "categories": [
+    "pasta",
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "פסטה ברוטב שמנת ופטריות",
+    "description": "פסטה ברוטב שמנת עשיר עם פטריות מושחמות.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "פסטה (פטוצ'יני או פנה)",
+      "quantity": {
+       "display": "500 גרם",
+       "provenance": "original",
+       "amount": 500,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "מלח למי הבישול",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "חמאה",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "בצל",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i5",
+      "name": "שום",
+      "quantity": {
+       "display": "2 שיניים",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "שיניים"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "פטריות טריות",
+      "quantity": {
+       "display": "250 גרם",
+       "provenance": "original",
+       "amount": 250,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "שמנת לבישול",
+      "quantity": {
+       "display": "250 מ\"ל",
+       "provenance": "original",
+       "amount": 250,
+       "unit": "מ\"ל"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "מלח",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i9",
+      "name": "פלפל שחור",
+      "quantity": {
+       "display": "לפי הטעם",
+       "provenance": "original"
+      }
+     },
+     {
+      "id": "i10",
+      "name": "פרמזן מגורר",
+      "quantity": {
+       "display": "½ כוס",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כוס"
+      },
+      "optional": true
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "סיר גדול",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מחבת רחבה",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "מסננת",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "קרש חיתוך",
+      "provenance": "original"
+     },
+     {
+      "id": "e5",
+      "name": "סכין",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "קוצצים את הבצל, כותשים את השום ופורסים את הפטריות."
+     },
+     {
+      "id": "src2",
+      "text": "ממיסים חמאה במחבת על אש בינונית ומטגנים את הבצל 3 דקות. מוסיפים את השום והפטריות ומטגנים עוד כ-7 דקות, עד שהפטריות משחימות."
+     },
+     {
+      "id": "src3",
+      "text": "מוסיפים את השמנת, המלח והפלפל ומבשלים על אש נמוכה כ-5 דקות, עד שהרוטב מסמיך מעט."
+     },
+     {
+      "id": "src4",
+      "text": "מוסיפים מלח למים הרותחים ומבשלים את הפסטה לפי האריזה, כ-10 דקות."
+     },
+     {
+      "id": "src5",
+      "text": "מסננים את הפסטה, מערבבים עם הרוטב ומפזרים פרמזן."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "חיתוך",
+      "instruction_he": "קוצצים את הבצל, כותשים את השום ופורסים את הפטריות.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i4",
+       "i5",
+       "i6"
+      ],
+      "equipment_ids": [
+       "e4",
+       "e5"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 8,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "טיגון בצל ופטריות",
+      "instruction_he": "ממיסים חמאה במחבת על אש בינונית ומטגנים את הבצל 3 דקות. מוסיפים את השום והפטריות ומטגנים עוד כ-7 דקות, עד שהפטריות משחימות.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i3",
+       "i4",
+       "i5",
+       "i6"
+      ],
+      "equipment_ids": [
+       "e2"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 10,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "פטריות במחבת",
+        "seconds": 600,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הפטריות רכות ושחומות ואין נוזלים במחבת.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הפטריות רכות ושחומות ואין נוזלים במחבת."
+     },
+     {
+      "id": "s3",
+      "title": "רוטב השמנת",
+      "instruction_he": "מוסיפים את השמנת, המלח והפלפל ומבשלים על אש נמוכה כ-5 דקות, עד שהרוטב מסמיך מעט.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i7",
+       "i8",
+       "i9"
+      ],
+      "equipment_ids": [
+       "e2"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "רוטב שמנת",
+        "seconds": 300,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הרוטב מצפה את גב הכף.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הרוטב מצפה את גב הכף."
+     },
+     {
+      "id": "s4",
+      "title": "בישול הפסטה",
+      "instruction_he": "מוסיפים מלח למים הרותחים ומבשלים את הפסטה לפי האריזה, כ-10 דקות.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "parallel_ok": true,
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "פסטה",
+        "seconds": 600,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הפסטה רכה אבל עדיין מעט נגיסה.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "הכנסתי את הפסטה",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "הפסטה מוכנה",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הפסטה רכה אבל עדיין מעט נגיסה."
+     },
+     {
+      "id": "s5",
+      "title": "ערבוב והגשה",
+      "instruction_he": "מסננים את הפסטה, מערבבים עם הרוטב ומפזרים פרמזן.",
+      "source_refs": [
+       "src5"
+      ],
+      "ingredient_ids": [
+       "i10"
+      ],
+      "equipment_ids": [
+       "e3"
+      ],
+      "depends_on": [
+       "s3",
+       "s4"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p2",
+      "kind": "boil_water",
+      "text_he": "מרתיחים סיר גדול של מים לפסטה",
+      "needed_by_step": "s4",
+      "lead_minutes": {
+       "value": 10,
+       "provenance": "inferred"
+      },
+      "surface": {
+       "at_start": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "aglio-olio",
+   "categories": [
+    "pasta",
+    "quick",
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "ספגטי אליו אוליו",
+    "description": "ספגטי עם שום ושמן זית, מנה מהירה מכמה מצרכים.",
+    "servings": {
+     "amount": 2,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "ספגטי",
+      "quantity": {
+       "display": "250 גרם",
+       "provenance": "original",
+       "amount": 250,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "מלח למי הבישול",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "4 כפות",
+       "provenance": "original",
+       "amount": 4,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "שום",
+      "quantity": {
+       "display": "4 שיניים",
+       "provenance": "original",
+       "amount": 4,
+       "unit": "שיניים"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "פתיתי צ'ילי",
+      "quantity": {
+       "display": "קורט",
+       "provenance": "original"
+      },
+      "optional": true
+     },
+     {
+      "id": "i6",
+      "name": "פטרוזיליה קצוצה",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "מלח",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "סיר גדול",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מחבת",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "מסננת",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "סכין",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מוסיפים מלח למים הרותחים ומבשלים את הספגטי לפי האריזה, כ-9 דקות. שומרים חצי כוס ממי הבישול לפני הסינון."
+     },
+     {
+      "id": "src2",
+      "text": "פורסים את השום דק. מחממים את השמן במחבת על אש נמוכה ומטגנים את השום והצ'ילי כ-2 דקות, עד שהשום זהוב בהיר."
+     },
+     {
+      "id": "src3",
+      "text": "מוסיפים את הספגטי למחבת עם מעט ממי הבישול, המלח והפטרוזיליה ומערבבים היטב."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "בישול הספגטי",
+      "instruction_he": "מוסיפים מלח למים הרותחים ומבשלים את הספגטי לפי האריזה, כ-9 דקות. שומרים חצי כוס ממי הבישול לפני הסינון.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e3"
+      ],
+      "depends_on": [],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t1",
+        "label_he": "ספגטי",
+        "seconds": 540,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הספגטי רך אבל עדיין מעט נגיס.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "הכנסתי את הספגטי",
+        "starts_timer": "t1"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיננתי את הספגטי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הספגטי רך אבל עדיין מעט נגיס."
+     },
+     {
+      "id": "s2",
+      "title": "שום בשמן",
+      "instruction_he": "פורסים את השום דק. מחממים את השמן במחבת על אש נמוכה ומטגנים את השום והצ'ילי כ-2 דקות, עד שהשום זהוב בהיר.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i3",
+       "i4",
+       "i5"
+      ],
+      "equipment_ids": [
+       "e2",
+       "e4"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "parallel_ok": true,
+      "estimated_active_minutes": {
+       "value": 5,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "ערבוב",
+      "instruction_he": "מוסיפים את הספגטי למחבת עם מעט ממי הבישול, המלח והפטרוזיליה ומערבבים היטב.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i6",
+       "i7"
+      ],
+      "equipment_ids": [
+       "e2"
+      ],
+      "depends_on": [
+       "s1",
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p2",
+      "kind": "boil_water",
+      "text_he": "מרתיחים סיר גדול של מים לספגטי",
+      "needed_by_step": "s1",
+      "lead_minutes": {
+       "value": 10,
+       "provenance": "inferred"
+      },
+      "surface": {
+       "at_start": true
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "chicken-potatoes",
+   "categories": [
+    "chicken"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "עוף ותפוחי אדמה בתנור",
+    "description": "כרעי עוף ותפוחי אדמה בתבנית אחת, בלי הרבה עבודה.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "כרעי עוף",
+      "quantity": {
+       "display": "4",
+       "provenance": "original",
+       "amount": 4
+      }
+     },
+     {
+      "id": "i2",
+      "name": "תפוחי אדמה בינוניים",
+      "quantity": {
+       "display": "5",
+       "provenance": "original",
+       "amount": 5
+      }
+     },
+     {
+      "id": "i3",
+      "name": "בצל",
+      "quantity": {
+       "display": "2",
+       "provenance": "original",
+       "amount": 2
+      }
+     },
+     {
+      "id": "i4",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "3 כפות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "פפריקה מתוקה",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "אבקת שום",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "מלח",
+      "quantity": {
+       "display": "2 כפיות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפיות"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "פלפל שחור",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "תבנית גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "קרש חיתוך",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "סכין",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "קערה גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e5",
+      "name": "נייר כסף",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "קולפים וחותכים את תפוחי האדמה לרבעים ואת הבצל לטבעות עבות, ומפזרים בתבנית."
+     },
+     {
+      "id": "src2",
+      "text": "מערבבים בקערה שמן, פפריקה, אבקת שום, מלח ופלפל. מורחים את התערובת על העוף ועל הירקות ומניחים את העוף מעל הירקות."
+     },
+     {
+      "id": "src3",
+      "text": "מכסים בנייר כסף ואופים 40 דקות."
+     },
+     {
+      "id": "src4",
+      "text": "ממשיכים לאפות בלי נייר הכסף כ-20 דקות, עד שהעוף שחום ותפוחי האדמה רכים."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "חיתוך הירקות",
+      "instruction_he": "קולפים וחותכים את תפוחי האדמה לרבעים ואת הבצל לטבעות עבות, ומפזרים בתבנית.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i2",
+       "i3"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2",
+       "e3"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 12,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "תיבול העוף",
+      "instruction_he": "מערבבים בקערה שמן, פפריקה, אבקת שום, מלח ופלפל. מורחים את התערובת על העוף ועל הירקות ומניחים את העוף מעל הירקות.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i4",
+       "i5",
+       "i6",
+       "i7",
+       "i8"
+      ],
+      "equipment_ids": [
+       "e4",
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 8,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "warnings_he": [
+       "שוטפים ידיים, קרש וסכין אחרי נגיעה בעוף לא מבושל."
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "אפייה מכוסה",
+      "instruction_he": "מכסים בנייר כסף ואופים 40 דקות.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1",
+       "e5"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "עוף בתנור מכוסה",
+        "seconds": 2400,
+        "provenance": "original",
+        "wait_kind": "bake",
+        "check_cue_he": "עברו 40 דקות, הגיע הזמן להסיר את נייר הכסף.",
+        "recheck_seconds": 300
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "in_oven",
+        "label_he": "הכנסתי לתנור",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "out_of_oven",
+        "label_he": "הסרתי את נייר הכסף",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "temperature": {
+       "value": 200,
+       "unit": "C",
+       "provenance": "original"
+      },
+      "doneness_cue_he": "עברו 40 דקות, הגיע הזמן להסיר את נייר הכסף."
+     },
+     {
+      "id": "s4",
+      "title": "אפייה בלי כיסוי",
+      "instruction_he": "ממשיכים לאפות בלי נייר הכסף כ-20 דקות, עד שהעוף שחום ותפוחי האדמה רכים.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "עוף בתנור",
+        "seconds": 1200,
+        "provenance": "original",
+        "wait_kind": "bake",
+        "check_cue_he": "העוף שחום, ובחיתוך ליד העצם המיץ שקוף.",
+        "recheck_seconds": 300
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "in_oven",
+        "label_he": "החזרתי לתנור",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "out_of_oven",
+        "label_he": "הוצאתי מהתנור",
+        "completes_step": true,
+        "confirm_policy": "always_ask"
+       }
+      ],
+      "temperature": {
+       "value": 200,
+       "unit": "C",
+       "provenance": "original"
+      },
+      "doneness_cue_he": "בחיתוך ליד העצם המיץ שקוף ואין בשר ורוד. במדחום: לפחות 74 מעלות."
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p1",
+      "kind": "preheat_oven",
+      "text_he": "מחממים את התנור ל-200 מעלות",
+      "needed_by_step": "s3",
+      "lead_minutes": {
+       "value": 15,
+       "provenance": "inferred",
+       "note_he": "תנור ביתי מתחמם בערך ברבע שעה."
+      },
+      "surface": {
+       "at_start": true
+      },
+      "timer": {
+       "id": "tp1",
+       "label_he": "חימום תנור",
+       "seconds": 900,
+       "provenance": "inferred"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "schnitzel",
+   "categories": [
+    "chicken"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "שניצל עוף",
+    "description": "שניצל פריך בציפוי פירורי לחם, מטוגן במחבת.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "חזה עוף פרוס לשניצלים",
+      "quantity": {
+       "display": "600 גרם",
+       "provenance": "original",
+       "amount": 600,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "ביצים",
+      "quantity": {
+       "display": "2",
+       "provenance": "original",
+       "amount": 2
+      }
+     },
+     {
+      "id": "i3",
+      "name": "קמח",
+      "quantity": {
+       "display": "½ כוס",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "פירורי לחם",
+      "quantity": {
+       "display": "1½ כוסות",
+       "provenance": "original",
+       "amount": 1.5,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "מלח",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "פלפל שחור",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "שמן לטיגון",
+      "quantity": {
+       "display": "1 כוס",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "לימון להגשה",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      },
+      "optional": true
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "3 צלחות עמוקות",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מחבת רחבה",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "מלקחיים",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "צלחת עם נייר סופג",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מניחים בשלוש צלחות: קמח, ביצים טרופות עם מלח ופלפל, ופירורי לחם."
+     },
+     {
+      "id": "src2",
+      "text": "מעבירים כל שניצל בקמח, אחר כך בביצה, ובסוף בפירורי הלחם. לוחצים קלות כדי שהציפוי ייצמד."
+     },
+     {
+      "id": "src3",
+      "text": "מחממים שמן בגובה כחצי סנטימטר על אש בינונית. מטגנים את השניצלים בכמה סבבים, כ-3 עד 4 דקות מכל צד, עד שהם זהובים. מניחים על נייר סופג ומגישים עם לימון."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "עמדת ציפוי",
+      "instruction_he": "מניחים בשלוש צלחות: קמח, ביצים טרופות עם מלח ופלפל, ופירורי לחם.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i2",
+       "i3",
+       "i4",
+       "i5",
+       "i6"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 5,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "ציפוי השניצלים",
+      "instruction_he": "מעבירים כל שניצל בקמח, אחר כך בביצה, ובסוף בפירורי הלחם. לוחצים קלות כדי שהציפוי ייצמד.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i1"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 10,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "warnings_he": [
+       "שוטפים ידיים, קרש וסכין אחרי נגיעה בעוף לא מבושל."
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "טיגון",
+      "instruction_he": "מחממים שמן בגובה כחצי סנטימטר על אש בינונית. מטגנים את השניצלים בכמה סבבים, כ-3 עד 4 דקות מכל צד, עד שהם זהובים. מניחים על נייר סופג ומגישים עם לימון.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i7",
+       "i8"
+      ],
+      "equipment_ids": [
+       "e2",
+       "e3",
+       "e4"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 20,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "כל השניצלים מוכנים",
+        "completes_step": true,
+        "confirm_policy": "always_ask"
+       }
+      ],
+      "doneness_cue_he": "בחיתוך של השניצל העבה ביותר הבשר לבן לגמרי, בלי ורוד."
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "chicken-breast-pan",
+   "categories": [
+    "chicken",
+    "quick"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "חזה עוף במחבת",
+    "description": "חזה עוף עסיסי עם פפריקה ושום, צרוב במחבת.",
+    "servings": {
+     "amount": 2,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "חזה עוף",
+      "quantity": {
+       "display": "400 גרם",
+       "provenance": "original",
+       "amount": 400,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "פפריקה מתוקה",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "אבקת שום",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "מלח",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "פלפל שחור",
+      "quantity": {
+       "display": "קורט",
+       "provenance": "original"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "מחבת",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "קרש חיתוך",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "מלקחיים",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "צלחת",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מייבשים את החזה בנייר סופג, מורחים בשמן ומתבלים משני הצדדים בפפריקה, שום, מלח ופלפל."
+     },
+     {
+      "id": "src2",
+      "text": "מחממים מחבת על אש בינונית גבוהה ומניחים את החזה. צורבים 5 דקות בלי להזיז."
+     },
+     {
+      "id": "src3",
+      "text": "הופכים, מנמיכים מעט את האש ומבשלים עוד כ-5 דקות, עד שהחזה עשוי."
+     },
+     {
+      "id": "src4",
+      "text": "מעבירים לצלחת ונותנים לנוח 3 דקות לפני חיתוך."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "תיבול",
+      "instruction_he": "מייבשים את החזה בנייר סופג, מורחים בשמן ומתבלים משני הצדדים בפפריקה, שום, מלח ופלפל.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4",
+       "i5",
+       "i6"
+      ],
+      "equipment_ids": [
+       "e2"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "warnings_he": [
+       "שוטפים ידיים, קרש וסכין אחרי נגיעה בעוף לא מבושל."
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "צד ראשון",
+      "instruction_he": "מחממים מחבת על אש בינונית גבוהה ומניחים את החזה. צורבים 5 דקות בלי להזיז.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1",
+       "e3"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "חזה עוף, צד ראשון",
+        "seconds": 300,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הצד התחתון זהוב.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "שמתי במחבת",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "הפכתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הצד התחתון זהוב."
+     },
+     {
+      "id": "s3",
+      "title": "צד שני",
+      "instruction_he": "הופכים, מנמיכים מעט את האש ומבשלים עוד כ-5 דקות, עד שהחזה עשוי.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "חזה עוף, צד שני",
+        "seconds": 300,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "בחיתוך במרכז הבשר לבן.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי את הצד השני",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "החזה מוכן",
+        "completes_step": true,
+        "confirm_policy": "always_ask"
+       }
+      ],
+      "doneness_cue_he": "בחיתוך במרכז החלק העבה הבשר לבן ואין ורוד. במדחום: לפחות 74 מעלות."
+     },
+     {
+      "id": "s4",
+      "title": "מנוחה",
+      "instruction_he": "מעבירים לצלחת ונותנים לנוח 3 דקות לפני חיתוך.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e4"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "מנוחת עוף",
+        "seconds": 180,
+        "provenance": "original",
+        "wait_kind": "rest",
+        "check_cue_he": "הבשר נח ושומר על עסיסיות.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "העברתי לצלחת",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "מגישים",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הבשר נח ושומר על עסיסיות."
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "chicken-stir-fry",
+   "categories": [
+    "chicken",
+    "quick"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "מוקפץ עוף וירקות",
+    "description": "רצועות עוף וירקות צבעוניים ברוטב סויה מתקתק.",
+    "servings": {
+     "amount": 3,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "חזה עוף",
+      "quantity": {
+       "display": "500 גרם",
+       "provenance": "original",
+       "amount": 500,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "פלפל אדום",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i3",
+      "name": "גזר",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i4",
+      "name": "בצל",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i5",
+      "name": "פרחי ברוקולי",
+      "quantity": {
+       "display": "1 כוס",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "שום",
+      "quantity": {
+       "display": "2 שיניים",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "שיניים"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "רוטב סויה",
+      "quantity": {
+       "display": "3 כפות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "סילאן או דבש",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     },
+     {
+      "id": "i9",
+      "name": "קורנפלור",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i10",
+      "name": "שמן",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "ווק או מחבת גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "קרש חיתוך",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "סכין",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "קערה קטנה",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "חותכים את העוף לרצועות, את הפלפל, הגזר והבצל לרצועות דקות, וכותשים את השום."
+     },
+     {
+      "id": "src2",
+      "text": "מערבבים בקערה קטנה את הסויה, הסילאן, הקורנפלור ו-3 כפות מים."
+     },
+     {
+      "id": "src3",
+      "text": "מחממים שמן בווק על אש גבוהה ומקפיצים את העוף כ-5 דקות. מוציאים לצלחת."
+     },
+     {
+      "id": "src4",
+      "text": "מקפיצים באותו ווק את הירקות והשום כ-4 דקות, כך שיישארו מעט פריכים."
+     },
+     {
+      "id": "src5",
+      "text": "מחזירים את העוף לווק, מוסיפים את הרוטב ומקפיצים עוד 2 דקות, עד שהרוטב מסמיך ומבריק."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "חיתוך",
+      "instruction_he": "חותכים את העוף לרצועות, את הפלפל, הגזר והבצל לרצועות דקות, וכותשים את השום.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4",
+       "i5",
+       "i6"
+      ],
+      "equipment_ids": [
+       "e2",
+       "e3"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 15,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "warnings_he": [
+       "שוטפים ידיים, קרש וסכין אחרי נגיעה בעוף לא מבושל."
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "הכנת הרוטב",
+      "instruction_he": "מערבבים בקערה קטנה את הסויה, הסילאן, הקורנפלור ו-3 כפות מים.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i7",
+       "i8",
+       "i9"
+      ],
+      "equipment_ids": [
+       "e4"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "הקפצת העוף",
+      "instruction_he": "מחממים שמן בווק על אש גבוהה ומקפיצים את העוף כ-5 דקות. מוציאים לצלחת.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i10",
+       "i1"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 5,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "עוף בווק",
+        "seconds": 300,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הרצועות לבנות לגמרי מבפנים.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "שמתי את העוף בווק",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "העוף מוכן",
+        "completes_step": true,
+        "confirm_policy": "always_ask"
+       }
+      ],
+      "doneness_cue_he": "בחיתוך של רצועה עבה הבשר לבן לגמרי, בלי ורוד."
+     },
+     {
+      "id": "s4",
+      "title": "הקפצת הירקות",
+      "instruction_he": "מקפיצים באותו ווק את הירקות והשום כ-4 דקות, כך שיישארו מעט פריכים.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "ירקות בווק",
+        "seconds": 240,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הירקות בצבע חי ועדיין מעט פריכים.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הירקות בצבע חי ועדיין מעט פריכים."
+     },
+     {
+      "id": "s5",
+      "title": "איחוד",
+      "instruction_he": "מחזירים את העוף לווק, מוסיפים את הרוטב ומקפיצים עוד 2 דקות, עד שהרוטב מסמיך ומבריק.",
+      "source_refs": [
+       "src5"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s4"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t5",
+        "label_he": "רוטב בווק",
+        "seconds": 120,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הרוטב סמיך ומצפה הכל.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "הוספתי את הרוטב",
+        "starts_timer": "t5"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "מגישים",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הרוטב סמיך ומצפה הכל."
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "white-rice",
+   "categories": [
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "אורז לבן",
+    "description": "אורז לבן מופרד ואוורירי, תוספת שמתאימה כמעט לכל דבר.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "אורז לבן (פרסי או בסמטי)",
+      "quantity": {
+       "display": "1½ כוסות",
+       "provenance": "original",
+       "amount": 1.5,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "מים",
+      "quantity": {
+       "display": "2¼ כוסות",
+       "provenance": "original",
+       "amount": 2.25,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "שמן",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "מלח",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "סיר בינוני עם מכסה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מסננת",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "שוטפים את האורז במסננת תחת מים קרים עד שהמים כמעט צלולים."
+     },
+     {
+      "id": "src2",
+      "text": "מחממים שמן בסיר, מוסיפים את האורז ומערבבים דקה. מוסיפים מים ומלח ומביאים לרתיחה. מנמיכים לאש הכי נמוכה, מכסים ומבשלים 18 דקות בלי להרים את המכסה."
+     },
+     {
+      "id": "src3",
+      "text": "מכבים את האש ומשאירים מכוסה 10 דקות, ואז מפרידים את האורז במזלג."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "שטיפת האורז",
+      "instruction_he": "שוטפים את האורז במסננת תחת מים קרים עד שהמים כמעט צלולים.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1"
+      ],
+      "equipment_ids": [
+       "e2"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "בישול האורז",
+      "instruction_he": "מחממים שמן בסיר, מוסיפים את האורז ומערבבים דקה. מוסיפים מים ומלח ומביאים לרתיחה. מנמיכים לאש הכי נמוכה, מכסים ומבשלים 18 דקות בלי להרים את המכסה.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 5,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "אורז",
+        "seconds": 1080,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "המים נספגו ויש חורים קטנים על פני האורז.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "כיסיתי והנמכתי את האש",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "המים נספגו",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "המים נספגו ויש חורים קטנים על פני האורז."
+     },
+     {
+      "id": "s3",
+      "title": "מנוחה",
+      "instruction_he": "מכבים את האש ומשאירים מכוסה 10 דקות, ואז מפרידים את האורז במזלג.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "מנוחת אורז",
+        "seconds": 600,
+        "provenance": "original",
+        "wait_kind": "rest",
+        "check_cue_he": "האורז תפוח ונפרד בקלות.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "כיביתי את האש",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "מגישים",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "האורז תפוח ונפרד בקלות."
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "mujaddara",
+   "categories": [
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "מג'דרה",
+    "description": "אורז ועדשים חומות עם הרבה בצל מטוגן.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "עדשים חומות",
+      "quantity": {
+       "display": "1 כוס",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "אורז לבן",
+      "quantity": {
+       "display": "1 כוס",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "בצל גדול",
+      "quantity": {
+       "display": "3",
+       "provenance": "original",
+       "amount": 3
+      }
+     },
+     {
+      "id": "i4",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "5 כפות",
+       "provenance": "original",
+       "amount": 5,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "כמון",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "מלח",
+      "quantity": {
+       "display": "1½ כפיות",
+       "provenance": "original",
+       "amount": 1.5,
+       "unit": "כפיות"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "פלפל שחור",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "מים",
+      "quantity": {
+       "display": "3 כוסות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כוסות"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "סיר בינוני עם מכסה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מחבת",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "מסננת",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "קרש חיתוך",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "שוטפים את העדשים ומבשלים אותן בסיר עם המים כ-15 דקות, עד שהן מתחילות להתרכך."
+     },
+     {
+      "id": "src2",
+      "text": "פורסים את הבצל דק ומטגנים בשמן זית על אש בינונית כ-20 דקות, עם ערבוב מדי פעם, עד שהוא חום ומקורמל."
+     },
+     {
+      "id": "src3",
+      "text": "שוטפים את האורז ומוסיפים לעדשים עם הכמון, המלח, הפלפל וחצי מהבצל. מביאים לרתיחה, מכסים ומבשלים על אש נמוכה 18 דקות."
+     },
+     {
+      "id": "src4",
+      "text": "משאירים 5 דקות מכוסה, מערבבים קלות ומגישים עם שאר הבצל מלמעלה."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "בישול העדשים",
+      "instruction_he": "שוטפים את העדשים ומבשלים אותן בסיר עם המים כ-15 דקות, עד שהן מתחילות להתרכך.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i8"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e3"
+      ],
+      "depends_on": [],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t1",
+        "label_he": "עדשים",
+        "seconds": 900,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "העדשים מתחילות להתרכך אבל שומרות על צורתן.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t1"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "העדשים מתחילות להתרכך אבל שומרות על צורתן."
+     },
+     {
+      "id": "s2",
+      "title": "טיגון הבצל",
+      "instruction_he": "פורסים את הבצל דק ומטגנים בשמן זית על אש בינונית כ-20 דקות, עם ערבוב מדי פעם, עד שהוא חום ומקורמל.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i3",
+       "i4"
+      ],
+      "equipment_ids": [
+       "e2",
+       "e4"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "parallel_ok": true,
+      "estimated_active_minutes": {
+       "value": 10,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "בצל מקורמל",
+        "seconds": 1200,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הבצל חום כהה ורך.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הבצל חום כהה ורך."
+     },
+     {
+      "id": "s3",
+      "title": "הוספת האורז",
+      "instruction_he": "שוטפים את האורז ומוסיפים לעדשים עם הכמון, המלח, הפלפל וחצי מהבצל. מביאים לרתיחה, מכסים ומבשלים על אש נמוכה 18 דקות.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i2",
+       "i5",
+       "i6",
+       "i7"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e3"
+      ],
+      "depends_on": [
+       "s1",
+       "s2"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "אורז ועדשים",
+        "seconds": 1080,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הנוזלים נספגו והאורז רך.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "כיסיתי את הסיר",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "האורז מוכן",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הנוזלים נספגו והאורז רך."
+     },
+     {
+      "id": "s4",
+      "title": "הגשה",
+      "instruction_he": "משאירים 5 דקות מכוסה, מערבבים קלות ומגישים עם שאר הבצל מלמעלה.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "roasted-vegetables",
+   "categories": [
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "ירקות צלויים בתנור",
+    "description": "ירקות שורש וקישואים צלויים עם שמן זית וטימין.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "בטטה גדולה",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i2",
+      "name": "גזר",
+      "quantity": {
+       "display": "3",
+       "provenance": "original",
+       "amount": 3
+      }
+     },
+     {
+      "id": "i3",
+      "name": "קישואים",
+      "quantity": {
+       "display": "2",
+       "provenance": "original",
+       "amount": 2
+      }
+     },
+     {
+      "id": "i4",
+      "name": "פלפל אדום",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i5",
+      "name": "בצל סגול",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i6",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "4 כפות",
+       "provenance": "original",
+       "amount": 4,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "מלח",
+      "quantity": {
+       "display": "1½ כפיות",
+       "provenance": "original",
+       "amount": 1.5,
+       "unit": "כפיות"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "פלפל שחור",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i9",
+      "name": "טימין יבש",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "תבנית גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "נייר אפייה",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "קרש חיתוך",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "סכין",
+      "provenance": "original"
+     },
+     {
+      "id": "e5",
+      "name": "קערה גדולה",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "חותכים את כל הירקות לקוביות בגודל דומה, כ-3 סנטימטרים."
+     },
+     {
+      "id": "src2",
+      "text": "מערבבים בקערה את הירקות עם שמן הזית, המלח, הפלפל והטימין, ומפזרים בשכבה אחת בתבנית מרופדת בנייר אפייה."
+     },
+     {
+      "id": "src3",
+      "text": "צולים כ-35 דקות, עם ערבוב אחד באמצע, עד שהירקות רכים ושחומים בשוליים."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "חיתוך הירקות",
+      "instruction_he": "חותכים את כל הירקות לקוביות בגודל דומה, כ-3 סנטימטרים.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4",
+       "i5"
+      ],
+      "equipment_ids": [
+       "e3",
+       "e4"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 15,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "תיבול",
+      "instruction_he": "מערבבים בקערה את הירקות עם שמן הזית, המלח, הפלפל והטימין, ומפזרים בשכבה אחת בתבנית מרופדת בנייר אפייה.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i6",
+       "i7",
+       "i8",
+       "i9"
+      ],
+      "equipment_ids": [
+       "e5",
+       "e1",
+       "e2"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "צלייה",
+      "instruction_he": "צולים כ-35 דקות, עם ערבוב אחד באמצע, עד שהירקות רכים ושחומים בשוליים.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "ירקות בתנור",
+        "seconds": 2100,
+        "provenance": "original",
+        "wait_kind": "bake",
+        "check_cue_he": "הירקות רכים ושחומים בשוליים.",
+        "recheck_seconds": 300
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "in_oven",
+        "label_he": "הכנסתי לתנור",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "out_of_oven",
+        "label_he": "הוצאתי מהתנור",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "temperature": {
+       "value": 220,
+       "unit": "C",
+       "provenance": "original"
+      },
+      "doneness_cue_he": "הירקות רכים ושחומים בשוליים."
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p1",
+      "kind": "preheat_oven",
+      "text_he": "מחממים את התנור ל-220 מעלות",
+      "needed_by_step": "s3",
+      "lead_minutes": {
+       "value": 15,
+       "provenance": "inferred",
+       "note_he": "תנור ביתי מתחמם בערך ברבע שעה."
+      },
+      "surface": {
+       "at_start": true
+      },
+      "timer": {
+       "id": "tp1",
+       "label_he": "חימום תנור",
+       "seconds": 900,
+       "provenance": "inferred"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "israeli-salad",
+   "categories": [
+    "vegetarian",
+    "quick"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "סלט ירקות ישראלי",
+    "description": "סלט קצוץ דק עם לימון ושמן זית.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "מלפפונים",
+      "quantity": {
+       "display": "4",
+       "provenance": "original",
+       "amount": 4
+      }
+     },
+     {
+      "id": "i2",
+      "name": "עגבניות",
+      "quantity": {
+       "display": "3",
+       "provenance": "original",
+       "amount": 3
+      }
+     },
+     {
+      "id": "i3",
+      "name": "בצל סגול",
+      "quantity": {
+       "display": "½",
+       "provenance": "original",
+       "amount": 0.5
+      }
+     },
+     {
+      "id": "i4",
+      "name": "פטרוזיליה קצוצה",
+      "quantity": {
+       "display": "3 כפות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "מיץ לימון",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "מלח",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "קרש חיתוך",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "סכין",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "קערה",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "חותכים את המלפפונים והעגבניות לקוביות קטנות, קוצצים דק את הבצל ומעבירים לקערה."
+     },
+     {
+      "id": "src2",
+      "text": "מוסיפים פטרוזיליה, מיץ לימון, שמן זית ומלח, מערבבים ומגישים מיד."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "חיתוך",
+      "instruction_he": "חותכים את המלפפונים והעגבניות לקוביות קטנות, קוצצים דק את הבצל ומעבירים לקערה.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2",
+       "e3"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 12,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "תיבול",
+      "instruction_he": "מוסיפים פטרוזיליה, מיץ לימון, שמן זית ומלח, מערבבים ומגישים מיד.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i4",
+       "i5",
+       "i6",
+       "i7"
+      ],
+      "equipment_ids": [
+       "e3"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "lentil-soup",
+   "categories": [
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "מרק עדשים כתומות",
+    "description": "מרק סמיך ומחמם עם כמון וכורכום.",
+    "servings": {
+     "amount": 6,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "עדשים כתומות",
+      "quantity": {
+       "display": "1½ כוסות",
+       "provenance": "original",
+       "amount": 1.5,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "בצל",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i3",
+      "name": "גזר",
+      "quantity": {
+       "display": "2",
+       "provenance": "original",
+       "amount": 2
+      }
+     },
+     {
+      "id": "i4",
+      "name": "שום",
+      "quantity": {
+       "display": "2 שיניים",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "שיניים"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "כמון",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "כורכום",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "מלח",
+      "quantity": {
+       "display": "2 כפיות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפיות"
+      }
+     },
+     {
+      "id": "i9",
+      "name": "מים",
+      "quantity": {
+       "display": "7 כוסות",
+       "provenance": "original",
+       "amount": 7,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i10",
+      "name": "מיץ לימון",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      },
+      "optional": true
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "סיר גדול",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "קרש חיתוך",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "סכין",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "בלנדר מוט",
+      "provenance": "original"
+     },
+     {
+      "id": "e5",
+      "name": "מסננת",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "קוצצים את הבצל, חותכים את הגזר לקוביות וכותשים את השום."
+     },
+     {
+      "id": "src2",
+      "text": "מחממים שמן בסיר ומטגנים את הבצל והגזר כ-6 דקות. מוסיפים את השום והתבלינים ומערבבים דקה."
+     },
+     {
+      "id": "src3",
+      "text": "שוטפים את העדשים ומוסיפים לסיר עם המים והמלח. מביאים לרתיחה ומבשלים על אש נמוכה כ-25 דקות, עד שהעדשים מתפרקות."
+     },
+     {
+      "id": "src4",
+      "text": "טוחנים בבלנדר מוט עד שהמרק חלק, מוסיפים מיץ לימון ומתקנים תיבול."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "חיתוך",
+      "instruction_he": "קוצצים את הבצל, חותכים את הגזר לקוביות וכותשים את השום.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i2",
+       "i3",
+       "i4"
+      ],
+      "equipment_ids": [
+       "e2",
+       "e3"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 8,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "טיגון הירקות",
+      "instruction_he": "מחממים שמן בסיר ומטגנים את הבצל והגזר כ-6 דקות. מוסיפים את השום והתבלינים ומערבבים דקה.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i5",
+       "i6",
+       "i7"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 7,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "טיגון ירקות",
+        "seconds": 360,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הבצל רך ושקוף.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הבצל רך ושקוף."
+     },
+     {
+      "id": "s3",
+      "title": "בישול המרק",
+      "instruction_he": "שוטפים את העדשים ומוסיפים לסיר עם המים והמלח. מביאים לרתיחה ומבשלים על אש נמוכה כ-25 דקות, עד שהעדשים מתפרקות.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i8",
+       "i9"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e5"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "מרק עדשים",
+        "seconds": 1500,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "העדשים רכות לגמרי ומתפרקות.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "המרק רותח, הנמכתי את האש",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "העדשים רכות",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "העדשים רכות לגמרי ומתפרקות."
+     },
+     {
+      "id": "s4",
+      "title": "טחינה",
+      "instruction_he": "טוחנים בבלנדר מוט עד שהמרק חלק, מוסיפים מיץ לימון ומתקנים תיבול.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [
+       "i10"
+      ],
+      "equipment_ids": [
+       "e4"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "warnings_he": [
+       "טוחנים בזהירות, המרק חם מאוד."
+      ]
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "baked-salmon",
+   "categories": [
+    "quick"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "סלמון בתנור",
+    "description": "נתחי סלמון עם לימון ושום, מוכנים ברבע שעה בתנור.",
+    "servings": {
+     "amount": 4,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "פילה סלמון",
+      "quantity": {
+       "display": "600 גרם",
+       "provenance": "original",
+       "amount": 600,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "שמן זית",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "לימון",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i4",
+      "name": "שום כתוש",
+      "quantity": {
+       "display": "2 שיניים",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "שיניים"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "מלח",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "פלפל שחור",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "שמיר קצוץ",
+      "quantity": {
+       "display": "2 כפות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפות"
+      },
+      "optional": true
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "תבנית",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "נייר אפייה",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "קערה קטנה",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מניחים את הסלמון בתבנית מרופדת בנייר אפייה. מערבבים שמן, מיץ מחצי לימון, שום, מלח ופלפל ומורחים על הדג."
+     },
+     {
+      "id": "src2",
+      "text": "אופים כ-15 דקות, עד שהדג משנה צבע ומתפרק בקלות במזלג."
+     },
+     {
+      "id": "src3",
+      "text": "מפזרים שמיר ומגישים עם פלחי לימון."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "תיבול",
+      "instruction_he": "מניחים את הסלמון בתבנית מרופדת בנייר אפייה. מערבבים שמן, מיץ מחצי לימון, שום, מלח ופלפל ומורחים על הדג.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4",
+       "i5",
+       "i6"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2",
+       "e3"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 6,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "אפייה",
+      "instruction_he": "אופים כ-15 דקות, עד שהדג משנה צבע ומתפרק בקלות במזלג.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "סלמון בתנור",
+        "seconds": 900,
+        "provenance": "original",
+        "wait_kind": "bake",
+        "check_cue_he": "הדג אטום ומתפרק בקלות במזלג.",
+        "recheck_seconds": 300
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "in_oven",
+        "label_he": "הכנסתי לתנור",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "out_of_oven",
+        "label_he": "הוצאתי מהתנור",
+        "completes_step": true,
+        "confirm_policy": "always_ask"
+       }
+      ],
+      "temperature": {
+       "value": 200,
+       "unit": "C",
+       "provenance": "original"
+      },
+      "doneness_cue_he": "במרכז הנתח העבה הדג אטום ומתפרק בקלות במזלג."
+     },
+     {
+      "id": "s3",
+      "title": "הגשה",
+      "instruction_he": "מפזרים שמיר ומגישים עם פלחי לימון.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i7"
+      ],
+      "equipment_ids": [],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p1",
+      "kind": "preheat_oven",
+      "text_he": "מחממים את התנור ל-200 מעלות",
+      "needed_by_step": "s2",
+      "lead_minutes": {
+       "value": 15,
+       "provenance": "inferred",
+       "note_he": "תנור ביתי מתחמם בערך ברבע שעה."
+      },
+      "surface": {
+       "at_start": true
+      },
+      "timer": {
+       "id": "tp1",
+       "label_he": "חימום תנור",
+       "seconds": 900,
+       "provenance": "inferred"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "chocolate-cake",
+   "categories": [
+    "baking",
+    "desserts"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "עוגת שוקולד",
+    "description": "עוגת שוקולד לחה בקערה אחת, בלי מיקסר.",
+    "servings": {
+     "amount": 12,
+     "unit": "פרוסות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "קמח לבן",
+      "quantity": {
+       "display": "1½ כוסות",
+       "provenance": "original",
+       "amount": 1.5,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "אבקת קקאו",
+      "quantity": {
+       "display": "½ כוס",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "סוכר",
+      "quantity": {
+       "display": "1 כוס",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "אבקת אפייה",
+      "quantity": {
+       "display": "2 כפיות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפיות"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "מלח",
+      "quantity": {
+       "display": "קורט",
+       "provenance": "original"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "ביצים",
+      "quantity": {
+       "display": "3",
+       "provenance": "original",
+       "amount": 3
+      }
+     },
+     {
+      "id": "i7",
+      "name": "שמן",
+      "quantity": {
+       "display": "½ כוס",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "חלב",
+      "quantity": {
+       "display": "1 כוס",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i9",
+      "name": "תמצית וניל",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "קערה גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מטרפה",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "תבנית עגולה בקוטר 24 ס\"מ",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "נייר אפייה",
+      "provenance": "original"
+     },
+     {
+      "id": "e5",
+      "name": "קיסם",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מרפדים את התבנית בנייר אפייה ומשמנים את הדפנות."
+     },
+     {
+      "id": "src2",
+      "text": "מערבבים בקערה את הקמח, הקקאו, הסוכר, אבקת האפייה והמלח."
+     },
+     {
+      "id": "src3",
+      "text": "מוסיפים ביצים, שמן, חלב ווניל וטורפים עד שמתקבלת בלילה חלקה בלי גושים."
+     },
+     {
+      "id": "src4",
+      "text": "יוצקים לתבנית ואופים כ-35 דקות, עד שקיסם שננעץ במרכז יוצא עם פירורים לחים בלבד."
+     },
+     {
+      "id": "src5",
+      "text": "מצננים בתבנית כ-20 דקות לפני שמוציאים."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "הכנת התבנית",
+      "instruction_he": "מרפדים את התבנית בנייר אפייה ומשמנים את הדפנות.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e3",
+       "e4"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "המצרכים היבשים",
+      "instruction_he": "מערבבים בקערה את הקמח, הקקאו, הסוכר, אבקת האפייה והמלח.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4",
+       "i5"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "הבלילה",
+      "instruction_he": "מוסיפים ביצים, שמן, חלב ווניל וטורפים עד שמתקבלת בלילה חלקה בלי גושים.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i6",
+       "i7",
+       "i8",
+       "i9"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s4",
+      "title": "אפייה",
+      "instruction_he": "יוצקים לתבנית ואופים כ-35 דקות, עד שקיסם שננעץ במרכז יוצא עם פירורים לחים בלבד.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e3",
+       "e5"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "עוגת שוקולד",
+        "seconds": 2100,
+        "provenance": "original",
+        "wait_kind": "bake",
+        "check_cue_he": "קיסם במרכז יוצא עם פירורים לחים, בלי בלילה נוזלית.",
+        "recheck_seconds": 300
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "in_oven",
+        "label_he": "הכנסתי לתנור",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "out_of_oven",
+        "label_he": "הוצאתי מהתנור",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "temperature": {
+       "value": 180,
+       "unit": "C",
+       "provenance": "original"
+      },
+      "doneness_cue_he": "קיסם במרכז יוצא עם פירורים לחים, בלי בלילה נוזלית."
+     },
+     {
+      "id": "s5",
+      "title": "צינון",
+      "instruction_he": "מצננים בתבנית כ-20 דקות לפני שמוציאים.",
+      "source_refs": [
+       "src5"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e3"
+      ],
+      "depends_on": [
+       "s4"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t5",
+        "label_he": "צינון עוגה",
+        "seconds": 1200,
+        "provenance": "original",
+        "wait_kind": "rest",
+        "check_cue_he": "העוגה פושרת ונפרדת מהדפנות.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "הנחתי לצינון",
+        "starts_timer": "t5"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "הוצאתי מהתבנית",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "העוגה פושרת ונפרדת מהדפנות."
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p1",
+      "kind": "preheat_oven",
+      "text_he": "מחממים את התנור ל-180 מעלות",
+      "needed_by_step": "s4",
+      "lead_minutes": {
+       "value": 15,
+       "provenance": "inferred",
+       "note_he": "תנור ביתי מתחמם בערך ברבע שעה."
+      },
+      "surface": {
+       "at_start": true
+      },
+      "timer": {
+       "id": "tp1",
+       "label_he": "חימום תנור",
+       "seconds": 900,
+       "provenance": "inferred"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "chocolate-chip-cookies",
+   "categories": [
+    "baking",
+    "desserts"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "עוגיות שוקולד צ'יפס",
+    "description": "עוגיות רכות במרכז ופריכות בשוליים.",
+    "servings": {
+     "amount": 24,
+     "unit": "עוגיות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "חמאה רכה",
+      "quantity": {
+       "display": "150 גרם",
+       "provenance": "original",
+       "amount": 150,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "סוכר חום",
+      "quantity": {
+       "display": "¾ כוס",
+       "provenance": "original",
+       "amount": 0.75,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "סוכר לבן",
+      "quantity": {
+       "display": "¼ כוס",
+       "provenance": "original",
+       "amount": 0.25,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "ביצה",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i5",
+      "name": "תמצית וניל",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "קמח לבן",
+      "quantity": {
+       "display": "2 כוסות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "סודה לשתייה",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "מלח",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i9",
+      "name": "שוקולד צ'יפס",
+      "quantity": {
+       "display": "1 כוס",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כוס"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "קערה גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מיקסר או מטרפה ידנית",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "2 תבניות",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "נייר אפייה",
+      "provenance": "original"
+     },
+     {
+      "id": "e5",
+      "name": "רשת צינון",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מקציפים את החמאה עם שני סוגי הסוכר כ-3 דקות, עד שהתערובת בהירה. מוסיפים ביצה ווניל ומערבבים."
+     },
+     {
+      "id": "src2",
+      "text": "מוסיפים קמח, סודה לשתייה ומלח ומערבבים רק עד שאין קמח יבש. מקפלים פנימה את השוקולד צ'יפס."
+     },
+     {
+      "id": "src3",
+      "text": "יוצרים כדורים בגודל אגוז ומסדרים על תבניות מרופדות בנייר אפייה, ברווחים של 5 סנטימטרים."
+     },
+     {
+      "id": "src4",
+      "text": "אופים כ-11 דקות, עד שהשוליים זהובים והמרכז עדיין רך. העוגיות מתקשות כשהן מתקררות."
+     },
+     {
+      "id": "src5",
+      "text": "משאירים 5 דקות על התבנית ומעבירים לרשת."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "הקצפה",
+      "instruction_he": "מקציפים את החמאה עם שני סוגי הסוכר כ-3 דקות, עד שהתערובת בהירה. מוסיפים ביצה ווניל ומערבבים.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4",
+       "i5"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 5,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "הבצק",
+      "instruction_he": "מוסיפים קמח, סודה לשתייה ומלח ומערבבים רק עד שאין קמח יבש. מקפלים פנימה את השוקולד צ'יפס.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i6",
+       "i7",
+       "i8",
+       "i9"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "עיצוב",
+      "instruction_he": "יוצרים כדורים בגודל אגוז ומסדרים על תבניות מרופדות בנייר אפייה, ברווחים של 5 סנטימטרים.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e3",
+       "e4"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 10,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s4",
+      "title": "אפייה",
+      "instruction_he": "אופים כ-11 דקות, עד שהשוליים זהובים והמרכז עדיין רך. העוגיות מתקשות כשהן מתקררות.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e3"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "עוגיות בתנור",
+        "seconds": 660,
+        "provenance": "original",
+        "wait_kind": "bake",
+        "check_cue_he": "השוליים זהובים והמרכז עוד רך.",
+        "recheck_seconds": 300
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "in_oven",
+        "label_he": "הכנסתי לתנור",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "out_of_oven",
+        "label_he": "הוצאתי מהתנור",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "temperature": {
+       "value": 180,
+       "unit": "C",
+       "provenance": "original"
+      },
+      "doneness_cue_he": "השוליים זהובים והמרכז עוד רך."
+     },
+     {
+      "id": "s5",
+      "title": "צינון",
+      "instruction_he": "משאירים 5 דקות על התבנית ומעבירים לרשת.",
+      "source_refs": [
+       "src5"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e5"
+      ],
+      "depends_on": [
+       "s4"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t5",
+        "label_he": "צינון עוגיות",
+        "seconds": 300,
+        "provenance": "original",
+        "wait_kind": "rest",
+        "check_cue_he": "אפשר להרים עוגייה בלי שתישבר.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "הנחתי לצינון",
+        "starts_timer": "t5"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "העברתי לרשת",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "אפשר להרים עוגייה בלי שתישבר."
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p1",
+      "kind": "preheat_oven",
+      "text_he": "מחממים את התנור ל-180 מעלות",
+      "needed_by_step": "s4",
+      "lead_minutes": {
+       "value": 15,
+       "provenance": "inferred",
+       "note_he": "תנור ביתי מתחמם בערך ברבע שעה."
+      },
+      "surface": {
+       "at_start": true
+      },
+      "timer": {
+       "id": "tp1",
+       "label_he": "חימום תנור",
+       "seconds": 900,
+       "provenance": "inferred"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "banana-muffins",
+   "categories": [
+    "baking",
+    "breakfast"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "מאפינס בננה",
+    "description": "מאפינס רכים מבננות בשלות, טובים גם לבוקר.",
+    "servings": {
+     "amount": 12,
+     "unit": "מאפינס",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "בננות בשלות מאוד",
+      "quantity": {
+       "display": "3",
+       "provenance": "original",
+       "amount": 3
+      }
+     },
+     {
+      "id": "i2",
+      "name": "ביצים",
+      "quantity": {
+       "display": "2",
+       "provenance": "original",
+       "amount": 2
+      }
+     },
+     {
+      "id": "i3",
+      "name": "שמן",
+      "quantity": {
+       "display": "5 כפות",
+       "provenance": "original",
+       "amount": 5,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "סוכר",
+      "quantity": {
+       "display": "½ כוס",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "קמח לבן",
+      "quantity": {
+       "display": "1¾ כוסות",
+       "provenance": "original",
+       "amount": 1.75,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "אבקת אפייה",
+      "quantity": {
+       "display": "2 כפיות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כפיות"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "קינמון",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "מלח",
+      "quantity": {
+       "display": "קורט",
+       "provenance": "original"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "קערה גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מזלג",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "תבנית מאפינס ל-12",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "מנג'טים",
+      "provenance": "original"
+     },
+     {
+      "id": "e5",
+      "name": "קיסם",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מסדרים מנג'טים בתבנית המאפינס."
+     },
+     {
+      "id": "src2",
+      "text": "מועכים את הבננות במזלג, מוסיפים ביצים, שמן וסוכר ומערבבים."
+     },
+     {
+      "id": "src3",
+      "text": "מוסיפים קמח, אבקת אפייה, קינמון ומלח ומערבבים רק עד שהתערובת אחידה."
+     },
+     {
+      "id": "src4",
+      "text": "ממלאים את המנג'טים עד שלושה רבעים ואופים כ-22 דקות, עד שקיסם יוצא נקי."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "הכנת התבנית",
+      "instruction_he": "מסדרים מנג'טים בתבנית המאפינס.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e3",
+       "e4"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "תערובת הבננות",
+      "instruction_he": "מועכים את הבננות במזלג, מוסיפים ביצים, שמן וסוכר ומערבבים.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 5,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "הבלילה",
+      "instruction_he": "מוסיפים קמח, אבקת אפייה, קינמון ומלח ומערבבים רק עד שהתערובת אחידה.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i5",
+       "i6",
+       "i7",
+       "i8"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 3,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s4",
+      "title": "אפייה",
+      "instruction_he": "ממלאים את המנג'טים עד שלושה רבעים ואופים כ-22 דקות, עד שקיסם יוצא נקי.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e3",
+       "e5"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "מאפינס בתנור",
+        "seconds": 1320,
+        "provenance": "original",
+        "wait_kind": "bake",
+        "check_cue_he": "קיסם במרכז מאפין יוצא נקי.",
+        "recheck_seconds": 300
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "in_oven",
+        "label_he": "הכנסתי לתנור",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "out_of_oven",
+        "label_he": "הוצאתי מהתנור",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "temperature": {
+       "value": 180,
+       "unit": "C",
+       "provenance": "original"
+      },
+      "doneness_cue_he": "קיסם במרכז מאפין יוצא נקי."
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p1",
+      "kind": "preheat_oven",
+      "text_he": "מחממים את התנור ל-180 מעלות",
+      "needed_by_step": "s4",
+      "lead_minutes": {
+       "value": 15,
+       "provenance": "inferred",
+       "note_he": "תנור ביתי מתחמם בערך ברבע שעה."
+      },
+      "surface": {
+       "at_start": true
+      },
+      "timer": {
+       "id": "tp1",
+       "label_he": "חימום תנור",
+       "seconds": 900,
+       "provenance": "inferred"
+      }
+     }
+    ]
+   }
+  },
+  {
+   "id": "chocolate-balls",
+   "categories": [
+    "desserts"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "כדורי שוקולד",
+    "description": "כדורי ביסקוויטים ושוקולד בלי אפייה, בדיוק לילדים.",
+    "servings": {
+     "amount": 30,
+     "unit": "כדורים",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "ביסקוויטים",
+      "quantity": {
+       "display": "250 גרם",
+       "provenance": "original",
+       "amount": 250,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "חמאה מומסת",
+      "quantity": {
+       "display": "100 גרם",
+       "provenance": "original",
+       "amount": 100,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "אבקת קקאו",
+      "quantity": {
+       "display": "3 כפות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "סוכר",
+      "quantity": {
+       "display": "½ כוס",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "חלב",
+      "quantity": {
+       "display": "½ כוס",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "קוקוס או סוכריות צבעוניות",
+      "quantity": {
+       "display": "½ כוס",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כוס"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "שקית סגורה או מעבד מזון",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "קערה גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "צלחת",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "קופסה",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מפוררים את הביסקוויטים לפירורים קטנים בשקית סגורה או במעבד מזון."
+     },
+     {
+      "id": "src2",
+      "text": "מערבבים בקערה את הפירורים עם החמאה, הקקאו, הסוכר והחלב עד שמתקבלת עיסה אחידה."
+     },
+     {
+      "id": "src3",
+      "text": "מקררים את העיסה 20 דקות כדי שיהיה קל לגלגל."
+     },
+     {
+      "id": "src4",
+      "text": "מגלגלים כדורים קטנים, מצפים בקוקוס ומקררים בקופסה עד ההגשה."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "פירור",
+      "instruction_he": "מפוררים את הביסקוויטים לפירורים קטנים בשקית סגורה או במעבד מזון.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 5,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "העיסה",
+      "instruction_he": "מערבבים בקערה את הפירורים עם החמאה, הקקאו, הסוכר והחלב עד שמתקבלת עיסה אחידה.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i2",
+       "i3",
+       "i4",
+       "i5"
+      ],
+      "equipment_ids": [
+       "e2"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s3",
+      "title": "קירור",
+      "instruction_he": "מקררים את העיסה 20 דקות כדי שיהיה קל לגלגל.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e2"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "קירור עיסה",
+        "seconds": 1200,
+        "provenance": "original",
+        "wait_kind": "chill",
+        "check_cue_he": "העיסה מוצקה מספיק כדי להחזיק צורה.",
+        "recheck_seconds": 600
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "הכנסתי למקרר",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "העיסה מוכנה",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "העיסה מוצקה מספיק כדי להחזיק צורה."
+     },
+     {
+      "id": "s4",
+      "title": "גלגול",
+      "instruction_he": "מגלגלים כדורים קטנים, מצפים בקוקוס ומקררים בקופסה עד ההגשה.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [
+       "i6"
+      ],
+      "equipment_ids": [
+       "e3",
+       "e4"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 15,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "chocolate-pudding",
+   "categories": [
+    "desserts"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "פודינג שוקולד",
+    "description": "פודינג שוקולד ביתי וחלק, מתבשל על הגז בעשר דקות.",
+    "servings": {
+     "amount": 4,
+     "unit": "כוסות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "חלב",
+      "quantity": {
+       "display": "2 כוסות",
+       "provenance": "original",
+       "amount": 2,
+       "unit": "כוסות"
+      }
+     },
+     {
+      "id": "i2",
+      "name": "סוכר",
+      "quantity": {
+       "display": "5 כפות",
+       "provenance": "original",
+       "amount": 5,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i3",
+      "name": "אבקת קקאו",
+      "quantity": {
+       "display": "3 כפות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i4",
+      "name": "קורנפלור",
+      "quantity": {
+       "display": "3 כפות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "מלח",
+      "quantity": {
+       "display": "קורט",
+       "provenance": "original"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "שוקולד מריר קצוץ",
+      "quantity": {
+       "display": "50 גרם",
+       "provenance": "original",
+       "amount": 50,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "תמצית וניל",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "סיר קטן",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מטרפה",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "4 כוסות הגשה",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "טורפים בסיר את הסוכר, הקקאו, הקורנפלור והמלח, ומוסיפים את החלב בהדרגה תוך כדי טריפה, עד שאין גושים."
+     },
+     {
+      "id": "src2",
+      "text": "מבשלים על אש בינונית תוך טריפה כל הזמן כ-6 דקות, עד שהתערובת רותחת ומסמיכה. מבשלים עוד דקה."
+     },
+     {
+      "id": "src3",
+      "text": "מורידים מהאש, מוסיפים את השוקולד והווניל וטורפים עד שהשוקולד נמס."
+     },
+     {
+      "id": "src4",
+      "text": "מחלקים לכוסות ומקררים לפחות שעתיים."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "ערבוב",
+      "instruction_he": "טורפים בסיר את הסוכר, הקקאו, הקורנפלור והמלח, ומוסיפים את החלב בהדרגה תוך כדי טריפה, עד שאין גושים.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2",
+       "i3",
+       "i4",
+       "i5"
+      ],
+      "equipment_ids": [
+       "e1",
+       "e2"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "בישול",
+      "instruction_he": "מבשלים על אש בינונית תוך טריפה כל הזמן כ-6 דקות, עד שהתערובת רותחת ומסמיכה. מבשלים עוד דקה.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1",
+       "e2"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 7,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "פודינג על האש",
+        "seconds": 360,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הפודינג סמיך ומבעבע.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "שמתי על האש",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "הפודינג סמיך",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הפודינג סמיך ומבעבע."
+     },
+     {
+      "id": "s3",
+      "title": "השוקולד",
+      "instruction_he": "מורידים מהאש, מוסיפים את השוקולד והווניל וטורפים עד שהשוקולד נמס.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i6",
+       "i7"
+      ],
+      "equipment_ids": [
+       "e2"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s4",
+      "title": "קירור",
+      "instruction_he": "מחלקים לכוסות ומקררים לפחות שעתיים.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e3"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 2,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "פודינג במקרר",
+        "seconds": 7200,
+        "provenance": "original",
+        "wait_kind": "chill",
+        "check_cue_he": "הפודינג קר ויציב.",
+        "recheck_seconds": 600
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "הכנסתי למקרר",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "מגישים",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הפודינג קר ויציב."
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "hard-boiled-eggs",
+   "categories": [
+    "breakfast",
+    "quick",
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "ביצים קשות",
+    "description": "ביצים קשות עם חלמון מלא ולא ירקרק.",
+    "servings": {
+     "amount": 4,
+     "unit": "ביצים",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "ביצים",
+      "quantity": {
+       "display": "4",
+       "provenance": "original",
+       "amount": 4
+      }
+     },
+     {
+      "id": "i2",
+      "name": "מים",
+      "quantity": {
+       "display": "לכיסוי",
+       "provenance": "original"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "סיר קטן",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "כף מחוררת",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "קערה עם מים קרים",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מניחים את הביצים בסיר, מכסים במים קרים ומביאים לרתיחה."
+     },
+     {
+      "id": "src2",
+      "text": "מנמיכים מעט את האש ומבשלים 9 דקות."
+     },
+     {
+      "id": "src3",
+      "text": "מעבירים בכף לקערה עם מים קרים ומשאירים 5 דקות לפני קילוף."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "הרתחה",
+      "instruction_he": "מניחים את הביצים בסיר, מכסים במים קרים ומביאים לרתיחה.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 8,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "המים רותחים",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "בישול",
+      "instruction_he": "מנמיכים מעט את האש ומבשלים 9 דקות.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "ביצים קשות",
+        "seconds": 540,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "עברו 9 דקות מהרתיחה.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי לבשל",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "הביצים מוכנות",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "עברו 9 דקות מהרתיחה."
+     },
+     {
+      "id": "s3",
+      "title": "קירור",
+      "instruction_he": "מעבירים בכף לקערה עם מים קרים ומשאירים 5 דקות לפני קילוף.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e2",
+       "e3"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t3",
+        "label_he": "קירור ביצים",
+        "seconds": 300,
+        "provenance": "original",
+        "wait_kind": "chill",
+        "check_cue_he": "הביצים קרות מספיק לקילוף.",
+        "recheck_seconds": 600
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "העברתי למים קרים",
+        "starts_timer": "t3"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "קילפתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הביצים קרות מספיק לקילוף."
+     }
+    ],
+    "prep_tasks": []
+   }
+  },
+  {
+   "id": "zucchini-quiche",
+   "categories": [
+    "baking",
+    "vegetarian"
+   ],
+   "recipe": {
+    "schema_version": 1,
+    "title": "פשטידת קישואים",
+    "description": "פשטידה רכה עם קישואים וגבינות, טובה חמה או קרה.",
+    "servings": {
+     "amount": 8,
+     "unit": "מנות",
+     "provenance": "original"
+    },
+    "ingredients": [
+     {
+      "id": "i1",
+      "name": "קישואים",
+      "quantity": {
+       "display": "4",
+       "provenance": "original",
+       "amount": 4
+      }
+     },
+     {
+      "id": "i2",
+      "name": "בצל",
+      "quantity": {
+       "display": "1",
+       "provenance": "original",
+       "amount": 1
+      }
+     },
+     {
+      "id": "i3",
+      "name": "ביצים",
+      "quantity": {
+       "display": "4",
+       "provenance": "original",
+       "amount": 4
+      }
+     },
+     {
+      "id": "i4",
+      "name": "גבינה לבנה 5%",
+      "quantity": {
+       "display": "250 גרם",
+       "provenance": "original",
+       "amount": 250,
+       "unit": "גרם"
+      }
+     },
+     {
+      "id": "i5",
+      "name": "גבינה צהובה מגוררת",
+      "quantity": {
+       "display": "1 כוס",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כוס"
+      }
+     },
+     {
+      "id": "i6",
+      "name": "קמח",
+      "quantity": {
+       "display": "3 כפות",
+       "provenance": "original",
+       "amount": 3,
+       "unit": "כפות"
+      }
+     },
+     {
+      "id": "i7",
+      "name": "מלח",
+      "quantity": {
+       "display": "1 כפית",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i8",
+      "name": "פלפל שחור",
+      "quantity": {
+       "display": "½ כפית",
+       "provenance": "original",
+       "amount": 0.5,
+       "unit": "כפית"
+      }
+     },
+     {
+      "id": "i9",
+      "name": "שמן",
+      "quantity": {
+       "display": "1 כף",
+       "provenance": "original",
+       "amount": 1,
+       "unit": "כף"
+      }
+     }
+    ],
+    "equipment": [
+     {
+      "id": "e1",
+      "name": "פומפייה",
+      "provenance": "original"
+     },
+     {
+      "id": "e2",
+      "name": "מחבת",
+      "provenance": "original"
+     },
+     {
+      "id": "e3",
+      "name": "קערה גדולה",
+      "provenance": "original"
+     },
+     {
+      "id": "e4",
+      "name": "תבנית מלבנית בינונית",
+      "provenance": "original"
+     },
+     {
+      "id": "e5",
+      "name": "נייר אפייה",
+      "provenance": "original"
+     }
+    ],
+    "source_steps": [
+     {
+      "id": "src1",
+      "text": "מגררים את הקישואים בפומפייה, סוחטים מהם את הנוזלים בידיים וקוצצים את הבצל."
+     },
+     {
+      "id": "src2",
+      "text": "מטגנים את הבצל בשמן כ-5 דקות, עד שהוא רך."
+     },
+     {
+      "id": "src3",
+      "text": "מערבבים בקערה את הביצים, הגבינות, הקמח, המלח והפלפל. מוסיפים את הקישואים והבצל."
+     },
+     {
+      "id": "src4",
+      "text": "יוצקים לתבנית מרופדת בנייר אפייה ואופים כ-40 דקות, עד שהפשטידה זהובה ויציבה במרכז."
+     }
+    ]
+   },
+   "plan": {
+    "schema_version": 1,
+    "steps": [
+     {
+      "id": "s1",
+      "title": "גירוד הקישואים",
+      "instruction_he": "מגררים את הקישואים בפומפייה, סוחטים מהם את הנוזלים בידיים וקוצצים את הבצל.",
+      "source_refs": [
+       "src1"
+      ],
+      "ingredient_ids": [
+       "i1",
+       "i2"
+      ],
+      "equipment_ids": [
+       "e1"
+      ],
+      "depends_on": [],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 10,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s2",
+      "title": "טיגון הבצל",
+      "instruction_he": "מטגנים את הבצל בשמן כ-5 דקות, עד שהוא רך.",
+      "source_refs": [
+       "src2"
+      ],
+      "ingredient_ids": [
+       "i9"
+      ],
+      "equipment_ids": [
+       "e2"
+      ],
+      "depends_on": [
+       "s1"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 5,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t2",
+        "label_he": "בצל במחבת",
+        "seconds": 300,
+        "provenance": "original",
+        "wait_kind": "cook",
+        "check_cue_he": "הבצל רך ושקוף.",
+        "recheck_seconds": 120
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "start",
+        "label_he": "התחלתי",
+        "starts_timer": "t2"
+       },
+       {
+        "id": "a2",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "doneness_cue_he": "הבצל רך ושקוף."
+     },
+     {
+      "id": "s3",
+      "title": "התערובת",
+      "instruction_he": "מערבבים בקערה את הביצים, הגבינות, הקמח, המלח והפלפל. מוסיפים את הקישואים והבצל.",
+      "source_refs": [
+       "src3"
+      ],
+      "ingredient_ids": [
+       "i3",
+       "i4",
+       "i5",
+       "i6",
+       "i7",
+       "i8"
+      ],
+      "equipment_ids": [
+       "e3"
+      ],
+      "depends_on": [
+       "s2"
+      ],
+      "kind": "active",
+      "estimated_active_minutes": {
+       "value": 4,
+       "provenance": "original"
+      },
+      "actions": [
+       {
+        "id": "a1",
+        "type": "done",
+        "label_he": "סיימתי",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ]
+     },
+     {
+      "id": "s4",
+      "title": "אפייה",
+      "instruction_he": "יוצקים לתבנית מרופדת בנייר אפייה ואופים כ-40 דקות, עד שהפשטידה זהובה ויציבה במרכז.",
+      "source_refs": [
+       "src4"
+      ],
+      "ingredient_ids": [],
+      "equipment_ids": [
+       "e4",
+       "e5"
+      ],
+      "depends_on": [
+       "s3"
+      ],
+      "kind": "passive",
+      "estimated_active_minutes": {
+       "value": 1,
+       "provenance": "original"
+      },
+      "timers": [
+       {
+        "id": "t4",
+        "label_he": "פשטידה בתנור",
+        "seconds": 2400,
+        "provenance": "original",
+        "wait_kind": "bake",
+        "check_cue_he": "הפשטידה זהובה ולא רועדת במרכז.",
+        "recheck_seconds": 300
+       }
+      ],
+      "actions": [
+       {
+        "id": "a1",
+        "type": "in_oven",
+        "label_he": "הכנסתי לתנור",
+        "starts_timer": "t4"
+       },
+       {
+        "id": "a2",
+        "type": "out_of_oven",
+        "label_he": "הוצאתי מהתנור",
+        "completes_step": true,
+        "confirm_policy": "auto_ok"
+       }
+      ],
+      "temperature": {
+       "value": 180,
+       "unit": "C",
+       "provenance": "original"
+      },
+      "doneness_cue_he": "הפשטידה זהובה ולא רועדת במרכז."
+     }
+    ],
+    "prep_tasks": [
+     {
+      "id": "p1",
+      "kind": "preheat_oven",
+      "text_he": "מחממים את התנור ל-180 מעלות",
+      "needed_by_step": "s4",
+      "lead_minutes": {
+       "value": 15,
+       "provenance": "inferred",
+       "note_he": "תנור ביתי מתחמם בערך ברבע שעה."
+      },
+      "surface": {
+       "at_start": true
+      },
+      "timer": {
+       "id": "tp1",
+       "label_he": "חימום תנור",
+       "seconds": 900,
+       "provenance": "inferred"
+      }
+     }
+    ]
+   }
+  }
+ ]
+}

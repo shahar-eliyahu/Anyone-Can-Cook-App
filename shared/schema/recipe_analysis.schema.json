@@ -512,7 +512,8 @@
             "text",
             "image",
             "url",
-            "sample"
+            "sample",
+            "remy"
           ],
           "title": "Type",
           "type": "string"

@@ -1187,7 +1187,7 @@ class AppLocalizationsHe extends AppLocalizations {
   String get homeGreeting => 'מה מבשלים היום?';
 
   @override
-  String get newRecipeSubtitle => 'מטקסט, מתמונה או מקישור';
+  String get newRecipeSubtitle => 'מתכון מוכן, רעיון מרמי או מתכון משלכם';
 
   @override
   String get allRecipesLink => 'לכל המתכונים';
@@ -1355,4 +1355,146 @@ class AppLocalizationsHe extends AppLocalizations {
 
   @override
   String get remyEmptyHint => 'אפשר לשאול אותי כל דבר על המתכון.';
+
+  @override
+  String get hubIntro => 'מה בא לכם לבשל?';
+
+  @override
+  String get hubCatalogTitle => 'מתכונים מוכנים';
+
+  @override
+  String get hubCatalogSubtitle =>
+      'מתכונים פשוטים שמוכנים לבישול, גם בלי אינטרנט';
+
+  @override
+  String get hubRemyTitle => 'רמי יציע מתכון';
+
+  @override
+  String get hubRemySubtitle => 'ספרו מה בא לכם או מה יש בבית';
+
+  @override
+  String get hubOwnTitle => 'מתכון משלי';
+
+  @override
+  String get hubOwnSubtitle => 'מטקסט, מתמונה או מקישור';
+
+  @override
+  String get catalogTitle => 'מתכונים מוכנים';
+
+  @override
+  String get catalogSearch => 'חיפוש לפי מתכון או מצרך';
+
+  @override
+  String get catalogEmpty => 'לא מצאתי מתכון כזה';
+
+  @override
+  String get catQuick => 'מהיר';
+
+  @override
+  String get catChicken => 'עוף';
+
+  @override
+  String get catPasta => 'פסטה';
+
+  @override
+  String get catBaking => 'אפייה';
+
+  @override
+  String get catBreakfast => 'ארוחת בוקר';
+
+  @override
+  String get catVegetarian => 'צמחוני';
+
+  @override
+  String get catDesserts => 'קינוחים';
+
+  @override
+  String get builtinLabel => 'מתכון מהאוסף';
+
+  @override
+  String get builtinSaved => 'המתכון נשמר במתכונים שלכם';
+
+  @override
+  String get createTitle => 'מתכון חדש עם רמי';
+
+  @override
+  String get createEmptyHint =>
+      'ספרו לי מה בא לכם לבשל, או מה יש לכם בבית, ואציע מתכון.';
+
+  @override
+  String get createNewChat => 'שיחה חדשה';
+
+  @override
+  String get createOpenRecipe => 'לצפייה במתכון';
+
+  @override
+  String get createInvalid =>
+      'לא הצלחתי להרכיב מתכון שלם הפעם. אפשר לנסות שוב, או לתאר במילים אחרות מה בא לכם.';
+
+  @override
+  String get createOffline =>
+      'אין חיבור לאינטרנט, ובלי חיבור אני לא יכול להציע מתכון חדש. המתכונים המוכנים עובדים גם בלי אינטרנט.';
+
+  @override
+  String get createUnavailable =>
+      'אני לא זמין כרגע להצעת מתכונים. אפשר לנסות שוב בעוד כמה דקות, או לבחור מהמתכונים המוכנים.';
+
+  @override
+  String get previewTitle => 'המתכון של רמי';
+
+  @override
+  String get previewIntro =>
+      'זו הצעה של רמי. עברו עליה, ואפשר לשנות לפני ששומרים.';
+
+  @override
+  String previewTimeEstimate(String time) {
+    return 'הערכת זמן: $time';
+  }
+
+  @override
+  String get previewSteps => 'אופן ההכנה';
+
+  @override
+  String get previewTips => 'טיפים מרמי';
+
+  @override
+  String get previewEdit => 'עריכה';
+
+  @override
+  String get previewDoneEditing => 'סיום עריכה';
+
+  @override
+  String get previewChangeWithRemy => 'שינוי עם רמי';
+
+  @override
+  String get previewDiscard => 'ביטול המתכון';
+
+  @override
+  String get previewDiscardConfirm => 'לבטל את המתכון? הוא לא יישמר.';
+
+  @override
+  String get previewNeedsItems => 'צריך לפחות מצרך אחד ושלב אחד.';
+
+  @override
+  String get previewRemove => 'הסרה';
+
+  @override
+  String get previewAddIngredient => 'הוספת מצרך';
+
+  @override
+  String get previewAddEquipment => 'הוספת ציוד';
+
+  @override
+  String get previewAddStep => 'הוספת שלב';
+
+  @override
+  String get previewFieldTitle => 'שם המתכון';
+
+  @override
+  String get previewFieldAmount => 'כמות';
+
+  @override
+  String previewFieldStep(int n) {
+    return 'שלב $n';
+  }
 }

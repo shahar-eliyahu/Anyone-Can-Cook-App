@@ -121,6 +121,25 @@ class ApiClient {
     return AssistantTurnResult.fromJson(data);
   }
 
+  /// Remy creating a recipe with the cook (stage recipe_creation): one call per message.
+  Future<RecipeCreationResult> createRecipeTurn({
+    required String messageHe,
+    required String modality,
+    required Map<String, Object?> preferences,
+    required List<Map<String, String>> history,
+    Map<String, Object?>? currentRecipe,
+  }) async {
+    final data = await _post('/v1/assistant/create', {
+      'stage': 'recipe_creation',
+      'message_he': messageHe,
+      'modality': modality,
+      'preferences': preferences,
+      'history': history,
+      'current_recipe': ?currentRecipe,
+    });
+    return RecipeCreationResult.fromJson(data);
+  }
+
   Future<RecipeAnalysis> _analysis(String path, Map<String, Object?> body) async =>
       RecipeAnalysis.fromJson(await _post(path, body));
 
@@ -155,6 +174,50 @@ class ApiClient {
 final apiClientProvider = Provider<ApiClient>(
   (ref) => ApiClient(apiBaseUrl, appToken: appClientToken),
 );
+
+/// Response of POST /v1/assistant/create. [analysis] is checked again on the device before it
+/// becomes a draft; anything that doesn't parse is treated as no recipe at all.
+class RecipeCreationResult {
+  const RecipeCreationResult({
+    required this.kind,
+    required this.answerHe,
+    required this.speechHe,
+    this.options = const [],
+    this.preferences = const {},
+    this.analysis,
+    this.totalMinutes,
+    this.tipsHe = const [],
+  });
+
+  factory RecipeCreationResult.fromJson(Map<String, dynamic> j) {
+    RecipeAnalysis? analysis;
+    try {
+      final a = j['analysis'];
+      analysis = a is Map<String, dynamic> ? RecipeAnalysis.fromJson(a) : null;
+    } on Object {
+      analysis = null; // malformed: no recipe
+    }
+    return RecipeCreationResult(
+      kind: j['kind'] as String,
+      answerHe: j['answer_he'] as String,
+      speechHe: j['speech_he'] as String? ?? j['answer_he'] as String,
+      options: [for (final o in j['options_he'] as List? ?? const []) if (o is String && o.trim().isNotEmpty) o.trim()],
+      preferences: Map<String, Object?>.from(j['preferences'] as Map? ?? const {}),
+      analysis: analysis,
+      totalMinutes: j['total_minutes'] as int?,
+      tipsHe: [for (final t in j['tips_he'] as List? ?? const []) if (t is String) t],
+    );
+  }
+
+  final String kind; // answer | options | recipe
+  final String answerHe;
+  final String speechHe;
+  final List<String> options;
+  final Map<String, Object?> preferences;
+  final RecipeAnalysis? analysis;
+  final int? totalMinutes;
+  final List<String> tipsHe;
+}
 
 /// Response of POST /v1/assistant/turn.
 class AssistantTurnResult {

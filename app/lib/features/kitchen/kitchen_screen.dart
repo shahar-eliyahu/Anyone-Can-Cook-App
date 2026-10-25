@@ -51,7 +51,7 @@ class KitchenScreen extends ConsumerWidget {
               icon: Icons.add_rounded,
               title: l10n.newRecipe,
               subtitle: l10n.newRecipeSubtitle,
-              onTap: () => context.push('/import'),
+              onTap: () => context.push('/new'),
             ),
           ),
           const Appear(index: 2, child: DraftsCard()),

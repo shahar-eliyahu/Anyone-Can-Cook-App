@@ -456,7 +456,8 @@ class RecipeRow extends DataClass implements Insertable<RecipeRow> {
   final int? analysisSchemaVersion;
   final bool planStale;
 
-  /// `draft` until the user approves a plan; only `ready` recipes are listed. (v2)
+  /// `draft` until the user approves a plan; only `ready` recipes are listed. `builtin`: the
+  /// device's working copy of a recipe from the bundled catalog, never listed as the cook's own. (v2)
   final String status;
 
   /// Hash of the imported source, to offer reopening instead of re-importing. (v2)

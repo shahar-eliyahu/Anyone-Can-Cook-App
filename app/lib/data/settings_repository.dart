@@ -5,6 +5,9 @@ abstract final class SettingKeys {
   static const importPrivacyAccepted = 'import_privacy_accepted';
   static const pendingImport = 'pending_import';
   static const handsFree = 'hands_free';
+
+  /// The recipe-creation conversation "רמי יציע מתכון" continues (until it creates a draft).
+  static const remyCreation = 'remy_creation';
 }
 
 class SettingsRepository {

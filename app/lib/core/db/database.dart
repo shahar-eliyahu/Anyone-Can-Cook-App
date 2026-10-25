@@ -24,7 +24,7 @@ class Recipes extends Table with SyncColumns {
   TextColumn get title => text()();
   TextColumn get customTitle => text().nullable()();
   BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
-  TextColumn get sourceType => text()(); // text | image | url | sample
+  TextColumn get sourceType => text()(); // text | image | url | sample | remy | builtin
   TextColumn get sourceUrl => text().nullable()();
   TextColumn get sourceText => text().nullable()();
   TextColumn get sourceImagePath => text().nullable()();
@@ -32,7 +32,8 @@ class Recipes extends Table with SyncColumns {
   IntColumn get analysisSchemaVersion => integer().nullable()();
   BoolColumn get planStale => boolean().withDefault(const Constant(false))();
 
-  /// `draft` until the user approves a plan; only `ready` recipes are listed. (v2)
+  /// `draft` until the user approves a plan; only `ready` recipes are listed. `builtin`: the
+  /// device's working copy of a recipe from the bundled catalog, never listed as the cook's own. (v2)
   TextColumn get status => text().withDefault(const Constant('ready'))();
 
   /// Hash of the imported source, to offer reopening instead of re-importing. (v2)

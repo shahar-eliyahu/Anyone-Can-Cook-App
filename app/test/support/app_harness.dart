@@ -11,6 +11,7 @@ import 'package:anyone_can_cook/data/sample_seeder.dart';
 import 'package:anyone_can_cook/data/session_repository.dart';
 import 'package:anyone_can_cook/data/settings_repository.dart';
 import 'package:anyone_can_cook/features/assistant/voice.dart';
+import 'package:anyone_can_cook/features/catalog/builtin_catalog.dart';
 import 'package:anyone_can_cook/features/import/image_store.dart';
 import 'package:anyone_can_cook/features/kitchen/backend_status.dart';
 import 'package:anyone_can_cook/features/timers/timer_notifier.dart';
@@ -76,6 +77,8 @@ class AppHarness {
           speechSynthesizerProvider.overrideWithValue(speech),
           speechRecognizerProvider.overrideWithValue(mic),
           photoPickerProvider.overrideWithValue(({required bool camera}) async => pickedPhoto),
+          // Sync read: the bundled catalog without real async I/O.
+          assetLoaderProvider.overrideWithValue((path) async => File(path).readAsStringSync()),
           healthProvider.overrideWith(
             (ref) => (health ??
                 () async => const HealthStatus(status: 'ok', version: '0.1.0', aiProvider: 'mock'))(),

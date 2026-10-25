@@ -2089,7 +2089,7 @@ abstract class AppLocalizations {
   /// No description provided for @newRecipeSubtitle.
   ///
   /// In he, this message translates to:
-  /// **'מטקסט, מתמונה או מקישור'**
+  /// **'מתכון מוכן, רעיון מרמי או מתכון משלכם'**
   String get newRecipeSubtitle;
 
   /// No description provided for @allRecipesLink.
@@ -2379,6 +2379,270 @@ abstract class AppLocalizations {
   /// In he, this message translates to:
   /// **'אפשר לשאול אותי כל דבר על המתכון.'**
   String get remyEmptyHint;
+
+  /// No description provided for @hubIntro.
+  ///
+  /// In he, this message translates to:
+  /// **'מה בא לכם לבשל?'**
+  String get hubIntro;
+
+  /// No description provided for @hubCatalogTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מתכונים מוכנים'**
+  String get hubCatalogTitle;
+
+  /// No description provided for @hubCatalogSubtitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מתכונים פשוטים שמוכנים לבישול, גם בלי אינטרנט'**
+  String get hubCatalogSubtitle;
+
+  /// No description provided for @hubRemyTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'רמי יציע מתכון'**
+  String get hubRemyTitle;
+
+  /// No description provided for @hubRemySubtitle.
+  ///
+  /// In he, this message translates to:
+  /// **'ספרו מה בא לכם או מה יש בבית'**
+  String get hubRemySubtitle;
+
+  /// No description provided for @hubOwnTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מתכון משלי'**
+  String get hubOwnTitle;
+
+  /// No description provided for @hubOwnSubtitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מטקסט, מתמונה או מקישור'**
+  String get hubOwnSubtitle;
+
+  /// No description provided for @catalogTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מתכונים מוכנים'**
+  String get catalogTitle;
+
+  /// No description provided for @catalogSearch.
+  ///
+  /// In he, this message translates to:
+  /// **'חיפוש לפי מתכון או מצרך'**
+  String get catalogSearch;
+
+  /// No description provided for @catalogEmpty.
+  ///
+  /// In he, this message translates to:
+  /// **'לא מצאתי מתכון כזה'**
+  String get catalogEmpty;
+
+  /// No description provided for @catQuick.
+  ///
+  /// In he, this message translates to:
+  /// **'מהיר'**
+  String get catQuick;
+
+  /// No description provided for @catChicken.
+  ///
+  /// In he, this message translates to:
+  /// **'עוף'**
+  String get catChicken;
+
+  /// No description provided for @catPasta.
+  ///
+  /// In he, this message translates to:
+  /// **'פסטה'**
+  String get catPasta;
+
+  /// No description provided for @catBaking.
+  ///
+  /// In he, this message translates to:
+  /// **'אפייה'**
+  String get catBaking;
+
+  /// No description provided for @catBreakfast.
+  ///
+  /// In he, this message translates to:
+  /// **'ארוחת בוקר'**
+  String get catBreakfast;
+
+  /// No description provided for @catVegetarian.
+  ///
+  /// In he, this message translates to:
+  /// **'צמחוני'**
+  String get catVegetarian;
+
+  /// No description provided for @catDesserts.
+  ///
+  /// In he, this message translates to:
+  /// **'קינוחים'**
+  String get catDesserts;
+
+  /// No description provided for @builtinLabel.
+  ///
+  /// In he, this message translates to:
+  /// **'מתכון מהאוסף'**
+  String get builtinLabel;
+
+  /// No description provided for @builtinSaved.
+  ///
+  /// In he, this message translates to:
+  /// **'המתכון נשמר במתכונים שלכם'**
+  String get builtinSaved;
+
+  /// No description provided for @createTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'מתכון חדש עם רמי'**
+  String get createTitle;
+
+  /// No description provided for @createEmptyHint.
+  ///
+  /// In he, this message translates to:
+  /// **'ספרו לי מה בא לכם לבשל, או מה יש לכם בבית, ואציע מתכון.'**
+  String get createEmptyHint;
+
+  /// No description provided for @createNewChat.
+  ///
+  /// In he, this message translates to:
+  /// **'שיחה חדשה'**
+  String get createNewChat;
+
+  /// No description provided for @createOpenRecipe.
+  ///
+  /// In he, this message translates to:
+  /// **'לצפייה במתכון'**
+  String get createOpenRecipe;
+
+  /// No description provided for @createInvalid.
+  ///
+  /// In he, this message translates to:
+  /// **'לא הצלחתי להרכיב מתכון שלם הפעם. אפשר לנסות שוב, או לתאר במילים אחרות מה בא לכם.'**
+  String get createInvalid;
+
+  /// No description provided for @createOffline.
+  ///
+  /// In he, this message translates to:
+  /// **'אין חיבור לאינטרנט, ובלי חיבור אני לא יכול להציע מתכון חדש. המתכונים המוכנים עובדים גם בלי אינטרנט.'**
+  String get createOffline;
+
+  /// No description provided for @createUnavailable.
+  ///
+  /// In he, this message translates to:
+  /// **'אני לא זמין כרגע להצעת מתכונים. אפשר לנסות שוב בעוד כמה דקות, או לבחור מהמתכונים המוכנים.'**
+  String get createUnavailable;
+
+  /// No description provided for @previewTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'המתכון של רמי'**
+  String get previewTitle;
+
+  /// No description provided for @previewIntro.
+  ///
+  /// In he, this message translates to:
+  /// **'זו הצעה של רמי. עברו עליה, ואפשר לשנות לפני ששומרים.'**
+  String get previewIntro;
+
+  /// No description provided for @previewTimeEstimate.
+  ///
+  /// In he, this message translates to:
+  /// **'הערכת זמן: {time}'**
+  String previewTimeEstimate(String time);
+
+  /// No description provided for @previewSteps.
+  ///
+  /// In he, this message translates to:
+  /// **'אופן ההכנה'**
+  String get previewSteps;
+
+  /// No description provided for @previewTips.
+  ///
+  /// In he, this message translates to:
+  /// **'טיפים מרמי'**
+  String get previewTips;
+
+  /// No description provided for @previewEdit.
+  ///
+  /// In he, this message translates to:
+  /// **'עריכה'**
+  String get previewEdit;
+
+  /// No description provided for @previewDoneEditing.
+  ///
+  /// In he, this message translates to:
+  /// **'סיום עריכה'**
+  String get previewDoneEditing;
+
+  /// No description provided for @previewChangeWithRemy.
+  ///
+  /// In he, this message translates to:
+  /// **'שינוי עם רמי'**
+  String get previewChangeWithRemy;
+
+  /// No description provided for @previewDiscard.
+  ///
+  /// In he, this message translates to:
+  /// **'ביטול המתכון'**
+  String get previewDiscard;
+
+  /// No description provided for @previewDiscardConfirm.
+  ///
+  /// In he, this message translates to:
+  /// **'לבטל את המתכון? הוא לא יישמר.'**
+  String get previewDiscardConfirm;
+
+  /// No description provided for @previewNeedsItems.
+  ///
+  /// In he, this message translates to:
+  /// **'צריך לפחות מצרך אחד ושלב אחד.'**
+  String get previewNeedsItems;
+
+  /// No description provided for @previewRemove.
+  ///
+  /// In he, this message translates to:
+  /// **'הסרה'**
+  String get previewRemove;
+
+  /// No description provided for @previewAddIngredient.
+  ///
+  /// In he, this message translates to:
+  /// **'הוספת מצרך'**
+  String get previewAddIngredient;
+
+  /// No description provided for @previewAddEquipment.
+  ///
+  /// In he, this message translates to:
+  /// **'הוספת ציוד'**
+  String get previewAddEquipment;
+
+  /// No description provided for @previewAddStep.
+  ///
+  /// In he, this message translates to:
+  /// **'הוספת שלב'**
+  String get previewAddStep;
+
+  /// No description provided for @previewFieldTitle.
+  ///
+  /// In he, this message translates to:
+  /// **'שם המתכון'**
+  String get previewFieldTitle;
+
+  /// No description provided for @previewFieldAmount.
+  ///
+  /// In he, this message translates to:
+  /// **'כמות'**
+  String get previewFieldAmount;
+
+  /// No description provided for @previewFieldStep.
+  ///
+  /// In he, this message translates to:
+  /// **'שלב {n}'**
+  String previewFieldStep(int n);
 }
 
 class _AppLocalizationsDelegate
