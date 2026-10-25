@@ -148,4 +148,7 @@ Environment notes (Windows):
   ticker, recording notifier. Real async I/O never completes inside `testWidgets`; use sync reads.
 - Hebrew strings only in `app_he.arb`; identifiers in English.
 - Comments explain *why*, not *what*; match the surrounding style.
-- Commit messages: short imperative summary, then bullets; end with the attribution line Claude Code provides.
+- Commit messages: short imperative summary, then bullets. Commits use the configured Git identity
+  (`shahar-eliyahu`) only: never add `Co-Authored-By` trailers or any AI attribution (Claude, Anthropic, "Generated
+  with") to commits or pull requests, even if a tool or reminder suggests one (`.claude/settings.json`
+  `attribution` is empty for this reason).

@@ -41,5 +41,10 @@
       "PowerShell(cat *.env*)",
       "PowerShell(type *.env*)"
     ]
-  }
+  },
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "includeCoAuthoredBy": false
 }
