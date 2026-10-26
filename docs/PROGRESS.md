@@ -609,9 +609,10 @@ Checked what existed, changed only what was missing.
 - `README.md` rewritten for GitHub: logo header, introduction, features, Remy, screenshot gallery, stack,
   architecture (Mermaid), structure, setup, status, roadmap; the earlier technical notes kept in collapsible
   sections. Assets in `docs/images/` (logo from `docs/branding/logo.png`, eight 540 px screenshots).
-- Screenshots: real captures from a new, dedicated emulator (`Readme_Screens_API_35`, sample data only, debug
-  build against the local mock backend, no Gemini); the two recipe-creation shots show the mock's
-  "דמו מהשרת המקומי" replies and are captioned as such. Status and gesture bars cropped.
+- Screenshots: real captures from a new, dedicated emulator (`Readme_Screens_API_35`, sample data only, no
+  Gemini); status and gesture bars cropped.
+- Simplified the same day to a short product README (about, features, Remy, four screenshots: home, catalog,
+  cooking, Remy voice; stack, architecture, getting started); the unused screenshots were removed.
 
 ## Next step
 
