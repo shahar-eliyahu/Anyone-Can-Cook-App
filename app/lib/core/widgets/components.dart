@@ -100,6 +100,23 @@ class EmptyState extends StatelessWidget {
   }
 }
 
+/// Short messages at the bottom of the screen: one at a time (a new one replaces the current one
+/// instead of waiting behind it) and gone by themselves after [duration]. Flutter keeps a snack bar
+/// with an action on screen until it is tapped (`persist` defaults to true), so that is decided
+/// here: a message with an action (undo) stays only while a screen reader is on, so its user can
+/// still reach the action (Material's accessibility rule).
+extension TemporaryMessages on ScaffoldMessengerState {
+  void showMessage(String text, {SnackBarAction? action, Duration duration = const Duration(seconds: 4)}) {
+    hideCurrentSnackBar();
+    showSnackBar(SnackBar(
+      content: Text(text),
+      action: action,
+      duration: duration,
+      persist: action != null && MediaQuery.accessibleNavigationOf(context),
+    ));
+  }
+}
+
 /// The one main action of a screen as a large, friendly card (home's "מתכון חדש"). Text and a single
 /// arrow only: a leading icon next to the arrow read as two different actions on real phones.
 class PrimaryActionCard extends StatelessWidget {

@@ -91,7 +91,7 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
     final messenger = ScaffoldMessenger.of(context);
     final result = await _controller.undoLast();
     if (result.reason == 'dependent_started') {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.undoNotAllowed)));
+      messenger.showMessage(l10n.undoNotAllowed);
     }
   }
 
@@ -245,7 +245,7 @@ class _CookingBodyState extends ConsumerState<_CookingBody> {
             final messenger = ScaffoldMessenger.of(context);
             final result = await _controller.undoStep(id);
             if (result.reason == 'dependent_started') {
-              messenger.showSnackBar(SnackBar(content: Text(l10n.undoNotAllowed)));
+              messenger.showMessage(l10n.undoNotAllowed);
             }
           }),
           const SizedBox(height: Space.s),
@@ -655,7 +655,7 @@ class _HandsFreeIndicator extends StatelessWidget {
               customBorder: const StadiumBorder(),
               onTap: () {
                 controller.stopForNow();
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.handsFreeStopped)));
+                ScaffoldMessenger.of(context).showMessage(l10n.handsFreeStopped);
               },
               child: ConstrainedBox(
                 constraints: const BoxConstraints(minHeight: 40),
@@ -683,7 +683,7 @@ class _HandsFreeIndicator extends StatelessWidget {
           tooltip: why ?? l10n.handsFreeResume,
           icon: Icon(Icons.mic_off_outlined, color: theme.colorScheme.onSurfaceVariant),
           onPressed: () {
-            if (why != null) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(why)));
+            if (why != null) ScaffoldMessenger.of(context).showMessage(why);
             controller.resume();
           },
         );

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/widgets/components.dart';
 import '../../data/providers.dart';
 import '../../data/recipe_repository.dart';
 import '../../data/session_repository.dart';
@@ -22,12 +23,12 @@ Future<void> startCooking(BuildContext context, WidgetRef ref, String recipeId) 
   final sessions = ref.read(sessionRepositoryProvider);
 
   if ((await recipes.getRecipe(recipeId))?.planStale ?? false) {
-    messenger.showSnackBar(SnackBar(content: Text(l10n.recipeOutdatedBanner)));
+    messenger.showMessage(l10n.recipeOutdatedBanner);
     return;
   }
   final plan = await recipes.latestApprovedPlan(recipeId);
   if (plan == null) {
-    messenger.showSnackBar(SnackBar(content: Text(l10n.noPlan)));
+    messenger.showMessage(l10n.noPlan);
     return;
   }
   // Timers need notification permission (Android 13+ asks at runtime) and,

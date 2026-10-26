@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import '../../core/widgets/app_scaffold.dart';
 import '../../core/widgets/brand.dart';
+import '../../core/widgets/components.dart';
 import '../../l10n/app_localizations.dart';
 import '../timers/timer_notifier.dart';
 import '../assistant/hands_free_choice.dart';
@@ -122,7 +123,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                           : () async {
                               final messenger = ScaffoldMessenger.of(context);
                               await notifier.scheduleTest(const Duration(seconds: 10));
-                              messenger.showSnackBar(SnackBar(content: Text(l10n.testNotificationScheduled)));
+                              messenger.showMessage(l10n.testNotificationScheduled);
                             },
                     ),
                   ),

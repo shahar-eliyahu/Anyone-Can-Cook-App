@@ -334,7 +334,7 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
     try {
       await _service.undo(recipeId, sub.id);
     } on SubstitutionFailed {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.substitutionFailed)));
+      messenger.showMessage(l10n.substitutionFailed);
     }
   }
 
@@ -367,7 +367,7 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
     try {
       final id = await ref.read(builtinRecipesProvider).copyToMyRecipes(row.id);
       router.pushReplacement('/recipes/$id');
-      messenger.showSnackBar(SnackBar(content: Text(l10n.builtinSaved)));
+      messenger.showMessage(l10n.builtinSaved);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -443,13 +443,13 @@ class _RecipeOverviewScreenState extends ConsumerState<RecipeOverviewScreen> {
       final deletedAt = await repo.softDelete(row.id);
       await forgetConversation(ref.read(settingsRepositoryProvider), row.id);
       if (router.canPop()) router.pop();
-      messenger.showSnackBar(SnackBar(
+      messenger.showMessage(
+        l10n.recipeDeleted,
         duration: const Duration(seconds: 5),
-        content: Text(l10n.recipeDeleted),
         action: SnackBarAction(label: l10n.undo, onPressed: () => repo.restore(row.id, deletedAt)),
-      ));
+      );
     } on RecipeHasActiveSessionException {
-      messenger.showSnackBar(SnackBar(content: Text(l10n.cannotDeleteActive)));
+      messenger.showMessage(l10n.cannotDeleteActive);
     }
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/theme.dart';
+import '../../core/widgets/components.dart';
 import '../../l10n/app_localizations.dart';
 import 'hands_free.dart';
 import 'voice.dart';
@@ -28,7 +29,7 @@ class _HandsFreeChoiceState extends ConsumerState<HandsFreeChoice> {
     try {
       if (on) {
         final problem = await turnOnHandsFree(ref);
-        if (problem != null) messenger.showSnackBar(SnackBar(content: Text(problem)));
+        if (problem != null) messenger.showMessage(problem);
       } else {
         await ref.read(handsFreePreferenceProvider.notifier).set(false);
       }

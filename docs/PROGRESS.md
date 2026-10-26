@@ -625,6 +625,21 @@ Checked what existed, changed only what was missing.
 - Beta APK `0.9.1+4`, same beta key: `C:\Users\shaha\AnyoneCanCook-Beta\AnyoneCanCook-beta-0.9.1-build4.apk`;
   installed as an update over build 3 on an emulator with its data kept.
 
+### Temporary messages disappear by themselves; beta build 5, 2026-10-26 (local commit)
+
+- Real-device bug: after deleting a recipe, "המתכון נמחק" with "בטל" stayed on screen. Cause: Flutter keeps a
+  snack bar that has an action until it is tapped (`SnackBar.persist` defaults to true with an action), so the
+  5-second duration was ignored. Messages without an action also queued behind each other.
+- Fix: one helper, `ScaffoldMessengerState.showMessage` (`core/widgets/components.dart`), used by all 13 messages:
+  a new message replaces the current one, every message times out (4 s, delete 5 s); a message with an action
+  stays only while a screen reader is on (Material accessibility rule), so TalkBack users can still reach undo.
+- Tests: `test/snack_bar_test.dart` (disappears after about 5 s, undo restores during display, waits with a
+  screen reader, leaving the screen leaves nothing stuck, repeated messages replace each other). The timeout test
+  fails on the old code. Flutter 335/335, analyzer clean.
+- Beta APK `0.9.2+5`, same beta key: `C:\Users\shaha\AnyoneCanCook-Beta\AnyoneCanCook-beta-0.9.2-build5.apk`;
+  installed as an update over build 4 on an emulator with its data kept; a deleted copy's message showed undo and
+  was gone within about 8 s (each screen check takes seconds).
+
 ## Next step
 
 1. User reviews Phase 4 on a real phone (`bac3d0d`, `73d2f01`, `bf9853f` are local only; Phase 3D is on

@@ -322,7 +322,7 @@ class _ImportScreenState extends ConsumerState<ImportScreen> {
                   onPressed: () async {
                     final messenger = ScaffoldMessenger.of(context);
                     await Clipboard.setData(ClipboardData(text: resolved));
-                    messenger.showSnackBar(SnackBar(content: Text(l10n.importUrlCopied)));
+                    messenger.showMessage(l10n.importUrlCopied);
                   },
                   icon: const Icon(Icons.copy_rounded),
                   label: Text(l10n.importCopyFullUrl),
