@@ -12,8 +12,8 @@ _Last updated: 2026-10-25 (origin/main at `d30f556`; later commits local only)_
 | 0 — Local foundations | ✅ Complete, committed and pushed (`1196478`). Render verified: `/health` 200, `/internal/ai-check` 404. |
 | 1 — Deterministic cooking core (no AI) | ✅ Implemented, verified (automated + emulator), approved by the user, committed and pushed to `main` (see `git log`). |
 | 2 — AI recipe analysis & planning | ✅ Complete, committed and pushed (`a6bd1f3` Phase 2, `a372736` app icon, `fa87e71` quota handling). Deployed on Render; live Gemini recipe test by the user passed (details below). |
-| 3 — Beginner cooking experience + assistant | ✅ 3C, 3A, 3B, 3D (local-first Remy + voice) implemented and verified locally; on `origin/main` (not deployed to Render). |
-| 4 — UX/UI redesign | ✅ 4B–4E implemented and verified locally (tests + emulator), committed locally, not pushed. Release work not started. |
+| 3 — Beginner cooking experience + assistant | ✅ 3C, 3A, 3B, 3D (local-first Remy + voice) implemented and verified; pushed and deployed. |
+| 4 — UX/UI redesign | ✅ 4B–4E, the Remy refinements and the recipe hub (catalog, Remy creates) implemented and verified; pushed and deployed (Render showed `/v1/assistant/create` on 2026-10-25). Private Android beta prepared (`docs/RELEASE.md`); store release not started. |
 
 ## Phase 1 — what exists
 
@@ -603,6 +603,15 @@ Checked what existed, changed only what was missing.
   update (build 3, same key) installed over it and kept the cooking in progress and the recipes.
 - **Open:** a phone with a development build must uninstall it before installing the beta (different key; its data
   starts fresh).
+
+### README redesign, 2026-10-26 (local commit)
+
+- `README.md` rewritten for GitHub: logo header, introduction, features, Remy, screenshot gallery, stack,
+  architecture (Mermaid), structure, setup, status, roadmap; the earlier technical notes kept in collapsible
+  sections. Assets in `docs/images/` (logo from `docs/branding/logo.png`, eight 540 px screenshots).
+- Screenshots: real captures from a new, dedicated emulator (`Readme_Screens_API_35`, sample data only, debug
+  build against the local mock backend, no Gemini); the two recipe-creation shots show the mock's
+  "דמו מהשרת המקומי" replies and are captioned as such. Status and gesture bars cropped.
 
 ## Next step
 
