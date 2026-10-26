@@ -398,8 +398,4 @@ live in the server's memory and reset when it restarts; catalog recipes have no 
 - The free Gemini tier may use requests to improve Google's products; the app tells users this before
   their first import and asks them not to send personal information.
 
----
 
-<div align="center">
-<sub>Anyone Can Cook · a private project by <a href="https://github.com/shahar-eliyahu">shahar-eliyahu</a>. No open-source license has been chosen yet.</sub>
-</div>
