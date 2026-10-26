@@ -48,7 +48,6 @@ class KitchenScreen extends ConsumerWidget {
           Appear(
             index: 1,
             child: PrimaryActionCard(
-              icon: Icons.add_rounded,
               title: l10n.newRecipe,
               subtitle: l10n.newRecipeSubtitle,
               onTap: () => context.push('/new'),

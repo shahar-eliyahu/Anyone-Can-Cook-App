@@ -614,6 +614,17 @@ Checked what existed, changed only what was missing.
 - Simplified the same day to a short product README (about, features, Remy, four screenshots: home, catalog,
   cooking, Remy voice; stack, architecture, getting started); the unused screenshots were removed.
 
+### Home card polish and beta build 4, 2026-10-26 (local commit)
+
+- Real-device feedback: the home "מתכון חדש" card showed a plus icon next to the arrow; the plus is removed
+  (`PrimaryActionCard` now has only text and one arrow). While testing large text, the section header under it
+  ("המתכונים שלי" + "לכל המתכונים") squeezed its title to nothing at 200% text when scrolled into view (an older
+  issue the existing test never scrolled to); `SectionTitle` now lets its trailing button share the row.
+- Tests: new home-card test at 360x640 (1x and 2x text) and 412x915: one arrow, no plus, RTL placement, no
+  overflow, opens the hub. Flutter 330/330, analyzer clean.
+- Beta APK `0.9.1+4`, same beta key: `C:\Users\shaha\AnyoneCanCook-Beta\AnyoneCanCook-beta-0.9.1-build4.apk`;
+  installed as an update over build 3 on an emulator with its data kept.
+
 ## Next step
 
 1. User reviews Phase 4 on a real phone (`bac3d0d`, `73d2f01`, `bf9853f` are local only; Phase 3D is on

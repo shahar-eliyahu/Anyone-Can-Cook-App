@@ -100,11 +100,11 @@ class EmptyState extends StatelessWidget {
   }
 }
 
-/// The one main action of a screen as a large, friendly card (home's "מתכון חדש").
+/// The one main action of a screen as a large, friendly card (home's "מתכון חדש"). Text and a single
+/// arrow only: a leading icon next to the arrow read as two different actions on real phones.
 class PrimaryActionCard extends StatelessWidget {
-  const PrimaryActionCard({super.key, required this.icon, required this.title, this.subtitle, required this.onTap});
+  const PrimaryActionCard({super.key, required this.title, this.subtitle, required this.onTap});
 
-  final IconData icon;
   final String title;
   final String? subtitle;
   final VoidCallback onTap;
@@ -125,12 +125,6 @@ class PrimaryActionCard extends StatelessWidget {
             child: Row(
               spacing: Space.l,
               children: [
-                Container(
-                  width: 48,
-                  height: 48,
-                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.16), shape: BoxShape.circle),
-                  child: Icon(icon, color: theme.colorScheme.onPrimary, size: 28),
-                ),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

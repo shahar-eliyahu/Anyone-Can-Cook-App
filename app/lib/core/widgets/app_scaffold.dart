@@ -236,7 +236,8 @@ class SectionTitle extends StatelessWidget {
                 child: Text(text, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
               ),
             ),
-            ?trailing,
+            // Shares the row with the title, so with large text neither squeezes the other to nothing.
+            if (trailing case final t?) Flexible(child: Align(alignment: AlignmentDirectional.centerEnd, child: t)),
           ],
         ),
       );

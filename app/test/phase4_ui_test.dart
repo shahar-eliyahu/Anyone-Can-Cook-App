@@ -158,6 +158,36 @@ void main() {
     expect(Directionality.of(tester.element(find.byType(BackButton))), TextDirection.rtl);
   });
 
+  for (final (width, height, textScale) in [(360.0, 640.0, 1.0), (360.0, 640.0, 2.0), (412.0, 915.0, 1.0)]) {
+    testApp('home "מתכון חדש" card: one arrow, no plus (${width.toInt()}×${height.toInt()}, ${textScale}x text)', (tester, h) async {
+      tester.view.physicalSize = Size(width * 3, height * 3);
+      tester.view.devicePixelRatio = 3;
+      tester.platformDispatcher.textScaleFactorTestValue = textScale;
+      addTearDown(tester.view.reset);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      await tester.pumpWidget(h.build());
+      await tester.pumpAndSettle();
+      final card = find.ancestor(of: find.text('מתכון חדש'), matching: find.byType(InkWell)).first;
+      expect(find.descendant(of: card, matching: find.byIcon(Icons.add_rounded)), findsNothing);
+      expect(find.descendant(of: card, matching: find.byType(Icon)), findsOneWidget);
+      expect(find.descendant(of: card, matching: find.byIcon(Icons.chevron_right_rounded)), findsOneWidget);
+      // RTL: the title starts on the right and the arrow sits at the far left.
+      final cardBox = tester.getRect(card);
+      expect(tester.getTopRight(find.text('מתכון חדש')).dx, greaterThan(cardBox.center.dx));
+      expect(tester.getCenter(find.descendant(of: card, matching: find.byType(Icon))).dx, lessThan(cardBox.center.dx));
+      expect(tester.takeException(), isNull); // no overflow
+      await tester.ensureVisible(card);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull); // the rest of home lays out too
+      // "לכל המתכונים" stays at the far (left) end of its section title.
+      final link = tester.getRect(find.text('לכל המתכונים'));
+      expect(link.left, lessThan(width * 0.3));
+      await tester.tap(card);
+      await tester.pumpAndSettle();
+      expect(find.text('מה בא לכם לבשל?'), findsOneWidget);
+    });
+  }
+
   testApp('the main action stays above the keyboard', (tester, h) async {
     phone(tester);
     await tester.pumpWidget(h.build(initialLocation: '/import'));
